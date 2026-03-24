@@ -1,10 +1,14 @@
 use anyhow::{Context, Result};
+use cargo_upstream_triage::cargo_toml::CrateDepInfo;
 use cargo_upstream_triage::cli::{AnalyzeArgs, Cli, Command, OutputFormat, ReportArgs};
-use cargo_upstream_triage::{graph, metrics, registry, report, scanner};
 use cargo_upstream_triage::report::AnalysisReport;
+use cargo_upstream_triage::{graph, metrics, registry, report, scanner};
 use clap::Parser;
 use rayon::prelude::*;
+use std::collections::HashMap;
 use std::io::Write;
+use std::path::PathBuf;
+use std::sync::Mutex;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -51,6 +55,11 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
         return Ok(());
     }
 
+    // Phase 2c: Parse Cargo.toml for each intermediate crate (for renames + optional info).
+    // Cache: crate source dir -> CrateDepInfo.
+    eprintln!("Parsing Cargo.toml files for dependency metadata...");
+    let cargo_toml_cache: Mutex<HashMap<String, CrateDepInfo>> = Mutex::new(HashMap::new());
+
     // Phase 3 & 4: Source retrieval + heuristic scanning (parallelized).
     eprintln!("Scanning intermediate crate sources...");
     let targets: Vec<metrics::UpstreamTarget> = edges
@@ -60,7 +69,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
             let src_dir =
                 registry::find_crate_source(&edge.intermediate_name, &edge.intermediate_version);
 
-            let src_dir = match src_dir {
+            let src_dir: PathBuf = match src_dir {
                 Some(d) => d,
                 None => {
                     // Workspace members — scan from metadata source path.
@@ -84,13 +93,56 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 }
             };
 
+            // Phase 3b: Parse Cargo.toml for rename/optional info.
+            let cache_key = format!("{}-{}", edge.intermediate_name, edge.intermediate_version);
+            let dep_info = {
+                let mut cache = cargo_toml_cache.lock().unwrap();
+                cache
+                    .entry(cache_key)
+                    .or_insert_with(|| {
+                        let manifest = src_dir.join("Cargo.toml");
+                        CrateDepInfo::from_manifest(&manifest)
+                    })
+                    .clone()
+            };
+
+            // Determine the local alias for the fat dependency.
+            let alias = dep_info.local_alias(&edge.fat_name);
+            let was_renamed = alias
+                .as_ref()
+                .is_some_and(|a| *a != edge.fat_name.replace('-', "_"));
+
+            let mut aliases: Vec<String> = Vec::new();
+            if let Some(ref a) = alias {
+                aliases.push(a.clone());
+            }
+
+            // Build enriched edge metadata.
+            let mut edge_meta = edge.edge_meta.clone();
+            if dep_info.is_optional(&edge.fat_name) {
+                edge_meta.already_optional = true;
+            }
+            if dep_info.is_platform_conditional(&edge.fat_name) {
+                edge_meta.platform_conditional = true;
+            }
+            if dep_info.is_build_dep(&edge.fat_name) {
+                edge_meta.build_only = true;
+            }
+
             // Phase 4: Scan.
             let rs_files = registry::collect_rs_files(&src_dir);
             if rs_files.is_empty() {
                 return None;
             }
 
-            let scan = scanner::scan_files(&rs_files, &edge.fat_name);
+            let scan = scanner::scan_files_with_aliases(&rs_files, &edge.fat_name, &aliases);
+
+            // Phase 4b: Compute unique subtree weight.
+            let w_unique =
+                dep_graph.unique_subtree_weight(&edge.intermediate_id, &edge.fat_id);
+
+            // Phase 4c: Compute dependency chain.
+            let dep_chain = dep_graph.dependency_chain(&edge.fat_id);
 
             // Phase 5: Compute metrics.
             Some(metrics::compute_target(
@@ -99,7 +151,11 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 &edge.fat_name,
                 &edge.fat_version,
                 edge.fat_transitive_weight,
+                w_unique,
                 scan,
+                edge_meta,
+                dep_chain,
+                was_renamed,
             ))
         })
         .collect();
