@@ -1,0 +1,3928 @@
+{
+  "tool_version": "0.1.0",
+  "timestamp": "2026-03-25T23:48:15.988539235+00:00",
+  "workspace_root": "/tmp/rust-projects/wild",
+  "threshold": 3.0,
+  "total_dependencies": 232,
+  "platform_dependencies": 161,
+  "phantom_dependencies": 71,
+  "fat_nodes_found": 49,
+  "targets": [
+    {
+      "intermediate": {
+        "name": "libwild",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "perfetto-recorder",
+        "version": "0.3.2"
+      },
+      "w_transitive": 57,
+      "w_unique": 10,
+      "c_ref": 7,
+      "hurrs": 8.142857142857142,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "perfetto-recorder",
+        "searched_names": [
+          "perfetto_recorder"
+        ],
+        "ref_count": 7,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/timing.rs",
+            "line_number": 21,
+            "line_content": "perfetto_recorder::start().map_err(",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/timing.rs",
+            "line_number": 22,
+            "line_content": "|_: perfetto_recorder::TracingDisabledAtBuildTime| {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/timing.rs",
+            "line_number": 35,
+            "line_content": "(tracing::info_span!($($args)*).entered(), perfetto_recorder::start_span!($($args)*))",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/timing.rs",
+            "line_number": 51,
+            "line_content": "perfetto_recorder::scope!($($args)*);",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/timing.rs",
+            "line_number": 288,
+            "line_content": "let mut trace = perfetto_recorder::TraceBuilder::new()?;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/timing.rs",
+            "line_number": 290,
+            "line_content": "trace.process_thread_data(&perfetto_recorder::ThreadTraceData::take_current_thread());",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/timing.rs",
+            "line_number": 298,
+            "line_content": ".process_thread_data(&perfetto_recorder::ThreadTraceData::take_current_thread());",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ThreadTraceData",
+          "TraceBuilder",
+          "TracingDisabledAtBuildTime",
+          "scope",
+          "start",
+          "start_span"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "perfetto-recorder"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 1242,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "linker-diff",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "tabled",
+        "version": "0.20.0"
+      },
+      "w_transitive": 14,
+      "w_unique": 7,
+      "c_ref": 3,
+      "hurrs": 4.666666666666667,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "tabled",
+        "searched_names": [
+          "tabled"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/linker-diff/src/header_diff.rs",
+            "line_number": 28,
+            "line_content": "use tabled::Table;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/linker-diff/src/header_diff.rs",
+            "line_number": 29,
+            "line_content": "use tabled::settings::Style;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/linker-diff/src/header_diff.rs",
+            "line_number": 30,
+            "line_content": "use tabled::settings::style::HorizontalLine;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Table",
+          "settings"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "linker-diff",
+        "tabled"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 35807,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "benchmark-runner",
+        "version": "0.1.0"
+      },
+      "fat_dependency": {
+        "name": "indicatif",
+        "version": "0.18.4"
+      },
+      "w_transitive": 23,
+      "w_unique": 6,
+      "c_ref": 2,
+      "hurrs": 11.5,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "indicatif",
+        "searched_names": [
+          "indicatif"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/benchmarks/runner/src/benchmarking.rs",
+            "line_number": 98,
+            "line_content": "let progress_bar = indicatif::ProgressBar::new(",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/benchmarks/runner/src/benchmarking.rs",
+            "line_number": 101,
+            "line_content": ".with_style(indicatif::ProgressStyle::with_template(",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ProgressBar",
+          "ProgressStyle"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "benchmark-runner",
+        "indicatif"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 7127,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "linker-diff",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "tempfile",
+        "version": "3.27.0"
+      },
+      "w_transitive": 50,
+      "w_unique": 5,
+      "c_ref": 1,
+      "hurrs": 50.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "tempfile",
+        "searched_names": [
+          "tempfile"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/linker-diff/src/utils.rs",
+            "line_number": 8,
+            "line_content": "use tempfile::NamedTempFile;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "NamedTempFile"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "linker-diff",
+        "tempfile"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 2322,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "benchmark-runner",
+        "version": "0.1.0"
+      },
+      "fat_dependency": {
+        "name": "toml",
+        "version": "1.0.7+spec-1.1.0"
+      },
+      "w_transitive": 19,
+      "w_unique": 5,
+      "c_ref": 1,
+      "hurrs": 19.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "toml",
+        "searched_names": [
+          "toml"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/benchmarks/runner/src/config.rs",
+            "line_number": 33,
+            "line_content": "toml::from_str(&contents)",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "from_str"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "benchmark-runner",
+        "toml"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 7226,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "libwild",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "blake3",
+        "version": "1.8.3"
+      },
+      "w_transitive": 54,
+      "w_unique": 5,
+      "c_ref": 3,
+      "hurrs": 18.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "blake3",
+        "searched_names": [
+          "blake3"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/elf_writer.rs",
+            "line_number": 219,
+            "line_content": "fn compute_hash(sized_output: &SizedOutput) -> blake3::Hash {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/elf_writer.rs",
+            "line_number": 221,
+            "line_content": "blake3::Hasher::new()",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/elf.rs",
+            "line_number": 1078,
+            "line_content": "BuildIdOption::Fast => Some(size_of::<blake3::Hash>()),",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Hash",
+          "Hasher"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "blake3"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 6902,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "libwild",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "zstd",
+        "version": "0.13.3"
+      },
+      "w_transitive": 49,
+      "w_unique": 4,
+      "c_ref": 1,
+      "hurrs": 49.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "zstd",
+        "searched_names": [
+          "zstd"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/elf.rs",
+            "line_number": 2871,
+            "line_content": "zstd::stream::Decoder::new(input)?.read_exact(out)?;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "stream"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "zstd"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 2213,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "perfetto-recorder",
+        "version": "0.3.2"
+      },
+      "fat_dependency": {
+        "name": "rand",
+        "version": "0.9.2"
+      },
+      "w_transitive": 47,
+      "w_unique": 4,
+      "c_ref": 3,
+      "hurrs": 15.666666666666666,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "rand",
+        "searched_names": [
+          "rand"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/perfetto-recorder-0.3.2/src/lib.rs",
+            "line_number": 10,
+            "line_content": "use rand::RngCore;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/perfetto-recorder-0.3.2/src/lib.rs",
+            "line_number": 11,
+            "line_content": "use rand::rngs::ThreadRng;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/perfetto-recorder-0.3.2/examples/rayon.rs",
+            "line_number": 42,
+            "line_content": "let sleep_ms = rand::random_range(2..10);",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "RngCore",
+          "random_range",
+          "rngs"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "perfetto-recorder",
+        "rand"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 6248,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rand",
+        "version": "0.9.2"
+      },
+      "fat_dependency": {
+        "name": "rand_chacha",
+        "version": "0.9.0"
+      },
+      "w_transitive": 46,
+      "w_unique": 2,
+      "c_ref": 2,
+      "hurrs": 23.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "rand_chacha",
+        "searched_names": [
+          "rand_chacha"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.9.2/src/rngs/std.rs",
+            "line_number": 14,
+            "line_content": "pub(crate) use rand_chacha::ChaCha12Core as Core;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.9.2/src/rngs/std.rs",
+            "line_number": 16,
+            "line_content": "use rand_chacha::ChaCha12Rng as Rng;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ChaCha12Core",
+          "ChaCha12Rng"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "std_rng"
+          ],
+          "recommended_defaults": [
+            "std",
+            "os_rng",
+            "small_rng",
+            "thread_rng"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "perfetto-recorder",
+        "rand",
+        "rand_chacha"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 738,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "symbolic-common",
+        "version": "12.17.2"
+      },
+      "fat_dependency": {
+        "name": "debugid",
+        "version": "0.8.0"
+      },
+      "w_transitive": 52,
+      "w_unique": 1,
+      "c_ref": 1,
+      "hurrs": 52.0,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "debugid",
+        "searched_names": [
+          "debugid"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/symbolic-common-12.17.2/src/lib.rs",
+            "line_number": 39,
+            "line_content": "pub use debugid::*;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": true
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "symbolic-common",
+        "debugid"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 689,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": true
+    },
+    {
+      "intermediate": {
+        "name": "wit-bindgen",
+        "version": "0.51.0"
+      },
+      "fat_dependency": {
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0"
+      },
+      "w_transitive": 35,
+      "w_unique": 17,
+      "c_ref": 1,
+      "hurrs": 35.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wit-bindgen-rust-macro",
+        "searched_names": [
+          "wit_bindgen_rust_macro"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-0.51.0/src/lib.rs",
+            "line_number": 868,
+            "line_content": "pub use wit_bindgen_rust_macro::generate;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "generate"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "macros"
+          ],
+          "recommended_defaults": [
+            "realloc",
+            "async",
+            "std",
+            "bitflags"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "linker-diff",
+        "tempfile",
+        "getrandom",
+        "wasip2",
+        "wit-bindgen",
+        "wit-bindgen-rust-macro"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 553,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0"
+      },
+      "fat_dependency": {
+        "name": "wit-bindgen-rust",
+        "version": "0.51.0"
+      },
+      "w_transitive": 34,
+      "w_unique": 5,
+      "c_ref": 3,
+      "hurrs": 11.333333333333334,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wit-bindgen-rust",
+        "searched_names": [
+          "wit_bindgen_rust"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 13,
+            "line_content": "use wit_bindgen_rust::{Opts, Ownership, WithOption};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 33,
+            "line_content": "if let Some(e) = err.downcast_ref::<wit_bindgen_rust::MissingWith>() {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 340,
+            "line_content": "impl From<ExportKey> for wit_bindgen_rust::ExportKey {",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ExportKey",
+          "MissingWith",
+          "Opts",
+          "Ownership",
+          "WithOption"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "linker-diff",
+        "tempfile",
+        "getrandom",
+        "wasip2",
+        "wit-bindgen",
+        "wit-bindgen-rust-macro",
+        "wit-bindgen-rust"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 5141,
+      "fat_dep_own_deps": 8,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "getrandom",
+        "version": "0.4.1"
+      },
+      "fat_dependency": {
+        "name": "wasip3",
+        "version": "0.4.0+wasi-0.3.0-rc-2026-01-06"
+      },
+      "w_transitive": 37,
+      "w_unique": 1,
+      "c_ref": 1,
+      "hurrs": 37.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wasip3",
+        "searched_names": [
+          "wasip3"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.4.1/src/backends/wasi_p2_3.rs",
+            "line_number": 12,
+            "line_content": "use wasip3 as wasi;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "linker-diff",
+        "tempfile",
+        "getrandom",
+        "wasip3"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 17495,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "wit-bindgen-rust",
+        "version": "0.51.0"
+      },
+      "fat_dependency": {
+        "name": "wit-component",
+        "version": "0.244.0"
+      },
+      "w_transitive": 30,
+      "w_unique": 1,
+      "c_ref": 2,
+      "hurrs": 15.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wit-component",
+        "searched_names": [
+          "wit_component"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-0.51.0/src/lib.rs",
+            "line_number": 929,
+            "line_content": "let component_type = wit_component::metadata::encode(",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-0.51.0/src/lib.rs",
+            "line_number": 932,
+            "line_content": "wit_component::StringEncoding::UTF8,",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "StringEncoding",
+          "metadata"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "linker-diff",
+        "tempfile",
+        "getrandom",
+        "wasip2",
+        "wit-bindgen",
+        "wit-bindgen-rust-macro",
+        "wit-bindgen-rust",
+        "wit-component"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 11183,
+      "fat_dep_own_deps": 11,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "linker-diff",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "symbolic-demangle",
+        "version": "12.17.2"
+      },
+      "w_transitive": 58,
+      "w_unique": 0,
+      "c_ref": 1,
+      "hurrs": 58.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "symbolic-demangle",
+        "searched_names": [
+          "symbolic_demangle"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/linker-diff/src/asm_diff.rs",
+            "line_number": 3579,
+            "line_content": "symbolic_demangle::demangle(&String::from_utf8_lossy(self.bytes))",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "demangle"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "linker-diff",
+        "symbolic-demangle"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 337,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "symbolic-demangle",
+        "version": "12.17.2"
+      },
+      "fat_dependency": {
+        "name": "symbolic-common",
+        "version": "12.17.2"
+      },
+      "w_transitive": 55,
+      "w_unique": 0,
+      "c_ref": 1,
+      "hurrs": 55.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "symbolic-common",
+        "searched_names": [
+          "symbolic_common"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/symbolic-demangle-12.17.2/src/lib.rs",
+            "line_number": 42,
+            "line_content": "use symbolic_common::{Language, Name, NameMangling};",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Language",
+          "Name",
+          "NameMangling"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "symbolic-common"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 1444,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "jobserver",
+        "version": "0.1.34"
+      },
+      "fat_dependency": {
+        "name": "getrandom",
+        "version": "0.3.4"
+      },
+      "w_transitive": 41,
+      "w_unique": 0,
+      "c_ref": 1,
+      "hurrs": 41.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "getrandom",
+        "searched_names": [
+          "getrandom"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jobserver-0.1.34/src/windows.rs",
+            "line_number": 81,
+            "line_content": "let bytes = getrandom::u32()?;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "u32"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "libwild",
+        "jobserver",
+        "getrandom"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 2022,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "blake3",
+        "version": "1.8.3"
+      },
+      "fat_dependency": {
+        "name": "cc",
+        "version": "1.2.56"
+      },
+      "w_transitive": 45,
+      "w_unique": 0,
+      "c_ref": 2,
+      "hurrs": 22.5,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "cc",
+        "searched_names": [
+          "cc"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/build.rs",
+            "line_number": 140,
+            "line_content": "fn new_build() -> cc::Build {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/blake3-1.8.3/build.rs",
+            "line_number": 141,
+            "line_content": "let mut build = cc::Build::new();",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Build"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": true,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "blake3",
+        "cc"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 5770,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "debugid",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "uuid",
+        "version": "1.22.0"
+      },
+      "w_transitive": 51,
+      "w_unique": 0,
+      "c_ref": 3,
+      "hurrs": 17.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "uuid",
+        "searched_names": [
+          "uuid"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/debugid-0.8.0/src/lib.rs",
+            "line_number": 22,
+            "line_content": "use uuid::{Bytes, Uuid};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/debugid-0.8.0/tests/test_debugid.rs",
+            "line_number": 5,
+            "line_content": "use uuid::Uuid;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/debugid-0.8.0/tests/test_serde.rs",
+            "line_number": 4,
+            "line_content": "use uuid::Uuid;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 3,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Bytes",
+          "Uuid"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "uuid"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 4607,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "libwild",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "symbolic-demangle",
+        "version": "12.17.2"
+      },
+      "w_transitive": 58,
+      "w_unique": 0,
+      "c_ref": 4,
+      "hurrs": 14.5,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "symbolic-demangle",
+        "searched_names": [
+          "symbolic_demangle"
+        ],
+        "ref_count": 4,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/symbol_db.rs",
+            "line_number": 68,
+            "line_content": "use symbolic_demangle::demangle;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/symbol_db.rs",
+            "line_number": 2133,
+            "line_content": "Display::fmt(&symbolic_demangle::demangle(s), f)",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/version_script.rs",
+            "line_number": 23,
+            "line_content": "use symbolic_demangle::Demangle;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/libwild/src/version_script.rs",
+            "line_number": 24,
+            "line_content": "use symbolic_demangle::DemangleOptions;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Demangle",
+          "DemangleOptions",
+          "demangle"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "linker-diff",
+        "symbolic-demangle"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 337,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "benchmark-runner",
+        "version": "0.1.0"
+      },
+      "fat_dependency": {
+        "name": "postcard",
+        "version": "1.1.3"
+      },
+      "w_transitive": 24,
+      "w_unique": 0,
+      "c_ref": 2,
+      "hurrs": 12.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "postcard",
+        "searched_names": [
+          "postcard"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/benchmarks/runner/src/reporting.rs",
+            "line_number": 26,
+            "line_content": "let results: Benchmarks = postcard::from_bytes(&bytes)",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/benchmarks/runner/src/benchmarking.rs",
+            "line_number": 55,
+            "line_content": "std::fs::write(&output_path, postcard::to_stdvec(&results)?)",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "from_bytes",
+          "to_stdvec"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "benchmark-runner",
+        "postcard"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 4052,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "linker-utils",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "derive_more",
+        "version": "2.1.1"
+      },
+      "w_transitive": 11,
+      "w_unique": 0,
+      "c_ref": 1,
+      "hurrs": 11.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "derive_more",
+        "searched_names": [
+          "derive_more"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/linker-utils/src/elf.rs",
+            "line_number": 42,
+            "line_content": "#[derive(Clone, Copy, derive_more::Debug, PartialEq, Eq, PartialOrd, Ord, Default)]",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Debug"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "derive_more"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 21606,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "cc",
+        "version": "1.2.56"
+      },
+      "fat_dependency": {
+        "name": "jobserver",
+        "version": "0.1.34"
+      },
+      "w_transitive": 42,
+      "w_unique": 0,
+      "c_ref": 4,
+      "hurrs": 10.5,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "jobserver",
+        "searched_names": [
+          "jobserver"
+        ],
+        "ref_count": 4,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cc-1.2.56/src/parallel/job_token.rs",
+            "line_number": 101,
+            "line_content": "inner: jobserver::Client,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cc-1.2.56/src/parallel/job_token.rs",
+            "line_number": 106,
+            "line_content": "jobserver::Client::from_env().map(|inner| Self {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cc-1.2.56/src/parallel/job_token.rs",
+            "line_number": 144,
+            "line_content": "inner: jobserver::HelperThread,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cc-1.2.56/src/parallel/job_token.rs",
+            "line_number": 146,
+            "line_content": "rx: mpsc::Receiver<io::Result<jobserver::Acquired>>,",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Acquired",
+          "Client",
+          "HelperThread"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "parallel"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "libwild",
+        "jobserver"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 1629,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "linker-trace",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "postcard",
+        "version": "1.1.3"
+      },
+      "w_transitive": 24,
+      "w_unique": 0,
+      "c_ref": 3,
+      "hurrs": 8.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "postcard",
+        "searched_names": [
+          "postcard"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/linker-trace/src/lib.rs",
+            "line_number": 31,
+            "line_content": "let r = postcard::to_io(self, writer);",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/linker-trace/src/lib.rs",
+            "line_number": 38,
+            "line_content": "Ok(postcard::to_stdvec(self)?)",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/linker-trace/src/lib.rs",
+            "line_number": 42,
+            "line_content": "postcard::from_bytes(bytes).context(\"Invalid linker trace\")",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "from_bytes",
+          "to_io",
+          "to_stdvec"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "benchmark-runner",
+        "postcard"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 4052,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "linker-layout",
+        "version": "0.8.0"
+      },
+      "fat_dependency": {
+        "name": "postcard",
+        "version": "1.1.3"
+      },
+      "w_transitive": 24,
+      "w_unique": 0,
+      "c_ref": 3,
+      "hurrs": 8.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "postcard",
+        "searched_names": [
+          "postcard"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/wild/linker-layout/src/lib.rs",
+            "line_number": 52,
+            "line_content": "postcard::to_io(self, writer)?;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/linker-layout/src/lib.rs",
+            "line_number": 57,
+            "line_content": "Ok(postcard::to_stdvec(self)?)",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/wild/linker-layout/src/lib.rs",
+            "line_number": 61,
+            "line_content": "postcard::from_bytes(bytes).context(\"Invalid linker layout\")",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "from_bytes",
+          "to_io",
+          "to_stdvec"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "benchmark-runner",
+        "postcard"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 4052,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    }
+  ],
+  "dep_tree": {
+    "nodes": [
+      {
+        "name": "block2",
+        "version": "0.6.2",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          17
+        ]
+      },
+      {
+        "name": "objc2-encode",
+        "version": "4.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wait-timeout",
+        "version": "0.2.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          236
+        ]
+      },
+      {
+        "name": "perf-event",
+        "version": "0.4.8",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          70,
+          236
+        ]
+      },
+      {
+        "name": "bumpalo",
+        "version": "3.20.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasip2",
+        "version": "1.0.2+wasi-0.2.9",
+        "transitive_weight": 37,
+        "is_workspace": false,
+        "children": [
+          216
+        ]
+      },
+      {
+        "name": "uuid",
+        "version": "1.22.0",
+        "transitive_weight": 51,
+        "is_workspace": false,
+        "children": [
+          93,
+          112,
+          190
+        ]
+      },
+      {
+        "name": "toml_writer",
+        "version": "1.0.7+spec-1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winapi-i686-pc-windows-gnu",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-link",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "syn",
+        "version": "2.0.117",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          94,
+          223,
+          101
+        ]
+      },
+      {
+        "name": "colosseum",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "pkg-config",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "minimal-lexical",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tabled",
+        "version": "0.20.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          150,
+          98,
+          99
+        ]
+      },
+      {
+        "name": "wit-bindgen-core",
+        "version": "0.51.0",
+        "transitive_weight": 28,
+        "is_workspace": false,
+        "children": [
+          224,
+          194,
+          203
+        ]
+      },
+      {
+        "name": "utf8parse",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "objc2",
+        "version": "0.6.3",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          1
+        ]
+      },
+      {
+        "name": "rayon",
+        "version": "1.11.0",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          166,
+          28
+        ]
+      },
+      {
+        "name": "critical-section",
+        "version": "1.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "thread_local",
+        "version": "1.1.9",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          80
+        ]
+      },
+      {
+        "name": "wasmparser",
+        "version": "0.244.0",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          218,
+          33,
+          100,
+          66
+        ]
+      },
+      {
+        "name": "bytesize",
+        "version": "2.3.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "objc2-user-notifications",
+        "version": "0.3.2",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          110,
+          17
+        ]
+      },
+      {
+        "name": "colored",
+        "version": "3.1.1",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          156
+        ]
+      },
+      {
+        "name": "derive_more-impl",
+        "version": "2.1.1",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          43,
+          223,
+          176,
+          120
+        ]
+      },
+      {
+        "name": "wit-component",
+        "version": "0.244.0",
+        "transitive_weight": 30,
+        "is_workspace": false,
+        "children": [
+          224,
+          232,
+          215,
+          21,
+          218,
+          219,
+          119,
+          229,
+          194,
+          100,
+          132
+        ]
+      },
+      {
+        "name": "tempfile",
+        "version": "3.27.0",
+        "transitive_weight": 50,
+        "is_workspace": false,
+        "children": [
+          93,
+          48,
+          156,
+          207,
+          147
+        ]
+      },
+      {
+        "name": "either",
+        "version": "1.15.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "blake3",
+        "version": "1.8.3",
+        "transitive_weight": 54,
+        "is_workspace": false,
+        "children": [
+          146,
+          166,
+          173,
+          197,
+          202,
+          80,
+          214
+        ]
+      },
+      {
+        "name": "jobserver",
+        "version": "0.1.34",
+        "transitive_weight": 42,
+        "is_workspace": false,
+        "children": [
+          50,
+          236
+        ]
+      },
+      {
+        "name": "bumpalo-herd",
+        "version": "0.1.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          4
+        ]
+      },
+      {
+        "name": "serde-keyvalue",
+        "version": "0.1.0",
+        "transitive_weight": 16,
+        "is_workspace": false,
+        "children": [
+          119,
+          115,
+          41,
+          151,
+          136
+        ]
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.15.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          217
+        ]
+      },
+      {
+        "name": "heapless",
+        "version": "0.7.17",
+        "transitive_weight": 18,
+        "is_workspace": false,
+        "children": [
+          119,
+          52,
+          141,
+          68,
+          176,
+          144
+        ]
+      },
+      {
+        "name": "objc2-core-graphics",
+        "version": "0.3.2",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          165,
+          220,
+          153,
+          17,
+          100
+        ]
+      },
+      {
+        "name": "zerocopy",
+        "version": "0.8.47",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          175
+        ]
+      },
+      {
+        "name": "iced-x86",
+        "version": "1.21.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          139
+        ]
+      },
+      {
+        "name": "itoa",
+        "version": "1.0.17",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "sharded-offset-map",
+        "version": "0.2.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          109
+        ]
+      },
+      {
+        "name": "sharded-slab",
+        "version": "0.1.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          139
+        ]
+      },
+      {
+        "name": "remain",
+        "version": "0.2.15",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223
+        ]
+      },
+      {
+        "name": "leb128fmt",
+        "version": "0.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "convert_case",
+        "version": "0.10.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          122
+        ]
+      },
+      {
+        "name": "libtest-mimic",
+        "version": "0.8.2",
+        "transitive_weight": 25,
+        "is_workspace": false,
+        "children": [
+          78,
+          221,
+          126,
+          91
+        ]
+      },
+      {
+        "name": "toml",
+        "version": "1.0.7+spec-1.1.0",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          218,
+          62,
+          149,
+          168,
+          143,
+          89,
+          7
+        ]
+      },
+      {
+        "name": "crossbeam-utils",
+        "version": "0.8.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasip3",
+        "version": "0.4.0+wasi-0.3.0-rc-2026-01-06",
+        "transitive_weight": 37,
+        "is_workspace": false,
+        "children": [
+          216
+        ]
+      },
+      {
+        "name": "rustix",
+        "version": "1.1.4",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          60,
+          156,
+          100,
+          236,
+          108
+        ]
+      },
+      {
+        "name": "libloading",
+        "version": "0.9.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          80,
+          9
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.3.4",
+        "transitive_weight": 41,
+        "is_workspace": false,
+        "children": [
+          5,
+          80,
+          236,
+          179
+        ]
+      },
+      {
+        "name": "memmap2",
+        "version": "0.9.10",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          236
+        ]
+      },
+      {
+        "name": "spin",
+        "version": "0.9.8",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          102
+        ]
+      },
+      {
+        "name": "wasm-bindgen-shared",
+        "version": "0.2.108",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          101
+        ]
+      },
+      {
+        "name": "tracing-core",
+        "version": "0.1.36",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          147
+        ]
+      },
+      {
+        "name": "object",
+        "version": "0.38.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          160
+        ]
+      },
+      {
+        "name": "git-version-macro",
+        "version": "0.3.9",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223
+        ]
+      },
+      {
+        "name": "cfg_aliases",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "strsim",
+        "version": "0.11.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "benchmark-runner",
+        "version": "0.1.0",
+        "transitive_weight": 76,
+        "is_workspace": true,
+        "children": [
+          125,
+          185,
+          78,
+          45,
+          119,
+          198,
+          194
+        ]
+      },
+      {
+        "name": "errno",
+        "version": "0.3.14",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          156,
+          236
+        ]
+      },
+      {
+        "name": "tracing-attributes",
+        "version": "0.1.31",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223
+        ]
+      },
+      {
+        "name": "serde_spanned",
+        "version": "1.0.4",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          168
+        ]
+      },
+      {
+        "name": "nix",
+        "version": "0.30.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          100,
+          80,
+          57,
+          236
+        ]
+      },
+      {
+        "name": "symbolic-demangle",
+        "version": "12.17.2",
+        "transitive_weight": 58,
+        "is_workspace": false,
+        "children": [
+          199,
+          233,
+          204
+        ]
+      },
+      {
+        "name": "wasm-bindgen-macro-support",
+        "version": "0.2.108",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223,
+          53,
+          4
+        ]
+      },
+      {
+        "name": "semver",
+        "version": "1.0.27",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          76,
+          15,
+          127,
+          10,
+          94,
+          223,
+          194
+        ]
+      },
+      {
+        "name": "hash32",
+        "version": "0.2.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          87
+        ]
+      },
+      {
+        "name": "anstyle-parse",
+        "version": "1.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          16
+        ]
+      },
+      {
+        "name": "perf-event-open-sys",
+        "version": "4.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          236
+        ]
+      },
+      {
+        "name": "zstd-safe",
+        "version": "7.2.4",
+        "transitive_weight": 48,
+        "is_workspace": false,
+        "children": [
+          157
+        ]
+      },
+      {
+        "name": "embedded-io",
+        "version": "0.6.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "adler2",
+        "version": "2.0.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "glob",
+        "version": "0.3.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winapi",
+        "version": "0.3.9",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          8,
+          85
+        ]
+      },
+      {
+        "name": "wit-bindgen-rust",
+        "version": "0.51.0",
+        "transitive_weight": 34,
+        "is_workspace": false,
+        "children": [
+          26,
+          15,
+          232,
+          218,
+          127,
+          10,
+          194,
+          203
+        ]
+      },
+      {
+        "name": "crossbeam-epoch",
+        "version": "0.9.18",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          46
+        ]
+      },
+      {
+        "name": "clap",
+        "version": "4.5.60",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          159,
+          172
+        ]
+      },
+      {
+        "name": "objc2-core-text",
+        "version": "0.3.2",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          35,
+          220,
+          17,
+          100
+        ]
+      },
+      {
+        "name": "cfg-if",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "equivalent",
+        "version": "1.0.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "console",
+        "version": "0.16.2",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          156,
+          124,
+          236,
+          147,
+          171
+        ]
+      },
+      {
+        "name": "thiserror-impl",
+        "version": "1.0.69",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223
+        ]
+      },
+      {
+        "name": "shlex",
+        "version": "1.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winapi-x86_64-pc-windows-gnu",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unit-prefix",
+        "version": "0.5.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "byteorder",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "pin-project-lite",
+        "version": "0.2.16",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winnow",
+        "version": "1.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          160
+        ]
+      },
+      {
+        "name": "zlib-rs",
+        "version": "0.6.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "escape8259",
+        "version": "0.5.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "allocator-api2",
+        "version": "0.2.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "getrandom",
+        "version": "0.4.1",
+        "transitive_weight": 42,
+        "is_workspace": false,
+        "children": [
+          5,
+          47,
+          80,
+          236,
+          179
+        ]
+      },
+      {
+        "name": "quote",
+        "version": "1.0.44",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          223
+        ]
+      },
+      {
+        "name": "smallvec",
+        "version": "1.15.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "leb128",
+        "version": "0.2.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "git-version",
+        "version": "0.3.9",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          56
+        ]
+      },
+      {
+        "name": "papergrid",
+        "version": "0.17.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          182,
+          142,
+          171
+        ]
+      },
+      {
+        "name": "testing_table",
+        "version": "0.3.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          171
+        ]
+      },
+      {
+        "name": "bitflags",
+        "version": "2.11.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-ident",
+        "version": "1.0.24",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "lock_api",
+        "version": "0.4.14",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          230
+        ]
+      },
+      {
+        "name": "sharded-vec-writer",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rand_chacha",
+        "version": "0.9.0",
+        "transitive_weight": 46,
+        "is_workspace": false,
+        "children": [
+          131,
+          155
+        ]
+      },
+      {
+        "name": "objc2-core-data",
+        "version": "0.3.2",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          110,
+          17
+        ]
+      },
+      {
+        "name": "once_cell_polyfill",
+        "version": "1.70.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "aho-corasick",
+        "version": "1.1.4",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          160
+        ]
+      },
+      {
+        "name": "linux-raw-sys",
+        "version": "0.12.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "sharded-vec-writer",
+        "version": "0.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "objc2-foundation",
+        "version": "0.3.2",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          220,
+          0,
+          17,
+          100,
+          236
+        ]
+      },
+      {
+        "name": "bytes",
+        "version": "1.11.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "js-sys",
+        "version": "0.3.85",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          190,
+          147
+        ]
+      },
+      {
+        "name": "objc2-core-image",
+        "version": "0.3.2",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          110,
+          17
+        ]
+      },
+      {
+        "name": "cobs",
+        "version": "0.3.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          212
+        ]
+      },
+      {
+        "name": "thiserror",
+        "version": "1.0.69",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          83
+        ]
+      },
+      {
+        "name": "proc-macro-error-attr2",
+        "version": "2.0.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          94,
+          223
+        ]
+      },
+      {
+        "name": "crossbeam-deque",
+        "version": "0.8.6",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          77,
+          46
+        ]
+      },
+      {
+        "name": "crossbeam-queue",
+        "version": "0.3.12",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          46
+        ]
+      },
+      {
+        "name": "serde",
+        "version": "1.0.228",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          168,
+          229
+        ]
+      },
+      {
+        "name": "unicode-xid",
+        "version": "0.2.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "derive_more",
+        "version": "2.1.1",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          25
+        ]
+      },
+      {
+        "name": "unicode-segmentation",
+        "version": "1.12.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "linker-utils",
+        "version": "0.8.0",
+        "transitive_weight": 17,
+        "is_workspace": true,
+        "children": [
+          121,
+          55,
+          194,
+          96,
+          152
+        ]
+      },
+      {
+        "name": "encode_unicode",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "postcard",
+        "version": "1.1.3",
+        "transitive_weight": 24,
+        "is_workspace": false,
+        "children": [
+          34,
+          114,
+          119,
+          174,
+          72
+        ]
+      },
+      {
+        "name": "anstyle",
+        "version": "1.0.13",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "prettyplease",
+        "version": "0.2.37",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          10,
+          223
+        ]
+      },
+      {
+        "name": "perfetto-recorder",
+        "version": "0.3.2",
+        "transitive_weight": 57,
+        "is_workspace": false,
+        "children": [
+          211,
+          237,
+          63,
+          156,
+          236
+        ]
+      },
+      {
+        "name": "zmij",
+        "version": "1.0.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "proc-macro-error2",
+        "version": "2.0.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          116,
+          10,
+          94,
+          223
+        ]
+      },
+      {
+        "name": "rand_core",
+        "version": "0.9.5",
+        "transitive_weight": 42,
+        "is_workspace": false,
+        "children": [
+          50
+        ]
+      },
+      {
+        "name": "log",
+        "version": "0.4.29",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "regex",
+        "version": "1.12.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          186,
+          107,
+          160,
+          227
+        ]
+      },
+      {
+        "name": "linker-layout",
+        "version": "0.8.0",
+        "transitive_weight": 26,
+        "is_workspace": true,
+        "children": [
+          125,
+          119,
+          194
+        ]
+      },
+      {
+        "name": "prost-derive",
+        "version": "0.14.3",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          183,
+          223,
+          194
+        ]
+      },
+      {
+        "name": "num-traits",
+        "version": "0.2.19",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          138
+        ]
+      },
+      {
+        "name": "atomic-take",
+        "version": "1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "autocfg",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "lazy_static",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "matchers",
+        "version": "0.2.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          186
+        ]
+      },
+      {
+        "name": "atomic-polyfill",
+        "version": "1.0.3",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          19
+        ]
+      },
+      {
+        "name": "fnv",
+        "version": "1.0.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "toml_parser",
+        "version": "1.0.10+spec-1.1.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          89
+        ]
+      },
+      {
+        "name": "stable_deref_trait",
+        "version": "1.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap_lex",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "cc",
+        "version": "1.2.56",
+        "transitive_weight": 45,
+        "is_workspace": false,
+        "children": [
+          30,
+          187,
+          236,
+          84
+        ]
+      },
+      {
+        "name": "once_cell",
+        "version": "1.21.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rustversion",
+        "version": "1.0.22",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "toml_datetime",
+        "version": "1.0.1+spec-1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          168
+        ]
+      },
+      {
+        "name": "tabled_derive",
+        "version": "0.11.0",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          130,
+          10,
+          94,
+          223,
+          203
+        ]
+      },
+      {
+        "name": "nom",
+        "version": "7.1.3",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          160,
+          13
+        ]
+      },
+      {
+        "name": "paste",
+        "version": "1.0.15",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "dispatch2",
+        "version": "0.3.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          17,
+          100
+        ]
+      },
+      {
+        "name": "web-time",
+        "version": "1.1.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          112,
+          190
+        ]
+      },
+      {
+        "name": "ppv-lite86",
+        "version": "0.2.21",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          36
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.61.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          9
+        ]
+      },
+      {
+        "name": "zstd-sys",
+        "version": "2.0.16+zstd.1.5.7",
+        "transitive_weight": 47,
+        "is_workspace": false,
+        "children": [
+          146,
+          12
+        ]
+      },
+      {
+        "name": "anstyle-query",
+        "version": "1.1.5",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          156
+        ]
+      },
+      {
+        "name": "clap_builder",
+        "version": "4.5.60",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          195,
+          126,
+          145,
+          58
+        ]
+      },
+      {
+        "name": "memchr",
+        "version": "2.8.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "objc2-cloud-kit",
+        "version": "0.3.2",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          110,
+          17,
+          100
+        ]
+      },
+      {
+        "name": "thiserror-impl",
+        "version": "2.0.18",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223
+        ]
+      },
+      {
+        "name": "tracing-subscriber",
+        "version": "0.3.23",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          238,
+          140,
+          186,
+          40,
+          20,
+          54,
+          147
+        ]
+      },
+      {
+        "name": "anstyle-wincon",
+        "version": "3.0.11",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          156,
+          126,
+          106
+        ]
+      },
+      {
+        "name": "objc2-io-surface",
+        "version": "0.3.2",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          220,
+          17,
+          100
+        ]
+      },
+      {
+        "name": "rayon-core",
+        "version": "1.13.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          117,
+          46
+        ]
+      },
+      {
+        "name": "gimli",
+        "version": "0.33.0",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          218,
+          213,
+          142,
+          144
+        ]
+      },
+      {
+        "name": "serde_core",
+        "version": "1.0.228",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          229
+        ]
+      },
+      {
+        "name": "foldhash",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "anstyle-parse",
+        "version": "0.2.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          16
+        ]
+      },
+      {
+        "name": "unicode-width",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap_derive",
+        "version": "4.5.55",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223,
+          203
+        ]
+      },
+      {
+        "name": "cpufeatures",
+        "version": "0.2.17",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          236
+        ]
+      },
+      {
+        "name": "embedded-io",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerocopy-derive",
+        "version": "0.8.47",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223
+        ]
+      },
+      {
+        "name": "rustc_version",
+        "version": "0.4.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          66
+        ]
+      },
+      {
+        "name": "objc2-quartz-core",
+        "version": "0.3.2",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          110,
+          220,
+          17,
+          100
+        ]
+      },
+      {
+        "name": "objc2-ui-kit",
+        "version": "0.3.2",
+        "transitive_weight": 18,
+        "is_workspace": false,
+        "children": [
+          161,
+          105,
+          113,
+          235,
+          177,
+          23,
+          79,
+          110,
+          35,
+          220,
+          0,
+          17,
+          100
+        ]
+      },
+      {
+        "name": "r-efi",
+        "version": "5.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "is_terminal_polyfill",
+        "version": "1.70.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "crc32fast",
+        "version": "1.5.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          80
+        ]
+      },
+      {
+        "name": "bytecount",
+        "version": "0.6.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "itertools",
+        "version": "0.14.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          28
+        ]
+      },
+      {
+        "name": "miniz_oxide",
+        "version": "0.8.9",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          73,
+          222
+        ]
+      },
+      {
+        "name": "indicatif",
+        "version": "0.18.4",
+        "transitive_weight": 23,
+        "is_workspace": false,
+        "children": [
+          154,
+          82,
+          192,
+          171,
+          86
+        ]
+      },
+      {
+        "name": "regex-automata",
+        "version": "0.4.14",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          107,
+          160,
+          227
+        ]
+      },
+      {
+        "name": "find-msvc-tools",
+        "version": "0.1.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "which",
+        "version": "8.0.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          236
+        ]
+      },
+      {
+        "name": "libwild",
+        "version": "0.8.0",
+        "transitive_weight": 156,
+        "is_workspace": true,
+        "children": [
+          64,
+          128,
+          199,
+          29,
+          6,
+          200,
+          30,
+          134,
+          208,
+          163,
+          123,
+          167,
+          218,
+          121,
+          238,
+          205,
+          97,
+          18,
+          36,
+          213,
+          24,
+          3,
+          31,
+          118,
+          183,
+          51,
+          55,
+          39,
+          20,
+          89,
+          194,
+          137,
+          100,
+          22,
+          11,
+          46,
+          169,
+          74,
+          196,
+          96,
+          236,
+          160,
+          103,
+          95
+        ]
+      },
+      {
+        "name": "wasm-bindgen",
+        "version": "0.2.108",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          231,
+          53,
+          80,
+          147,
+          148
+        ]
+      },
+      {
+        "name": "linker-diff",
+        "version": "0.8.0",
+        "transitive_weight": 134,
+        "is_workspace": true,
+        "children": [
+          64,
+          27,
+          134,
+          208,
+          78,
+          163,
+          123,
+          167,
+          14,
+          238,
+          36,
+          213,
+          24,
+          37,
+          183,
+          51,
+          55,
+          188,
+          194,
+          160
+        ]
+      },
+      {
+        "name": "portable-atomic",
+        "version": "1.13.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "debugid",
+        "version": "0.8.0",
+        "transitive_weight": 52,
+        "is_workspace": false,
+        "children": [
+          6
+        ]
+      },
+      {
+        "name": "anyhow",
+        "version": "1.0.102",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "anstream",
+        "version": "0.6.21",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          164,
+          158,
+          170,
+          126,
+          210,
+          180,
+          16
+        ]
+      },
+      {
+        "name": "hex",
+        "version": "0.4.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "arrayref",
+        "version": "0.3.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wait4",
+        "version": "0.1.3",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          75,
+          80,
+          236
+        ]
+      },
+      {
+        "name": "symbolic-common",
+        "version": "12.17.2",
+        "transitive_weight": 55,
+        "is_workspace": false,
+        "children": [
+          193,
+          6,
+          51,
+          144
+        ]
+      },
+      {
+        "name": "zstd",
+        "version": "0.13.3",
+        "transitive_weight": 49,
+        "is_workspace": false,
+        "children": [
+          71
+        ]
+      },
+      {
+        "name": "wild-linker",
+        "version": "0.8.0",
+        "transitive_weight": 157,
+        "is_workspace": true,
+        "children": [
+          189
+        ]
+      },
+      {
+        "name": "arrayvec",
+        "version": "0.7.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "heck",
+        "version": "0.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rustc-demangle",
+        "version": "0.1.27",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "flate2",
+        "version": "1.1.9",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          184,
+          181,
+          90
+        ]
+      },
+      {
+        "name": "strum_macros",
+        "version": "0.28.0",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223,
+          203
+        ]
+      },
+      {
+        "name": "fastrand",
+        "version": "2.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "linker-trace",
+        "version": "0.8.0",
+        "transitive_weight": 26,
+        "is_workspace": true,
+        "children": [
+          125,
+          119,
+          194
+        ]
+      },
+      {
+        "name": "strum",
+        "version": "0.28.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          206
+        ]
+      },
+      {
+        "name": "colorchoice",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rand",
+        "version": "0.9.2",
+        "transitive_weight": 47,
+        "is_workspace": false,
+        "children": [
+          104,
+          131
+        ]
+      },
+      {
+        "name": "thiserror",
+        "version": "2.0.18",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          162
+        ]
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.16.1",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          92,
+          81,
+          169
+        ]
+      },
+      {
+        "name": "constant_time_eq",
+        "version": "0.4.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-encoder",
+        "version": "0.244.0",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          21,
+          42
+        ]
+      },
+      {
+        "name": "wit-bindgen",
+        "version": "0.51.0",
+        "transitive_weight": 36,
+        "is_workspace": false,
+        "children": [
+          67
+        ]
+      },
+      {
+        "name": "foldhash",
+        "version": "0.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "indexmap",
+        "version": "2.13.0",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          119,
+          168,
+          213,
+          81
+        ]
+      },
+      {
+        "name": "serde_json",
+        "version": "1.0.149",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          119,
+          168,
+          38,
+          160,
+          129
+        ]
+      },
+      {
+        "name": "objc2-core-foundation",
+        "version": "0.3.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          153,
+          17,
+          100
+        ]
+      },
+      {
+        "name": "anstream",
+        "version": "1.0.0",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          164,
+          158,
+          69,
+          126,
+          210,
+          180,
+          16
+        ]
+      },
+      {
+        "name": "simd-adler32",
+        "version": "0.3.8",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "proc-macro2",
+        "version": "1.0.106",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          101
+        ]
+      },
+      {
+        "name": "wit-parser",
+        "version": "0.244.0",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          21,
+          218,
+          219,
+          119,
+          229,
+          194,
+          228,
+          132,
+          66,
+          120
+        ]
+      },
+      {
+        "name": "android_system_properties",
+        "version": "0.1.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          236
+        ]
+      },
+      {
+        "name": "ar",
+        "version": "0.9.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "regex-syntax",
+        "version": "0.8.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "id-arena",
+        "version": "2.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_derive",
+        "version": "1.0.228",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          10,
+          94,
+          223
+        ]
+      },
+      {
+        "name": "scopeguard",
+        "version": "1.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-macro",
+        "version": "0.2.108",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          65,
+          94
+        ]
+      },
+      {
+        "name": "wasm-metadata",
+        "version": "0.244.0",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          215,
+          21,
+          218,
+          194
+        ]
+      },
+      {
+        "name": "cpp_demangle",
+        "version": "0.5.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          80
+        ]
+      },
+      {
+        "name": "os_info",
+        "version": "3.14.0",
+        "transitive_weight": 33,
+        "is_workspace": false,
+        "children": [
+          178,
+          110,
+          119,
+          63,
+          225,
+          17,
+          156,
+          132
+        ]
+      },
+      {
+        "name": "objc2-core-location",
+        "version": "0.3.2",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          110,
+          17
+        ]
+      },
+      {
+        "name": "libc",
+        "version": "0.2.183",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "prost",
+        "version": "0.14.3",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          135,
+          111
+        ]
+      },
+      {
+        "name": "tracing",
+        "version": "0.1.44",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          61,
+          54,
+          88
+        ]
+      }
+    ],
+    "root_indices": [
+      201,
+      189,
+      191,
+      59,
+      208,
+      134,
+      123
+    ]
+  }
+}

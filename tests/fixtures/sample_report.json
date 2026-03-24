@@ -1,0 +1,793 @@
+{
+  "tool_version": "0.1.0-sample",
+  "timestamp": "epoch:1700000000",
+  "workspace_root": "/sample/workspace",
+  "threshold": 3.0,
+  "total_dependencies": 42,
+  "platform_dependencies": 38,
+  "phantom_dependencies": 4,
+  "heavy_nodes_found": 6,
+  "targets": [
+    {
+      "intermediate": {
+        "name": "my-app",
+        "version": "0.1.0"
+      },
+      "heavy_dependency": {
+        "name": "unused-dep",
+        "version": "0.3.0"
+      },
+      "w_transitive": 12,
+      "w_unique": 5,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "High",
+      "scan_result": {
+        "heavy_crate_name": "unused-dep",
+        "searched_names": [
+          "unused_dep"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "test_only_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "my-app",
+        "unused-dep"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "is_standalone_integration": false,
+      "heavy_dep_loc": 800,
+      "heavy_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "my-app",
+        "version": "0.1.0"
+      },
+      "heavy_dependency": {
+        "name": "heavy-framework",
+        "version": "2.0.0"
+      },
+      "w_transitive": 25,
+      "w_unique": 18,
+      "c_ref": 3,
+      "hurrs": 8.3,
+      "confidence": "High",
+      "scan_result": {
+        "heavy_crate_name": "heavy-framework",
+        "searched_names": [
+          "heavy_framework"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/sample/workspace/src/main.rs",
+            "line_number": 10,
+            "line_content": "use heavy_framework::App;",
+            "in_generated_file": false,
+            "in_test_code": false
+          },
+          {
+            "path": "/sample/workspace/src/main.rs",
+            "line_number": 42,
+            "line_content": "heavy_framework::init();",
+            "in_generated_file": false,
+            "in_test_code": false
+          },
+          {
+            "path": "/sample/workspace/src/lib.rs",
+            "line_number": 5,
+            "line_content": "use heavy_framework::Config;",
+            "in_generated_file": false,
+            "in_test_code": false
+          }
+        ],
+        "files_with_matches": 3,
+        "generated_file_refs": 0,
+        "test_only_refs": 0,
+        "distinct_items": [
+          "App",
+          "init()",
+          "Config"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "my-app",
+        "heavy-framework"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "is_standalone_integration": false,
+      "heavy_dep_loc": 15000,
+      "heavy_dep_own_deps": 12,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "serde",
+        "version": "1.0.200"
+      },
+      "heavy_dependency": {
+        "name": "serde_derive",
+        "version": "1.0.200"
+      },
+      "w_transitive": 5,
+      "w_unique": 3,
+      "c_ref": 8,
+      "hurrs": 0.6,
+      "confidence": "Medium",
+      "scan_result": {
+        "heavy_crate_name": "serde_derive",
+        "searched_names": [
+          "serde_derive"
+        ],
+        "ref_count": 8,
+        "file_matches": [
+          {
+            "path": "/home/user/.cargo/registry/src/index.crates.io/serde-1.0.200/src/lib.rs",
+            "line_number": 15,
+            "line_content": "#[derive(Serialize, Deserialize)]",
+            "in_generated_file": false,
+            "in_test_code": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "test_only_refs": 0,
+        "distinct_items": [
+          "#[derive(Serialize, Deserialize)]"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "derive"
+          ],
+          "recommended_defaults": [
+            "std"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "my-app",
+        "serde",
+        "serde_derive"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "is_standalone_integration": false,
+      "heavy_dep_loc": 2500,
+      "heavy_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "my-lib",
+        "version": "0.1.0"
+      },
+      "heavy_dependency": {
+        "name": "once_cell",
+        "version": "1.19.0"
+      },
+      "w_transitive": 1,
+      "w_unique": 1,
+      "c_ref": 2,
+      "hurrs": 0.5,
+      "confidence": "Medium",
+      "scan_result": {
+        "heavy_crate_name": "once_cell",
+        "searched_names": [
+          "once_cell"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/sample/workspace/my-lib/src/lib.rs",
+            "line_number": 3,
+            "line_content": "use once_cell::sync::Lazy;",
+            "in_generated_file": false,
+            "in_test_code": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "test_only_refs": 0,
+        "distinct_items": [
+          "Lazy"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "ReplaceWithStd": {
+          "suggestion": "std::sync::LazyLock (stable since 1.80)"
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "my-lib",
+        "once_cell"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "is_standalone_integration": false,
+      "heavy_dep_loc": 600,
+      "heavy_dep_own_deps": 0,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "http-client",
+        "version": "3.0.0"
+      },
+      "heavy_dependency": {
+        "name": "tokio",
+        "version": "1.35.0"
+      },
+      "w_transitive": 20,
+      "w_unique": 0,
+      "c_ref": 15,
+      "hurrs": 1.3,
+      "confidence": "Noise",
+      "scan_result": {
+        "heavy_crate_name": "tokio",
+        "searched_names": [
+          "tokio"
+        ],
+        "ref_count": 15,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "test_only_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "RequiredBySibling": {
+          "sibling": "hyper"
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "my-app",
+        "http-client",
+        "tokio"
+      ],
+      "required_by_sibling": "hyper",
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "is_standalone_integration": false,
+      "heavy_dep_loc": 50000,
+      "heavy_dep_own_deps": 8,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "my-lib",
+        "version": "0.1.0"
+      },
+      "heavy_dependency": {
+        "name": "tiny-helper",
+        "version": "0.2.0"
+      },
+      "w_transitive": 4,
+      "w_unique": 2,
+      "c_ref": 1,
+      "hurrs": 4.0,
+      "confidence": "High",
+      "scan_result": {
+        "heavy_crate_name": "tiny-helper",
+        "searched_names": [
+          "tiny_helper"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/sample/workspace/my-lib/src/util.rs",
+            "line_number": 7,
+            "line_content": "use tiny_helper::slugify;",
+            "in_generated_file": false,
+            "in_test_code": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "test_only_refs": 0,
+        "distinct_items": [
+          "slugify"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "InlineUpstream": {
+          "heavy_loc": 120,
+          "api_items_used": 1
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "my-lib",
+        "tiny-helper"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "is_standalone_integration": false,
+      "heavy_dep_loc": 120,
+      "heavy_dep_own_deps": 0,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "my-app",
+        "version": "0.1.0"
+      },
+      "heavy_dependency": {
+        "name": "test-helpers",
+        "version": "1.0.0"
+      },
+      "w_transitive": 8,
+      "w_unique": 4,
+      "c_ref": 3,
+      "hurrs": 2.7,
+      "confidence": "High",
+      "scan_result": {
+        "heavy_crate_name": "test-helpers",
+        "searched_names": [
+          "test_helpers"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/sample/workspace/src/tests/integration.rs",
+            "line_number": 1,
+            "line_content": "use test_helpers::setup;",
+            "in_generated_file": false,
+            "in_test_code": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "test_only_refs": 3,
+        "distinct_items": [
+          "setup"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "MoveToDevDeps",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "my-app",
+        "test-helpers"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "is_standalone_integration": false,
+      "heavy_dep_loc": 400,
+      "heavy_dep_own_deps": 2,
+      "has_re_export_all": false
+    }
+  ],
+  "dep_tree": {
+    "nodes": [
+      {
+        "name": "my-app",
+        "version": "0.1.0",
+        "transitive_weight": 42,
+        "is_workspace": true,
+        "children": [
+          2,
+          3,
+          4,
+          8,
+          9,
+          15
+        ],
+        "enabled_features": [
+          "default"
+        ],
+        "available_features": {
+          "default": [
+            "heavy-framework"
+          ],
+          "remote": [
+            "dep:remote-lib"
+          ]
+        }
+      },
+      {
+        "name": "my-lib",
+        "version": "0.1.0",
+        "transitive_weight": 15,
+        "is_workspace": true,
+        "children": [
+          5,
+          6,
+          10
+        ]
+      },
+      {
+        "name": "heavy-framework",
+        "version": "2.0.0",
+        "transitive_weight": 25,
+        "is_workspace": false,
+        "children": [
+          7,
+          11,
+          12
+        ],
+        "enabled_features": [
+          "default",
+          "async"
+        ],
+        "available_features": {
+          "async": [
+            "dep:tokio"
+          ],
+          "default": [
+            "async"
+          ]
+        }
+      },
+      {
+        "name": "serde",
+        "version": "1.0.200",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          13
+        ],
+        "enabled_features": [
+          "default",
+          "std",
+          "derive"
+        ],
+        "available_features": {
+          "default": [
+            "std"
+          ],
+          "derive": [
+            "dep:serde_derive"
+          ],
+          "std": []
+        }
+      },
+      {
+        "name": "unused-dep",
+        "version": "0.3.0",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          14
+        ]
+      },
+      {
+        "name": "regex",
+        "version": "1.10.0",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [],
+        "enabled_features": [
+          "default",
+          "std",
+          "unicode"
+        ],
+        "available_features": {
+          "default": [
+            "std",
+            "unicode"
+          ],
+          "std": [],
+          "unicode": []
+        }
+      },
+      {
+        "name": "tiny-helper",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tokio",
+        "version": "1.35.0",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [],
+        "enabled_features": [
+          "default",
+          "rt",
+          "net",
+          "macros"
+        ],
+        "available_features": {
+          "default": [
+            "rt"
+          ],
+          "macros": [],
+          "net": [],
+          "rt": []
+        }
+      },
+      {
+        "name": "http-client",
+        "version": "3.0.0",
+        "transitive_weight": 22,
+        "is_workspace": false,
+        "children": [
+          7
+        ]
+      },
+      {
+        "name": "test-helpers",
+        "version": "1.0.0",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "once_cell",
+        "version": "1.19.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "heavy-sub-a",
+        "version": "1.0.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "heavy-sub-b",
+        "version": "1.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_derive",
+        "version": "1.0.200",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "dead-dep",
+        "version": "0.1.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "remote-lib",
+        "version": "2.0.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          16,
+          17
+        ]
+      },
+      {
+        "name": "remote-sub-a",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "remote-sub-b",
+        "version": "0.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      }
+    ],
+    "root_indices": [
+      0,
+      1
+    ],
+    "edges": [
+      {
+        "from": 0,
+        "to": 2,
+        "is_optional": true,
+        "gating_feature": "default",
+        "enabled_child_features": [
+          "default",
+          "async"
+        ]
+      },
+      {
+        "from": 0,
+        "to": 3,
+        "is_optional": false,
+        "enabled_child_features": [
+          "derive",
+          "std"
+        ]
+      },
+      {
+        "from": 0,
+        "to": 4,
+        "is_optional": false
+      },
+      {
+        "from": 0,
+        "to": 8,
+        "is_optional": false
+      },
+      {
+        "from": 0,
+        "to": 9,
+        "is_optional": false
+      },
+      {
+        "from": 1,
+        "to": 5,
+        "is_optional": false,
+        "enabled_child_features": [
+          "default"
+        ]
+      },
+      {
+        "from": 1,
+        "to": 6,
+        "is_optional": false
+      },
+      {
+        "from": 1,
+        "to": 10,
+        "is_optional": false
+      },
+      {
+        "from": 2,
+        "to": 7,
+        "is_optional": true,
+        "gating_feature": "async",
+        "enabled_child_features": [
+          "rt",
+          "net"
+        ]
+      },
+      {
+        "from": 2,
+        "to": 11,
+        "is_optional": false
+      },
+      {
+        "from": 2,
+        "to": 12,
+        "is_optional": false
+      },
+      {
+        "from": 3,
+        "to": 13,
+        "is_optional": true,
+        "gating_feature": "derive"
+      },
+      {
+        "from": 4,
+        "to": 14,
+        "is_optional": false
+      },
+      {
+        "from": 8,
+        "to": 7,
+        "is_optional": false,
+        "enabled_child_features": [
+          "rt",
+          "net",
+          "macros"
+        ]
+      },
+      {
+        "from": 0,
+        "to": 15,
+        "is_optional": true,
+        "gating_feature": "remote"
+      },
+      {
+        "from": 15,
+        "to": 16,
+        "is_optional": false
+      },
+      {
+        "from": 15,
+        "to": 17,
+        "is_optional": false
+      }
+    ]
+  },
+  "unused_edges": [
+    [
+      "my-app",
+      "unused-dep"
+    ],
+    [
+      "my-lib",
+      "dead-dep"
+    ]
+  ],
+  "unused_direct_deps": [
+    {
+      "from_crate": "my-app",
+      "dep_name": "unused-dep",
+      "dep_version": "0.3.0",
+      "real_deps_saved": 5,
+      "is_test_example": false
+    }
+  ],
+  "direct_dep_summary": [
+    {
+      "workspace_member": "my-app",
+      "dep_name": "heavy-framework",
+      "dep_version": "2.0.0",
+      "unique_transitive_deps": 18,
+      "total_transitive_deps": 25
+    },
+    {
+      "workspace_member": "my-app",
+      "dep_name": "serde",
+      "dep_version": "1.0.200",
+      "unique_transitive_deps": 3,
+      "total_transitive_deps": 5
+    },
+    {
+      "workspace_member": "my-lib",
+      "dep_name": "regex",
+      "dep_version": "1.10.0",
+      "unique_transitive_deps": 2,
+      "total_transitive_deps": 8
+    }
+  ]
+}

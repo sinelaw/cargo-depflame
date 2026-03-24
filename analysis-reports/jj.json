@@ -1,0 +1,7501 @@
+{
+  "tool_version": "0.1.0",
+  "timestamp": "2026-03-25T23:48:26.329638492+00:00",
+  "workspace_root": "/tmp/rust-projects/jj",
+  "threshold": 3.0,
+  "total_dependencies": 543,
+  "platform_dependencies": 372,
+  "phantom_dependencies": 171,
+  "fat_nodes_found": 201,
+  "targets": [
+    {
+      "intermediate": {
+        "name": "jj-cli",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "sapling-renderdag",
+        "version": "0.1.0"
+      },
+      "w_transitive": 8,
+      "w_unique": 1,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "sapling-renderdag",
+        "searched_names": [
+          "sapling_renderdag"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "sapling-renderdag"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "jj-cli",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "sapling-streampager",
+        "version": "0.12.0"
+      },
+      "w_transitive": 160,
+      "w_unique": 9,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "sapling-streampager",
+        "searched_names": [
+          "sapling_streampager"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "sapling-streampager"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 7230,
+      "fat_dep_own_deps": 14,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "clap_builder",
+        "version": "4.6.0"
+      },
+      "fat_dependency": {
+        "name": "anstream",
+        "version": "1.0.0"
+      },
+      "w_transitive": 20,
+      "w_unique": 7,
+      "c_ref": 6,
+      "hurrs": 3.3333333333333335,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "anstream",
+        "searched_names": [
+          "anstream"
+        ],
+        "ref_count": 6,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_builder-4.6.0/src/output/fmt.rs",
+            "line_number": 38,
+            "line_content": "ColorChoice::Always => anstream::ColorChoice::Always,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_builder-4.6.0/src/output/fmt.rs",
+            "line_number": 39,
+            "line_content": "ColorChoice::Auto => anstream::ColorChoice::Auto,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_builder-4.6.0/src/output/fmt.rs",
+            "line_number": 40,
+            "line_content": "ColorChoice::Never => anstream::ColorChoice::Never,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_builder-4.6.0/src/output/fmt.rs",
+            "line_number": 47,
+            "line_content": "stderr = anstream::AutoStream::new(std::io::stderr().lock(), color_when);",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_builder-4.6.0/src/output/fmt.rs",
+            "line_number": 51,
+            "line_content": "stdout = anstream::AutoStream::new(std::io::stdout().lock(), color_when);",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_builder-4.6.0/src/builder/styled_str.rs",
+            "line_number": 135,
+            "line_content": "anstream::adapter::strip_str(&self.0)",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "AutoStream",
+          "ColorChoice",
+          "adapter"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "color"
+          ],
+          "recommended_defaults": [
+            "std",
+            "help",
+            "usage",
+            "error-context",
+            "suggestions"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "clap",
+        "clap_builder",
+        "anstream"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 1997,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "jj-cli",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "whoami",
+        "version": "2.1.1"
+      },
+      "w_transitive": 56,
+      "w_unique": 6,
+      "c_ref": 5,
+      "hurrs": 11.2,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "whoami",
+        "searched_names": [
+          "whoami"
+        ],
+        "ref_count": 5,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/jj/cli/src/config.rs",
+            "line_number": 384,
+            "line_content": "hostname: whoami::hostname().ok(),",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/jj/cli/src/config.rs",
+            "line_number": 674,
+            "line_content": "whoami::hostname().inspect_err(|err| tracing::warn!(?err, \"failed to get hostname\"))",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/jj/cli/src/config.rs",
+            "line_number": 679,
+            "line_content": "whoami::username().inspect_err(|err| tracing::warn!(?err, \"failed to get username\"))",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/jj/cli/tests/test_global_opts.rs",
+            "line_number": 1017,
+            "line_content": "let hostname = whoami::hostname().expect(\"hostname should be set\");",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/jj/cli/tests/test_global_opts.rs",
+            "line_number": 1018,
+            "line_content": "let username = whoami::username().expect(\"username should be set\");",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "hostname",
+          "username"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "whoami"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 2272,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "gen-protos",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "prost-build",
+        "version": "0.14.3"
+      },
+      "w_transitive": 78,
+      "w_unique": 5,
+      "c_ref": 1,
+      "hurrs": 78.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "prost-build",
+        "searched_names": [
+          "prost_build"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/jj/lib/gen-protos/src/main.rs",
+            "line_number": 32,
+            "line_content": "prost_build::Config::new()",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Config"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "gen-protos",
+        "prost-build"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 3745,
+      "fat_dep_own_deps": 11,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "termwiz",
+        "version": "0.23.3"
+      },
+      "fat_dependency": {
+        "name": "wezterm-blob-leases",
+        "version": "0.1.1"
+      },
+      "w_transitive": 76,
+      "w_unique": 5,
+      "c_ref": 4,
+      "hurrs": 19.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "wezterm-blob-leases",
+        "searched_names": [
+          "wezterm_blob_leases"
+        ],
+        "ref_count": 4,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/image.rs",
+            "line_number": 21,
+            "line_content": "use wezterm_blob_leases::{BlobLease, BlobManager};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/image.rs",
+            "line_number": 209,
+            "line_content": "serde(with = \"wezterm_blob_leases::lease_bytes\")",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/image.rs",
+            "line_number": 367,
+            "line_content": "Err(wezterm_blob_leases::Error::StorageNotInit) => Ok(Self::EncodedFile(data)),",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/error.rs",
+            "line_number": 76,
+            "line_content": "BlobLease(#[from] wezterm_blob_leases::Error),",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "BlobLease",
+          "BlobManager",
+          "Error",
+          "lease_bytes"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "sapling-streampager",
+        "termwiz",
+        "wezterm-blob-leases"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 370,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "jj-lib",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "interim",
+        "version": "0.2.1"
+      },
+      "w_transitive": 44,
+      "w_unique": 5,
+      "c_ref": 3,
+      "hurrs": 14.666666666666666,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "interim",
+        "searched_names": [
+          "interim"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/jj/lib/src/time_util.rs",
+            "line_number": 21,
+            "line_content": "use interim::DateError;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/jj/lib/src/time_util.rs",
+            "line_number": 22,
+            "line_content": "use interim::Dialect;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/jj/lib/src/time_util.rs",
+            "line_number": 23,
+            "line_content": "use interim::parse_date_string;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "DateError",
+          "Dialect",
+          "parse_date_string"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-lib",
+        "interim"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 1352,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "sapling-streampager",
+        "version": "0.12.0"
+      },
+      "fat_dependency": {
+        "name": "dirs",
+        "version": "6.0.0"
+      },
+      "w_transitive": 30,
+      "w_unique": 5,
+      "c_ref": 4,
+      "hurrs": 7.5,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "dirs",
+        "searched_names": [
+          "dirs"
+        ],
+        "ref_count": 4,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sapling-streampager-0.12.0/src/keymaps.rs",
+            "line_number": 34,
+            "line_content": "if let Some(mut path) = dirs::config_dir() {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sapling-streampager-0.12.0/src/prompt_history.rs",
+            "line_number": 70,
+            "line_content": "if let Some(mut path) = dirs::data_dir() {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sapling-streampager-0.12.0/src/prompt_history.rs",
+            "line_number": 136,
+            "line_content": "if let Some(mut path) = dirs::data_dir() {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sapling-streampager-0.12.0/src/config.rs",
+            "line_number": 203,
+            "line_content": "if let Some(mut path) = dirs::config_dir() {",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 3,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "config_dir",
+          "data_dir"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "sapling-streampager",
+        "dirs"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 202,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "termwiz",
+        "version": "0.23.3"
+      },
+      "fat_dependency": {
+        "name": "wezterm-color-types",
+        "version": "0.3.0"
+      },
+      "w_transitive": 26,
+      "w_unique": 4,
+      "c_ref": 2,
+      "hurrs": 13.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "wezterm-color-types",
+        "searched_names": [
+          "wezterm_color_types"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/color.rs",
+            "line_number": 8,
+            "line_content": "pub use wezterm_color_types::{LinearRgba, SrgbaTuple};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/escape/mod.rs",
+            "line_number": 12,
+            "line_content": "use wezterm_color_types::LinearRgba;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "LinearRgba",
+          "SrgbaTuple"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "sapling-streampager",
+        "termwiz",
+        "wezterm-color-types"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 767,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "interim",
+        "version": "0.2.1"
+      },
+      "fat_dependency": {
+        "name": "logos",
+        "version": "0.15.1"
+      },
+      "w_transitive": 13,
+      "w_unique": 4,
+      "c_ref": 3,
+      "hurrs": 4.333333333333333,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "logos",
+        "searched_names": [
+          "logos"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/interim-0.2.1/src/errors.rs",
+            "line_number": 4,
+            "line_content": "use logos::Span;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/interim-0.2.1/src/parser.rs",
+            "line_number": 1,
+            "line_content": "use logos::{Lexer, Logos};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/interim-0.2.1/src/parser.rs",
+            "line_number": 26,
+            "line_content": "#[derive(logos::Logos, Debug, PartialEq, Eq, Clone, Copy)]",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Lexer",
+          "Logos",
+          "Span"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-lib",
+        "interim",
+        "logos"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 1549,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "wezterm-blob-leases",
+        "version": "0.1.1"
+      },
+      "fat_dependency": {
+        "name": "uuid",
+        "version": "1.21.0"
+      },
+      "w_transitive": 54,
+      "w_unique": 3,
+      "c_ref": 1,
+      "hurrs": 54.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "uuid",
+        "searched_names": [
+          "uuid"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wezterm-blob-leases-0.1.1/src/lease_id.rs",
+            "line_number": 2,
+            "line_content": "use uuid::Uuid;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Uuid"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "sapling-streampager",
+        "termwiz",
+        "wezterm-blob-leases",
+        "uuid"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 4607,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "jj-cli",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "ansi-to-tui",
+        "version": "8.0.1"
+      },
+      "w_transitive": 39,
+      "w_unique": 3,
+      "c_ref": 1,
+      "hurrs": 39.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "ansi-to-tui",
+        "searched_names": [
+          "ansi_to_tui"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/jj/cli/src/commands/arrange.rs",
+            "line_number": 602,
+            "line_content": "let text = ansi_to_tui::IntoText::into_text(&text_lines).unwrap();",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "IntoText"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "ansi-to-tui"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 1004,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "logos",
+        "version": "0.15.1"
+      },
+      "fat_dependency": {
+        "name": "logos-derive",
+        "version": "0.15.1"
+      },
+      "w_transitive": 12,
+      "w_unique": 3,
+      "c_ref": 1,
+      "hurrs": 12.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "logos-derive",
+        "searched_names": [
+          "logos_derive"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/logos-0.15.1/src/lib.rs",
+            "line_number": 31,
+            "line_content": "pub use logos_derive::Logos;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Logos"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "export_derive",
+            "logos-derive"
+          ],
+          "recommended_defaults": [
+            "std"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-lib",
+        "interim",
+        "logos",
+        "logos-derive"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 5,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "proptest",
+        "version": "1.10.0"
+      },
+      "fat_dependency": {
+        "name": "rusty-fork",
+        "version": "0.3.1"
+      },
+      "w_transitive": 68,
+      "w_unique": 3,
+      "c_ref": 7,
+      "hurrs": 9.714285714285714,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "rusty-fork",
+        "searched_names": [
+          "rusty_fork"
+        ],
+        "ref_count": 7,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proptest-1.10.0/src/lib.rs",
+            "line_number": 55,
+            "line_content": "extern crate rusty_fork;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proptest-1.10.0/src/test_runner/runner.rs",
+            "line_number": 18,
+            "line_content": "use rusty_fork;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proptest-1.10.0/src/test_runner/runner.rs",
+            "line_number": 439,
+            "line_content": "let test_name = rusty_fork::fork_test::fix_module_path(",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proptest-1.10.0/src/test_runner/runner.rs",
+            "line_number": 462,
+            "line_content": "let (child_error, last_fork_file_len) = rusty_fork::fork(",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proptest-1.10.0/src/test_runner/runner.rs",
+            "line_number": 983,
+            "line_content": "child: &mut rusty_fork::ChildWrapper,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proptest-1.10.0/src/test_runner/runner.rs",
+            "line_number": 1002,
+            "line_content": "child: &mut rusty_fork::ChildWrapper,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proptest-1.10.0/src/test_runner/runner.rs",
+            "line_number": 1011,
+            "line_content": "child: &mut rusty_fork::ChildWrapper,",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ChildWrapper",
+          "fork",
+          "fork_test"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "fork",
+            "rusty-fork",
+            "timeout"
+          ],
+          "recommended_defaults": [
+            "std",
+            "bit-set"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "testutils",
+        "proptest",
+        "rusty-fork"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 687,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "termwiz",
+        "version": "0.23.3"
+      },
+      "fat_dependency": {
+        "name": "wezterm-input-types",
+        "version": "0.1.0"
+      },
+      "w_transitive": 21,
+      "w_unique": 3,
+      "c_ref": 3,
+      "hurrs": 7.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "wezterm-input-types",
+        "searched_names": [
+          "wezterm_input_types"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/input.rs",
+            "line_number": 14,
+            "line_content": "use wezterm_input_types::ctrl_mapping;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/input.rs",
+            "line_number": 16,
+            "line_content": "pub use wezterm_input_types::Modifiers;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termwiz-0.23.3/src/escape/csi.rs",
+            "line_number": 55,
+            "line_content": "pub use wezterm_input_types::KittyKeyboardFlags;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "KittyKeyboardFlags",
+          "Modifiers",
+          "ctrl_mapping"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "sapling-streampager",
+        "termwiz",
+        "wezterm-input-types"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 2816,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "jj-cli",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "clap_mangen",
+        "version": "0.2.31"
+      },
+      "w_transitive": 50,
+      "w_unique": 2,
+      "c_ref": 1,
+      "hurrs": 50.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "clap_mangen",
+        "searched_names": [
+          "clap_mangen"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/jj/cli/src/commands/util/install_man_pages.rs",
+            "line_number": 38,
+            "line_content": "clap_mangen::generate_to(app, man1_dir)?;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "generate_to"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "clap_mangen"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 631,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "gix-tempfile",
+        "version": "21.0.2"
+      },
+      "fat_dependency": {
+        "name": "dashmap",
+        "version": "6.1.0"
+      },
+      "w_transitive": 20,
+      "w_unique": 2,
+      "c_ref": 1,
+      "hurrs": 20.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "dashmap",
+        "searched_names": [
+          "dashmap"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-tempfile-21.0.2/src/lib.rs",
+            "line_number": 47,
+            "line_content": "type HashMap<K, V> = dashmap::DashMap<K, V>;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "DashMap"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "hp-hashmap"
+          ],
+          "recommended_defaults": []
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "gix",
+        "gix-tempfile",
+        "dashmap"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 3077,
+      "fat_dep_own_deps": 6,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "pest_derive",
+        "version": "2.8.6"
+      },
+      "fat_dependency": {
+        "name": "pest_generator",
+        "version": "2.8.6"
+      },
+      "w_transitive": 20,
+      "w_unique": 2,
+      "c_ref": 1,
+      "hurrs": 20.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "pest_generator",
+        "searched_names": [
+          "pest_generator"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/pest_derive-2.8.6/src/lib.rs",
+            "line_number": 324,
+            "line_content": "pest_generator::derive_parser(input.into(), true).into()",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "derive_parser"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "pest_derive",
+        "pest_generator"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 1568,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "jj-cli",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "rpassword",
+        "version": "7.4.0"
+      },
+      "w_transitive": 14,
+      "w_unique": 2,
+      "c_ref": 1,
+      "hurrs": 14.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "rpassword",
+        "searched_names": [
+          "rpassword"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/jj/cli/src/ui.rs",
+            "line_number": 689,
+            "line_content": "rpassword::prompt_password(format!(\"{prompt}: \"))",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "prompt_password"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "rpassword"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 240,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "logos-derive",
+        "version": "0.15.1"
+      },
+      "fat_dependency": {
+        "name": "logos-codegen",
+        "version": "0.15.1"
+      },
+      "w_transitive": 11,
+      "w_unique": 2,
+      "c_ref": 1,
+      "hurrs": 11.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "logos-codegen",
+        "searched_names": [
+          "logos_codegen"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/logos-derive-0.15.1/src/lib.rs",
+            "line_number": 5,
+            "line_content": "logos_codegen::generate(input.into()).into()",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "generate"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-lib",
+        "interim",
+        "logos",
+        "logos-derive",
+        "logos-codegen"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 5119,
+      "fat_dep_own_deps": 8,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "wezterm-color-types",
+        "version": "0.3.0"
+      },
+      "fat_dependency": {
+        "name": "csscolorparser",
+        "version": "0.6.2"
+      },
+      "w_transitive": 13,
+      "w_unique": 2,
+      "c_ref": 2,
+      "hurrs": 6.5,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "csscolorparser",
+        "searched_names": [
+          "csscolorparser"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wezterm-color-types-0.3.0/src/lib.rs",
+            "line_number": 1,
+            "line_content": "use csscolorparser::Color;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wezterm-color-types-0.3.0/src/lib.rs",
+            "line_number": 777,
+            "line_content": "} else if let Ok(c) = csscolorparser::parse(s) {",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Color",
+          "parse"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "sapling-streampager",
+        "termwiz",
+        "wezterm-color-types",
+        "csscolorparser"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 1248,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "prost-build",
+        "version": "0.14.3"
+      },
+      "fat_dependency": {
+        "name": "petgraph",
+        "version": "0.8.3"
+      },
+      "w_transitive": 16,
+      "w_unique": 2,
+      "c_ref": 3,
+      "hurrs": 5.333333333333333,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "petgraph",
+        "searched_names": [
+          "petgraph"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/prost-build-0.14.3/src/message_graph.rs",
+            "line_number": 3,
+            "line_content": "use petgraph::algo::has_path_connecting;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/prost-build-0.14.3/src/message_graph.rs",
+            "line_number": 4,
+            "line_content": "use petgraph::graph::NodeIndex;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/prost-build-0.14.3/src/message_graph.rs",
+            "line_number": 5,
+            "line_content": "use petgraph::Graph;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Graph",
+          "algo",
+          "graph"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "gen-protos",
+        "prost-build",
+        "petgraph"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 29870,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "gix-hash",
+        "version": "0.23.0"
+      },
+      "fat_dependency": {
+        "name": "sha1-checked",
+        "version": "0.10.0"
+      },
+      "w_transitive": 12,
+      "w_unique": 2,
+      "c_ref": 3,
+      "hurrs": 4.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "sha1-checked",
+        "searched_names": [
+          "sha1_checked"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-hash-0.23.0/src/hasher.rs",
+            "line_number": 11,
+            "line_content": "use sha1_checked::{CollisionResult, Digest};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-hash-0.23.0/src/hasher.rs",
+            "line_number": 25,
+            "line_content": "Sha1(sha1_checked::Sha1),",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-hash-0.23.0/src/hasher.rs",
+            "line_number": 39,
+            "line_content": "Self::Sha1(sha1_checked::Builder::default().safe_hash(false).build())",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Builder",
+          "CollisionResult",
+          "Digest",
+          "Sha1"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "sha1"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "gix",
+        "gix-hash",
+        "sha1-checked"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 2270,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "testutils",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "proptest-state-machine",
+        "version": "0.7.0"
+      },
+      "w_transitive": 83,
+      "w_unique": 1,
+      "c_ref": 1,
+      "hurrs": 83.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "proptest-state-machine",
+        "searched_names": [
+          "proptest_state_machine"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/jj/lib/testutils/src/proptest.rs",
+            "line_number": 28,
+            "line_content": "use proptest_state_machine::ReferenceStateMachine;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ReferenceStateMachine"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "testutils",
+        "proptest-state-machine"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 1439,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "jj-cli",
+        "version": "0.39.0"
+      },
+      "fat_dependency": {
+        "name": "clap_complete_nushell",
+        "version": "4.6.0"
+      },
+      "w_transitive": 52,
+      "w_unique": 1,
+      "c_ref": 1,
+      "hurrs": 52.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "clap_complete_nushell",
+        "searched_names": [
+          "clap_complete_nushell"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/jj/cli/src/commands/util/completion.rs",
+            "line_number": 80,
+            "line_content": "use clap_complete_nushell::Nushell;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Nushell"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "jj-cli",
+        "clap_complete_nushell"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 410,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "proptest",
+        "version": "1.10.0"
+      },
+      "fat_dependency": {
+        "name": "rand_xorshift",
+        "version": "0.4.0"
+      },
+      "w_transitive": 51,
+      "w_unique": 1,
+      "c_ref": 1,
+      "hurrs": 51.0,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "rand_xorshift",
+        "searched_names": [
+          "rand_xorshift"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proptest-1.10.0/src/test_runner/rng.rs",
+            "line_number": 16,
+            "line_content": "use rand_xorshift::XorShiftRng;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "XorShiftRng"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "testutils",
+        "proptest",
+        "rand_xorshift"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 178,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    }
+  ],
+  "dep_tree": {
+    "nodes": [
+      {
+        "name": "strum",
+        "version": "0.27.2",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          162
+        ]
+      },
+      {
+        "name": "num-iter",
+        "version": "0.1.45",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          157,
+          487,
+          50
+        ]
+      },
+      {
+        "name": "dirs",
+        "version": "6.0.0",
+        "transitive_weight": 30,
+        "is_workspace": false,
+        "children": [
+          289
+        ]
+      },
+      {
+        "name": "windows_x86_64_gnullvm",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "leb128fmt",
+        "version": "0.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "regex",
+        "version": "1.12.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          220,
+          405,
+          423,
+          506
+        ]
+      },
+      {
+        "name": "termwiz",
+        "version": "0.23.3",
+        "transitive_weight": 140,
+        "is_workspace": false,
+        "children": [
+          392,
+          187,
+          464,
+          197,
+          191,
+          263,
+          452,
+          399,
+          414,
+          14,
+          173,
+          171,
+          74,
+          86,
+          194,
+          24,
+          184,
+          403,
+          257,
+          487,
+          501,
+          261,
+          331,
+          204,
+          8,
+          291,
+          524,
+          509,
+          176,
+          520,
+          417,
+          363,
+          27,
+          66
+        ]
+      },
+      {
+        "name": "wasi",
+        "version": "0.14.7+wasi-0.2.4",
+        "transitive_weight": 38,
+        "is_workspace": false,
+        "children": [
+          320
+        ]
+      },
+      {
+        "name": "finl_unicode",
+        "version": "1.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "icu_collections",
+        "version": "2.1.1",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          493,
+          356,
+          307,
+          511,
+          81
+        ]
+      },
+      {
+        "name": "signal-hook-registry",
+        "version": "1.4.8",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          390,
+          176
+        ]
+      },
+      {
+        "name": "diff",
+        "version": "0.1.13",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "prost-build",
+        "version": "0.14.3",
+        "transitive_weight": 78,
+        "is_workspace": false,
+        "children": [
+          280,
+          484,
+          521,
+          16,
+          225,
+          5,
+          352,
+          83,
+          388,
+          520,
+          125
+        ]
+      },
+      {
+        "name": "zmij",
+        "version": "1.0.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "filedescriptor",
+        "version": "0.8.3",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          194,
+          257,
+          176
+        ]
+      },
+      {
+        "name": "itertools",
+        "version": "0.13.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          348
+        ]
+      },
+      {
+        "name": "prost",
+        "version": "0.14.3",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          114,
+          196
+        ]
+      },
+      {
+        "name": "ratatui-core",
+        "version": "0.1.0",
+        "transitive_weight": 33,
+        "is_workspace": false,
+        "children": [
+          216,
+          86,
+          221,
+          0,
+          406,
+          505,
+          260,
+          365,
+          317,
+          83,
+          66,
+          29
+        ]
+      },
+      {
+        "name": "proc-macro2",
+        "version": "1.0.106",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          41
+        ]
+      },
+      {
+        "name": "foldhash",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "linux-raw-sys",
+        "version": "0.12.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "nix",
+        "version": "0.31.2",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          86,
+          404,
+          219,
+          176
+        ]
+      },
+      {
+        "name": "rand_chacha",
+        "version": "0.10.0",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          419,
+          391
+        ]
+      },
+      {
+        "name": "serde",
+        "version": "1.0.228",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          395,
+          158
+        ]
+      },
+      {
+        "name": "num-derive",
+        "version": "0.4.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "tracing-attributes",
+        "version": "0.1.31",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "termtree",
+        "version": "0.5.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ucd-trie",
+        "version": "0.1.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-bom",
+        "version": "2.0.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-width",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "bumpalo",
+        "version": "3.20.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "darling_core",
+        "version": "0.23.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18,
+          177,
+          206
+        ]
+      },
+      {
+        "name": "crossbeam-utils",
+        "version": "0.8.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "plain",
+        "version": "0.2.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_i686_gnu",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-config",
+        "version": "0.54.0",
+        "transitive_weight": 135,
+        "is_workspace": false,
+        "children": [
+          199,
+          364,
+          447,
+          351,
+          532,
+          529,
+          437,
+          496,
+          406,
+          304,
+          423,
+          28
+        ]
+      },
+      {
+        "name": "anstyle-parse",
+        "version": "0.2.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          538
+        ]
+      },
+      {
+        "name": "clap_mangen",
+        "version": "0.2.31",
+        "transitive_weight": 50,
+        "is_workspace": false,
+        "children": [
+          490,
+          155
+        ]
+      },
+      {
+        "name": "gix-hash",
+        "version": "0.23.0",
+        "transitive_weight": 69,
+        "is_workspace": false,
+        "children": [
+          447,
+          193,
+          292,
+          406
+        ]
+      },
+      {
+        "name": "gix-pack",
+        "version": "0.68.0",
+        "transitive_weight": 93,
+        "is_workspace": false,
+        "children": [
+          223,
+          295,
+          38,
+          447,
+          529,
+          475,
+          451,
+          496,
+          406,
+          174,
+          65,
+          85
+        ]
+      },
+      {
+        "name": "parking_lot",
+        "version": "0.12.5",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          305,
+          409
+        ]
+      },
+      {
+        "name": "unicode-ident",
+        "version": "1.0.24",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ciborium-ll",
+        "version": "0.2.2",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          523,
+          350
+        ]
+      },
+      {
+        "name": "zerovec-derive",
+        "version": "0.11.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "cassowary",
+        "version": "0.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "futures-util",
+        "version": "0.3.32",
+        "transitive_weight": 16,
+        "is_workspace": false,
+        "children": [
+          227,
+          172,
+          96,
+          186,
+          134,
+          200,
+          244,
+          176,
+          423,
+          478,
+          369
+        ]
+      },
+      {
+        "name": "futures-executor",
+        "version": "0.3.32",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          45,
+          186,
+          244
+        ]
+      },
+      {
+        "name": "gix-trace",
+        "version": "0.1.18",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-xid",
+        "version": "0.2.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix",
+        "version": "0.81.0",
+        "transitive_weight": 192,
+        "is_workspace": false,
+        "children": [
+          144,
+          371,
+          283,
+          255,
+          546,
+          145,
+          240,
+          429,
+          435,
+          454,
+          35,
+          302,
+          518,
+          199,
+          467,
+          150,
+          56,
+          286,
+          79,
+          315,
+          535,
+          120,
+          39,
+          321,
+          312,
+          335,
+          223,
+          180,
+          295,
+          38,
+          123,
+          486,
+          367,
+          428,
+          364,
+          447,
+          293,
+          463,
+          339,
+          351,
+          127,
+          529,
+          402,
+          451,
+          441,
+          496,
+          406,
+          47,
+          213
+        ]
+      },
+      {
+        "name": "autocfg",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_i686_msvc",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "darling_macro",
+        "version": "0.23.0",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          31,
+          352,
+          308
+        ]
+      },
+      {
+        "name": "csscolorparser",
+        "version": "0.6.2",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          173,
+          201
+        ]
+      },
+      {
+        "name": "walkdir",
+        "version": "2.5.0",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          59,
+          275
+        ]
+      },
+      {
+        "name": "vec_map",
+        "version": "0.8.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-worktree-stream",
+        "version": "0.30.0",
+        "transitive_weight": 106,
+        "is_workspace": false,
+        "children": [
+          79,
+          312,
+          223,
+          38,
+          486,
+          428,
+          447,
+          529,
+          40,
+          451
+        ]
+      },
+      {
+        "name": "id-arena",
+        "version": "2.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "uuid",
+        "version": "1.21.0",
+        "transitive_weight": 54,
+        "is_workspace": false,
+        "children": [
+          77,
+          84,
+          237,
+          159
+        ]
+      },
+      {
+        "name": "same-file",
+        "version": "1.0.6",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          275
+        ]
+      },
+      {
+        "name": "imara-diff",
+        "version": "0.1.8",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          290
+        ]
+      },
+      {
+        "name": "rand_xorshift",
+        "version": "0.4.0",
+        "transitive_weight": 51,
+        "is_workspace": false,
+        "children": [
+          203
+        ]
+      },
+      {
+        "name": "num-bigint",
+        "version": "0.4.6",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          157,
+          487
+        ]
+      },
+      {
+        "name": "tinyvec",
+        "version": "1.11.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          319
+        ]
+      },
+      {
+        "name": "crossbeam-epoch",
+        "version": "0.9.18",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          32
+        ]
+      },
+      {
+        "name": "memmap2",
+        "version": "0.9.10",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          176
+        ]
+      },
+      {
+        "name": "unicode-segmentation",
+        "version": "1.12.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winreg",
+        "version": "0.56.0",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          285,
+          404
+        ]
+      },
+      {
+        "name": "castaway",
+        "version": "0.2.4",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          377
+        ]
+      },
+      {
+        "name": "itoa",
+        "version": "1.0.18",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "crc32fast",
+        "version": "1.5.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          404
+        ]
+      },
+      {
+        "name": "winapi-i686-pc-windows-gnu",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "bit-vec",
+        "version": "0.6.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "plotters-svg",
+        "version": "0.3.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          249
+        ]
+      },
+      {
+        "name": "fancy-regex",
+        "version": "0.11.0",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          5,
+          116
+        ]
+      },
+      {
+        "name": "fixedbitset",
+        "version": "0.5.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "insta",
+        "version": "1.46.3",
+        "transitive_weight": 73,
+        "is_workspace": false,
+        "children": [
+          280,
+          299,
+          5,
+          104,
+          480
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.4.2",
+        "transitive_weight": 43,
+        "is_workspace": false,
+        "children": [
+          320,
+          539,
+          404,
+          176,
+          383,
+          391
+        ]
+      },
+      {
+        "name": "num_threads",
+        "version": "0.1.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          176
+        ]
+      },
+      {
+        "name": "gix-filter",
+        "version": "0.28.0",
+        "transitive_weight": 98,
+        "is_workspace": false,
+        "children": [
+          223,
+          38,
+          486,
+          339,
+          91,
+          106,
+          529,
+          402,
+          437,
+          496,
+          406,
+          517,
+          47
+        ]
+      },
+      {
+        "name": "socket2",
+        "version": "0.6.2",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          129,
+          176
+        ]
+      },
+      {
+        "name": "displaydoc",
+        "version": "0.2.5",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "tracing-log",
+        "version": "0.2.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          462,
+          520,
+          104
+        ]
+      },
+      {
+        "name": "itertools",
+        "version": "0.14.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          348
+        ]
+      },
+      {
+        "name": "js-sys",
+        "version": "0.3.91",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          237,
+          104
+        ]
+      },
+      {
+        "name": "uluru",
+        "version": "3.1.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          247
+        ]
+      },
+      {
+        "name": "bitflags",
+        "version": "2.11.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          395
+        ]
+      },
+      {
+        "name": "predicates-core",
+        "version": "1.0.10",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "android_system_properties",
+        "version": "0.1.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          176
+        ]
+      },
+      {
+        "name": "darling",
+        "version": "0.23.0",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          52,
+          31
+        ]
+      },
+      {
+        "name": "ratatui-widgets",
+        "version": "0.3.0",
+        "transitive_weight": 48,
+        "is_workspace": false,
+        "children": [
+          17,
+          327,
+          126,
+          124,
+          86,
+          0,
+          365,
+          317,
+          83,
+          66,
+          29
+        ]
+      },
+      {
+        "name": "gix-packetline",
+        "version": "0.21.2",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          437,
+          193,
+          406,
+          47
+        ]
+      },
+      {
+        "name": "serde_json",
+        "version": "1.0.149",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          23,
+          395,
+          69,
+          423,
+          13
+        ]
+      },
+      {
+        "name": "num_cpus",
+        "version": "1.17.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          294,
+          176
+        ]
+      },
+      {
+        "name": "windows_i686_gnullvm",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "cpufeatures",
+        "version": "0.3.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          176
+        ]
+      },
+      {
+        "name": "futures",
+        "version": "0.1.31",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "anes",
+        "version": "0.1.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_gnu",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "colorchoice",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "proptest-state-machine",
+        "version": "0.7.0",
+        "transitive_weight": 83,
+        "is_workspace": false,
+        "children": [
+          398
+        ]
+      },
+      {
+        "name": "enum_dispatch",
+        "version": "0.3.13",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18,
+          104
+        ]
+      },
+      {
+        "name": "rand",
+        "version": "0.9.2",
+        "transitive_weight": 55,
+        "is_workspace": false,
+        "children": [
+          250,
+          203
+        ]
+      },
+      {
+        "name": "imara-diff",
+        "version": "0.2.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          290,
+          423
+        ]
+      },
+      {
+        "name": "once_cell",
+        "version": "1.21.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ratatui-macros",
+        "version": "0.7.0",
+        "transitive_weight": 49,
+        "is_workspace": false,
+        "children": [
+          90,
+          17
+        ]
+      },
+      {
+        "name": "gix-quote",
+        "version": "0.7.0",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          402,
+          451,
+          437
+        ]
+      },
+      {
+        "name": "anstyle-parse",
+        "version": "1.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          538
+        ]
+      },
+      {
+        "name": "deltae",
+        "version": "0.3.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "num-rational",
+        "version": "0.4.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          62,
+          157,
+          487
+        ]
+      },
+      {
+        "name": "io-close",
+        "version": "0.3.7",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          257,
+          176
+        ]
+      },
+      {
+        "name": "ref-cast-impl",
+        "version": "1.0.25",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "windows-core",
+        "version": "0.62.2",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          151,
+          253,
+          458,
+          432,
+          169
+        ]
+      },
+      {
+        "name": "async-trait",
+        "version": "0.1.89",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "bytes",
+        "version": "1.11.1",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          23
+        ]
+      },
+      {
+        "name": "num",
+        "version": "0.4.3",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          109,
+          62,
+          1,
+          214,
+          157,
+          487
+        ]
+      },
+      {
+        "name": "bit-set",
+        "version": "0.5.3",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          72
+        ]
+      },
+      {
+        "name": "powerfmt",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ratatui-crossterm",
+        "version": "0.1.0",
+        "transitive_weight": 81,
+        "is_workspace": false,
+        "children": [
+          527,
+          17,
+          126,
+          404
+        ]
+      },
+      {
+        "name": "proptest-derive",
+        "version": "0.8.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "gix-negotiate",
+        "version": "0.29.0",
+        "transitive_weight": 93,
+        "is_workspace": false,
+        "children": [
+          335,
+          223,
+          180,
+          38,
+          463,
+          86
+        ]
+      },
+      {
+        "name": "clap_complete",
+        "version": "4.6.0",
+        "transitive_weight": 51,
+        "is_workspace": false,
+        "children": [
+          490,
+          183,
+          338,
+          318
+        ]
+      },
+      {
+        "name": "wait-timeout",
+        "version": "0.2.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          176
+        ]
+      },
+      {
+        "name": "gix-pathspec",
+        "version": "0.16.1",
+        "transitive_weight": 62,
+        "is_workspace": false,
+        "children": [
+          486,
+          364,
+          532,
+          529,
+          437,
+          86,
+          406
+        ]
+      },
+      {
+        "name": "line-clipping",
+        "version": "0.3.5",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          86
+        ]
+      },
+      {
+        "name": "multimap",
+        "version": "0.10.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "instability",
+        "version": "0.3.11",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          89,
+          352,
+          308,
+          317,
+          18
+        ]
+      },
+      {
+        "name": "gix-url",
+        "version": "0.35.2",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          529,
+          437,
+          406,
+          382
+        ]
+      },
+      {
+        "name": "outref",
+        "version": "0.5.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.60.2",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          132
+        ]
+      },
+      {
+        "name": "anstyle-wincon",
+        "version": "3.0.11",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          129,
+          436,
+          141
+        ]
+      },
+      {
+        "name": "phf_generator",
+        "version": "0.11.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          500,
+          485
+        ]
+      },
+      {
+        "name": "windows-targets",
+        "version": "0.53.5",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          169,
+          322,
+          415,
+          226,
+          488,
+          170,
+          98,
+          472,
+          135
+        ]
+      },
+      {
+        "name": "bit-vec",
+        "version": "0.8.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "futures-io",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_msvc",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "option-ext",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap_complete_nushell",
+        "version": "4.6.0",
+        "transitive_weight": 52,
+        "is_workspace": false,
+        "children": [
+          121,
+          490
+        ]
+      },
+      {
+        "name": "rtoolbox",
+        "version": "0.0.3",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          544,
+          176
+        ]
+      },
+      {
+        "name": "document-features",
+        "version": "0.2.12",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          316
+        ]
+      },
+      {
+        "name": "block-buffer",
+        "version": "0.10.4",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          189
+        ]
+      },
+      {
+        "name": "once_cell_polyfill",
+        "version": "1.70.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_aarch64_gnullvm",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "crossterm_winapi",
+        "version": "0.9.1",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          257
+        ]
+      },
+      {
+        "name": "gix-status",
+        "version": "0.28.0",
+        "transitive_weight": 165,
+        "is_workspace": false,
+        "children": [
+          255,
+          145,
+          429,
+          454,
+          79,
+          223,
+          38,
+          123,
+          428,
+          447,
+          529,
+          492,
+          437,
+          406,
+          270
+        ]
+      },
+      {
+        "name": "gix-dir",
+        "version": "0.23.0",
+        "transitive_weight": 156,
+        "is_workspace": false,
+        "children": [
+          429,
+          454,
+          302,
+          223,
+          123,
+          367,
+          428,
+          529,
+          402,
+          437,
+          406,
+          47
+        ]
+      },
+      {
+        "name": "rayon-core",
+        "version": "1.13.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          238,
+          32
+        ]
+      },
+      {
+        "name": "wasite",
+        "version": "1.0.2",
+        "transitive_weight": 39,
+        "is_workspace": false,
+        "children": [
+          7
+        ]
+      },
+      {
+        "name": "bit-set",
+        "version": "0.8.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          133
+        ]
+      },
+      {
+        "name": "euclid",
+        "version": "0.22.13",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          487
+        ]
+      },
+      {
+        "name": "gix-archive",
+        "version": "0.30.0",
+        "transitive_weight": 107,
+        "is_workspace": false,
+        "children": [
+          56,
+          223,
+          463,
+          451,
+          437
+        ]
+      },
+      {
+        "name": "windows-implement",
+        "version": "0.60.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "anstream",
+        "version": "1.0.0",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [
+          130,
+          433,
+          107,
+          436,
+          99,
+          273,
+          538
+        ]
+      },
+      {
+        "name": "predicates",
+        "version": "3.1.4",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          436,
+          323,
+          87
+        ]
+      },
+      {
+        "name": "page_size",
+        "version": "0.6.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          257,
+          176
+        ]
+      },
+      {
+        "name": "roff",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "mac_address",
+        "version": "1.1.8",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          414,
+          257
+        ]
+      },
+      {
+        "name": "num-integer",
+        "version": "0.1.46",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          487
+        ]
+      },
+      {
+        "name": "serde_derive",
+        "version": "1.0.228",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "atomic",
+        "version": "0.6.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          181
+        ]
+      },
+      {
+        "name": "winapi-x86_64-pc-windows-gnu",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "test-case",
+        "version": "3.3.1",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          530
+        ]
+      },
+      {
+        "name": "strum_macros",
+        "version": "0.27.2",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18,
+          388
+        ]
+      },
+      {
+        "name": "deranged",
+        "version": "0.5.8",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          117
+        ]
+      },
+      {
+        "name": "allocator-api2",
+        "version": "0.2.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-targets",
+        "version": "0.52.6",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          142,
+          495,
+          34,
+          94,
+          51,
+          470,
+          3,
+          513
+        ]
+      },
+      {
+        "name": "semver",
+        "version": "1.0.27",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "fnv",
+        "version": "1.0.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-macro-support",
+        "version": "0.2.114",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18,
+          231,
+          30
+        ]
+      },
+      {
+        "name": "windows-link",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_i686_msvc",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "sha2",
+        "version": "0.10.9",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          373,
+          342,
+          404
+        ]
+      },
+      {
+        "name": "futures-channel",
+        "version": "0.3.32",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          186,
+          200
+        ]
+      },
+      {
+        "name": "phf",
+        "version": "0.11.3",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          508,
+          500
+        ]
+      },
+      {
+        "name": "clru",
+        "version": "0.6.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          365
+        ]
+      },
+      {
+        "name": "borrow-or-share",
+        "version": "0.2.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "libc",
+        "version": "0.2.183",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ident_case",
+        "version": "1.0.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "matchers",
+        "version": "0.2.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          220
+        ]
+      },
+      {
+        "name": "terminal_size",
+        "version": "0.4.3",
+        "transitive_weight": 33,
+        "is_workspace": false,
+        "children": [
+          457,
+          129
+        ]
+      },
+      {
+        "name": "gix-commitgraph",
+        "version": "0.35.0",
+        "transitive_weight": 74,
+        "is_workspace": false,
+        "children": [
+          38,
+          475,
+          451,
+          437,
+          65,
+          213
+        ]
+      },
+      {
+        "name": "bytemuck",
+        "version": "1.25.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "chrono",
+        "version": "0.4.44",
+        "transitive_weight": 34,
+        "is_workspace": false,
+        "children": [
+          394,
+          23,
+          487,
+          169
+        ]
+      },
+      {
+        "name": "is_executable",
+        "version": "1.0.5",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          129
+        ]
+      },
+      {
+        "name": "ordered-float",
+        "version": "4.6.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          487
+        ]
+      },
+      {
+        "name": "quick-error",
+        "version": "1.2.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "futures-core",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wezterm-color-types",
+        "version": "0.3.0",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          399,
+          53,
+          108,
+          509
+        ]
+      },
+      {
+        "name": "sapling-streampager",
+        "version": "0.12.0",
+        "transitive_weight": 160,
+        "is_workspace": false,
+        "children": [
+          6,
+          2,
+          191,
+          496,
+          23,
+          101,
+          406,
+          505,
+          5,
+          65,
+          449,
+          66,
+          507,
+          55
+        ]
+      },
+      {
+        "name": "generic-array",
+        "version": "0.14.7",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          426,
+          306
+        ]
+      },
+      {
+        "name": "nom",
+        "version": "7.1.3",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          423,
+          215
+        ]
+      },
+      {
+        "name": "terminfo",
+        "version": "0.9.0",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          173,
+          205,
+          190,
+          167
+        ]
+      },
+      {
+        "name": "fluent-uri",
+        "version": "0.4.1",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          23,
+          385,
+          175
+        ]
+      },
+      {
+        "name": "faster-hex",
+        "version": "0.10.0",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          23,
+          246
+        ]
+      },
+      {
+        "name": "thiserror",
+        "version": "1.0.69",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          324
+        ]
+      },
+      {
+        "name": "valuable",
+        "version": "0.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "prost-derive",
+        "version": "0.14.3",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          83,
+          18,
+          331
+        ]
+      },
+      {
+        "name": "wezterm-input-types",
+        "version": "0.1.0",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          399,
+          23,
+          149,
+          389,
+          509
+        ]
+      },
+      {
+        "name": "rayon",
+        "version": "1.11.0",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          146,
+          348
+        ]
+      },
+      {
+        "name": "gix-ref",
+        "version": "0.61.0",
+        "transitive_weight": 129,
+        "is_workspace": false,
+        "children": [
+          286,
+          315,
+          223,
+          38,
+          428,
+          447,
+          293,
+          529,
+          402,
+          441,
+          406,
+          65,
+          304
+        ]
+      },
+      {
+        "name": "futures-sink",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "lab",
+        "version": "0.11.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerotrie",
+        "version": "0.2.3",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          307,
+          511,
+          81
+        ]
+      },
+      {
+        "name": "rand_core",
+        "version": "0.9.5",
+        "transitive_weight": 50,
+        "is_workspace": false,
+        "children": [
+          543
+        ]
+      },
+      {
+        "name": "base64",
+        "version": "0.22.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "phf_codegen",
+        "version": "0.11.3",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          131,
+          500
+        ]
+      },
+      {
+        "name": "strsim",
+        "version": "0.11.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unarray",
+        "version": "0.1.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wit-bindgen",
+        "version": "0.51.0",
+        "transitive_weight": 36,
+        "is_workspace": false,
+        "children": [
+          407
+        ]
+      },
+      {
+        "name": "oorandom",
+        "version": "11.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "yoke-derive",
+        "version": "0.8.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          514,
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "redox_users",
+        "version": "0.5.2",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          481,
+          406,
+          372
+        ]
+      },
+      {
+        "name": "globset",
+        "version": "0.4.18",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          437,
+          220,
+          405,
+          520,
+          506
+        ]
+      },
+      {
+        "name": "nonempty",
+        "version": "0.12.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "num-complex",
+        "version": "0.4.6",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          487
+        ]
+      },
+      {
+        "name": "minimal-lexical",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "kasuari",
+        "version": "0.4.11",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          406,
+          365,
+          270
+        ]
+      },
+      {
+        "name": "subtle",
+        "version": "2.6.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "syn",
+        "version": "1.0.109",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          308,
+          18,
+          41
+        ]
+      },
+      {
+        "name": "cfg_aliases",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "regex-automata",
+        "version": "0.4.14",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          405,
+          423,
+          506
+        ]
+      },
+      {
+        "name": "compact_str",
+        "version": "0.9.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          68,
+          404,
+          69,
+          377,
+          525,
+          298
+        ]
+      },
+      {
+        "name": "arc-swap",
+        "version": "1.9.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          377
+        ]
+      },
+      {
+        "name": "gix-object",
+        "version": "0.58.0",
+        "transitive_weight": 87,
+        "is_workspace": false,
+        "children": [
+          295,
+          38,
+          447,
+          293,
+          463,
+          529,
+          402,
+          441,
+          437,
+          496,
+          406,
+          304,
+          69
+        ]
+      },
+      {
+        "name": "serde_bytes",
+        "version": "0.11.19",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          23,
+          395
+        ]
+      },
+      {
+        "name": "prettyplease",
+        "version": "0.2.37",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          18
+        ]
+      },
+      {
+        "name": "windows_i686_gnu",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "futures-macro",
+        "version": "0.3.32",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "icu_provider",
+        "version": "2.1.1",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          297,
+          202,
+          356,
+          307,
+          511,
+          81,
+          277
+        ]
+      },
+      {
+        "name": "yansi",
+        "version": "1.0.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-general-category",
+        "version": "1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-shared",
+        "version": "0.2.114",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          41
+        ]
+      },
+      {
+        "name": "redox_syscall",
+        "version": "0.7.3",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          86
+        ]
+      },
+      {
+        "name": "num-cmp",
+        "version": "0.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-macro",
+        "version": "0.2.114",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          168,
+          308
+        ]
+      },
+      {
+        "name": "futures",
+        "version": "0.3.32",
+        "transitive_weight": 18,
+        "is_workspace": false,
+        "children": [
+          46,
+          45,
+          172,
+          186,
+          134,
+          200,
+          244
+        ]
+      },
+      {
+        "name": "time-core",
+        "version": "0.1.8",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen",
+        "version": "0.2.114",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          234,
+          231,
+          404,
+          104,
+          377
+        ]
+      },
+      {
+        "name": "crossbeam-deque",
+        "version": "0.8.6",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          64,
+          32
+        ]
+      },
+      {
+        "name": "find-msvc-tools",
+        "version": "0.1.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-submodule",
+        "version": "0.28.0",
+        "transitive_weight": 149,
+        "is_workspace": false,
+        "children": [
+          35,
+          535,
+          123,
+          127,
+          529,
+          437,
+          406
+        ]
+      },
+      {
+        "name": "toml_parser",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          248
+        ]
+      },
+      {
+        "name": "clap_builder",
+        "version": "4.6.0",
+        "transitive_weight": 45,
+        "is_workspace": false,
+        "children": [
+          179,
+          152,
+          436,
+          338,
+          206
+        ]
+      },
+      {
+        "name": "objc2-system-configuration",
+        "version": "0.3.2",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          536
+        ]
+      },
+      {
+        "name": "futures-task",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "stable_deref_trait",
+        "version": "1.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "heapless",
+        "version": "0.8.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          379,
+          245
+        ]
+      },
+      {
+        "name": "arrayvec",
+        "version": "0.7.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winnow",
+        "version": "1.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          423
+        ]
+      },
+      {
+        "name": "plotters-backend",
+        "version": "0.3.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rand_chacha",
+        "version": "0.9.0",
+        "transitive_weight": 54,
+        "is_workspace": false,
+        "children": [
+          203,
+          419
+        ]
+      },
+      {
+        "name": "icu_normalizer_data",
+        "version": "2.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ratatui-termwiz",
+        "version": "0.1.0",
+        "transitive_weight": 158,
+        "is_workspace": false,
+        "children": [
+          6,
+          17
+        ]
+      },
+      {
+        "name": "windows-interface",
+        "version": "0.59.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "fancy-regex",
+        "version": "0.17.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          220,
+          148,
+          506
+        ]
+      },
+      {
+        "name": "gix-diff",
+        "version": "0.61.0",
+        "transitive_weight": 158,
+        "is_workspace": false,
+        "children": [
+          429,
+          454,
+          79,
+          315,
+          312,
+          223,
+          38,
+          123,
+          486,
+          428,
+          339,
+          529,
+          437,
+          406,
+          103,
+          60,
+          47
+        ]
+      },
+      {
+        "name": "libtest-mimic",
+        "version": "0.8.1",
+        "transitive_weight": 52,
+        "is_workspace": false,
+        "children": [
+          490,
+          479,
+          436,
+          303
+        ]
+      },
+      {
+        "name": "winapi",
+        "version": "0.3.9",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          71,
+          160
+        ]
+      },
+      {
+        "name": "pest_generator",
+        "version": "2.8.6",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [
+          287,
+          352,
+          403,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "thiserror-impl",
+        "version": "2.0.18",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "unicode-truncate",
+        "version": "2.0.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          83,
+          66,
+          29
+        ]
+      },
+      {
+        "name": "vtparse",
+        "version": "0.6.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          538
+        ]
+      },
+      {
+        "name": "wasm-metadata",
+        "version": "0.244.0",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          288,
+          476,
+          357,
+          331
+        ]
+      },
+      {
+        "name": "wezterm-bidi",
+        "version": "0.2.3",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          399,
+          520
+        ]
+      },
+      {
+        "name": "watchman_client",
+        "version": "0.9.0",
+        "transitive_weight": 72,
+        "is_workspace": false,
+        "children": [
+          314,
+          442,
+          235,
+          510,
+          114,
+          23,
+          194,
+          257,
+          331,
+          332
+        ]
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.14.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "derive_more-impl",
+        "version": "2.1.1",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          326,
+          18,
+          374
+        ]
+      },
+      {
+        "name": "toml_writer",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "interim",
+        "version": "0.2.1",
+        "transitive_weight": 44,
+        "is_workspace": false,
+        "children": [
+          182,
+          519
+        ]
+      },
+      {
+        "name": "whoami",
+        "version": "2.1.1",
+        "transitive_weight": 56,
+        "is_workspace": false,
+        "children": [
+          147,
+          274,
+          481,
+          243,
+          176
+        ]
+      },
+      {
+        "name": "portable-atomic",
+        "version": "1.13.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-transport",
+        "version": "0.55.1",
+        "transitive_weight": 68,
+        "is_workspace": false,
+        "children": [
+          447,
+          339,
+          351,
+          91,
+          106,
+          127,
+          437,
+          406
+        ]
+      },
+      {
+        "name": "tinystr",
+        "version": "0.8.2",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          356,
+          81
+        ]
+      },
+      {
+        "name": "is_terminal_polyfill",
+        "version": "1.70.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "web-sys",
+        "version": "0.3.91",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          84,
+          237
+        ]
+      },
+      {
+        "name": "winapi-util",
+        "version": "0.1.11",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          544
+        ]
+      },
+      {
+        "name": "referencing",
+        "version": "0.45.0",
+        "transitive_weight": 66,
+        "is_workspace": false,
+        "children": [
+          300,
+          543,
+          40,
+          192,
+          92,
+          365,
+          382
+        ]
+      },
+      {
+        "name": "writeable",
+        "version": "0.6.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "byteorder",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-linebreak",
+        "version": "0.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tempfile",
+        "version": "3.27.0",
+        "transitive_weight": 64,
+        "is_workspace": false,
+        "children": [
+          543,
+          457,
+          544,
+          422,
+          104
+        ]
+      },
+      {
+        "name": "tracing-subscriber",
+        "version": "0.3.23",
+        "transitive_weight": 37,
+        "is_workspace": false,
+        "children": [
+          425,
+          400,
+          496,
+          178,
+          82,
+          220,
+          462,
+          533,
+          343,
+          104
+        ]
+      },
+      {
+        "name": "wit-parser",
+        "version": "0.244.0",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          476,
+          357,
+          92,
+          23,
+          158,
+          331,
+          57,
+          520,
+          166,
+          48
+        ]
+      },
+      {
+        "name": "gix-blame",
+        "version": "0.11.0",
+        "transitive_weight": 159,
+        "is_workspace": false,
+        "children": [
+          255,
+          429,
+          312,
+          335,
+          223,
+          180,
+          38,
+          463,
+          451,
+          496,
+          406,
+          47
+        ]
+      },
+      {
+        "name": "jiff-tzdb",
+        "version": "0.1.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.59.0",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          165
+        ]
+      },
+      {
+        "name": "gix-lock",
+        "version": "21.0.2",
+        "transitive_weight": 99,
+        "is_workspace": false,
+        "children": [
+          315,
+          402,
+          406
+        ]
+      },
+      {
+        "name": "pest_meta",
+        "version": "2.8.6",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          171,
+          403
+        ]
+      },
+      {
+        "name": "wasm-encoder",
+        "version": "0.244.0",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          476,
+          4
+        ]
+      },
+      {
+        "name": "dirs-sys",
+        "version": "0.5.0",
+        "transitive_weight": 29,
+        "is_workspace": false,
+        "children": [
+          211,
+          285,
+          176,
+          136
+        ]
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.15.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          366
+        ]
+      },
+      {
+        "name": "fixedbitset",
+        "version": "0.4.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "sha1-checked",
+        "version": "0.10.0",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          497,
+          373
+        ]
+      },
+      {
+        "name": "gix-actor",
+        "version": "0.40.0",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          463,
+          451,
+          437,
+          304
+        ]
+      },
+      {
+        "name": "hermit-abi",
+        "version": "0.5.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-hashtable",
+        "version": "0.13.0",
+        "transitive_weight": 74,
+        "is_workspace": false,
+        "children": [
+          38,
+          40,
+          365
+        ]
+      },
+      {
+        "name": "datatest-stable",
+        "version": "0.3.3",
+        "transitive_weight": 64,
+        "is_workspace": false,
+        "children": [
+          256,
+          54,
+          416,
+          489
+        ]
+      },
+      {
+        "name": "icu_locale_core",
+        "version": "2.1.1",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          272,
+          356,
+          81,
+          424,
+          277
+        ]
+      },
+      {
+        "name": "static_assertions",
+        "version": "1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "console",
+        "version": "0.15.11",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          285,
+          333,
+          176,
+          104
+        ]
+      },
+      {
+        "name": "ahash",
+        "version": "0.8.12",
+        "transitive_weight": 53,
+        "is_workspace": false,
+        "children": [
+          543,
+          23,
+          354,
+          404,
+          104,
+          306
+        ]
+      },
+      {
+        "name": "r-efi",
+        "version": "5.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-discover",
+        "version": "0.49.0",
+        "transitive_weight": 133,
+        "is_workspace": false,
+        "children": [
+          199,
+          428,
+          351,
+          529,
+          437,
+          406,
+          378
+        ]
+      },
+      {
+        "name": "escape8259",
+        "version": "0.5.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winnow",
+        "version": "0.7.15",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          423
+        ]
+      },
+      {
+        "name": "parking_lot_core",
+        "version": "0.9.12",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          370,
+          496,
+          404,
+          176,
+          169
+        ]
+      },
+      {
+        "name": "version_check",
+        "version": "0.9.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "yoke",
+        "version": "0.8.1",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          511,
+          210,
+          245
+        ]
+      },
+      {
+        "name": "quote",
+        "version": "1.0.45",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          18
+        ]
+      },
+      {
+        "name": "scm-record",
+        "version": "0.10.1",
+        "transitive_weight": 202,
+        "is_workspace": false,
+        "children": [
+          325,
+          527,
+          92,
+          400,
+          23,
+          406,
+          487,
+          44,
+          29
+        ]
+      },
+      {
+        "name": "tracing-chrome",
+        "version": "0.7.2",
+        "transitive_weight": 41,
+        "is_workspace": false,
+        "children": [
+          281,
+          92,
+          462
+        ]
+      },
+      {
+        "name": "wit-bindgen-rust",
+        "version": "0.51.0",
+        "transitive_weight": 34,
+        "is_workspace": false,
+        "children": [
+          453,
+          427,
+          262,
+          357,
+          225,
+          352,
+          331,
+          388
+        ]
+      },
+      {
+        "name": "gix-traverse",
+        "version": "0.55.0",
+        "transitive_weight": 93,
+        "is_workspace": false,
+        "children": [
+          335,
+          223,
+          180,
+          295,
+          38,
+          463,
+          496,
+          86,
+          406
+        ]
+      },
+      {
+        "name": "tokio-macros",
+        "version": "2.6.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "tokio-util",
+        "version": "0.6.10",
+        "transitive_weight": 53,
+        "is_workspace": false,
+        "children": [
+          442,
+          114,
+          186,
+          134,
+          200,
+          520,
+          478,
+          369
+        ]
+      },
+      {
+        "name": "gix-tempfile",
+        "version": "21.0.2",
+        "transitive_weight": 98,
+        "is_workspace": false,
+        "children": [
+          280,
+          428,
+          413,
+          40,
+          176
+        ]
+      },
+      {
+        "name": "litrs",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "indoc",
+        "version": "2.0.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          377
+        ]
+      },
+      {
+        "name": "shlex",
+        "version": "1.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tinyvec_macros",
+        "version": "0.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasip2",
+        "version": "1.0.2+wasi-0.2.9",
+        "transitive_weight": 37,
+        "is_workspace": false,
+        "children": [
+          208
+        ]
+      },
+      {
+        "name": "gix-revision",
+        "version": "0.43.0",
+        "transitive_weight": 93,
+        "is_workspace": false,
+        "children": [
+          335,
+          223,
+          180,
+          38,
+          463,
+          451,
+          437,
+          86,
+          47,
+          213
+        ]
+      },
+      {
+        "name": "windows_aarch64_gnullvm",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "difflib",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "thiserror-impl",
+        "version": "1.0.69",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "ratatui",
+        "version": "0.30.0",
+        "transitive_weight": 195,
+        "is_workspace": false,
+        "children": [
+          252,
+          118,
+          105,
+          90,
+          17,
+          126
+        ]
+      },
+      {
+        "name": "convert_case",
+        "version": "0.10.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          66
+        ]
+      },
+      {
+        "name": "time",
+        "version": "0.3.47",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          395,
+          163,
+          78,
+          176,
+          337,
+          117,
+          236
+        ]
+      },
+      {
+        "name": "assert_cmd",
+        "version": "2.2.0",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          437,
+          153,
+          515,
+          122,
+          436,
+          176,
+          87
+        ]
+      },
+      {
+        "name": "gix-bitmap",
+        "version": "0.3.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          451
+        ]
+      },
+      {
+        "name": "cc",
+        "version": "1.2.56",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          239,
+          318
+        ]
+      },
+      {
+        "name": "anyhow",
+        "version": "1.0.102",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "maplit",
+        "version": "1.0.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "encode_unicode",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap_derive",
+        "version": "4.6.0",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18,
+          388
+        ]
+      },
+      {
+        "name": "gix-revwalk",
+        "version": "0.29.0",
+        "transitive_weight": 92,
+        "is_workspace": false,
+        "children": [
+          223,
+          180,
+          295,
+          38,
+          463,
+          451,
+          496,
+          406
+        ]
+      },
+      {
+        "name": "logos-codegen",
+        "version": "0.15.1",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18,
+          374,
+          386,
+          167,
+          509,
+          506
+        ]
+      },
+      {
+        "name": "num-conv",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap_lex",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-command",
+        "version": "0.8.0",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          106,
+          529,
+          437,
+          47,
+          340
+        ]
+      },
+      {
+        "name": "shell-words",
+        "version": "1.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "prodash",
+        "version": "31.0.0",
+        "transitive_weight": 18,
+        "is_workspace": false,
+        "children": [
+          40
+        ]
+      },
+      {
+        "name": "cpufeatures",
+        "version": "0.2.17",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          176
+        ]
+      },
+      {
+        "name": "thread_local",
+        "version": "1.1.9",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          404
+        ]
+      },
+      {
+        "name": "maybe-async",
+        "version": "0.2.10",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "iana-time-zone-haiku",
+        "version": "0.1.2",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          330
+        ]
+      },
+      {
+        "name": "memoffset",
+        "version": "0.9.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          50
+        ]
+      },
+      {
+        "name": "serde_spanned",
+        "version": "1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          395
+        ]
+      },
+      {
+        "name": "either",
+        "version": "1.15.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "testutils",
+        "version": "0.39.0",
+        "transitive_weight": 314,
+        "is_workspace": true,
+        "children": [
+          512,
+          49,
+          100,
+          398,
+          280,
+          442,
+          541,
+          468,
+          235,
+          437,
+          113,
+          119,
+          368,
+          83,
+          408
+        ]
+      },
+      {
+        "name": "ciborium-io",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-sec",
+        "version": "0.13.2",
+        "transitive_weight": 22,
+        "is_workspace": false,
+        "children": [
+          529,
+          86,
+          547,
+          176
+        ]
+      },
+      {
+        "name": "syn",
+        "version": "2.0.117",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          308,
+          18,
+          41
+        ]
+      },
+      {
+        "name": "icu_normalizer",
+        "version": "2.1.1",
+        "transitive_weight": 29,
+        "is_workspace": false,
+        "children": [
+          401,
+          228,
+          9,
+          356,
+          496,
+          251
+        ]
+      },
+      {
+        "name": "zerocopy",
+        "version": "0.8.40",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          461
+        ]
+      },
+      {
+        "name": "derive_more",
+        "version": "2.1.1",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          266
+        ]
+      },
+      {
+        "name": "zerovec",
+        "version": "0.11.5",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          307,
+          511,
+          43
+        ]
+      },
+      {
+        "name": "indexmap",
+        "version": "2.13.0",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          23,
+          395,
+          365,
+          362
+        ]
+      },
+      {
+        "name": "ansi-to-tui",
+        "version": "8.0.1",
+        "transitive_weight": 39,
+        "is_workspace": false,
+        "children": [
+          17,
+          496,
+          406,
+          381,
+          430
+        ]
+      },
+      {
+        "name": "cast",
+        "version": "0.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "sapling-renderdag",
+        "version": "0.1.0",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          86
+        ]
+      },
+      {
+        "name": "timeago",
+        "version": "0.6.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "equivalent",
+        "version": "1.0.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "siphasher",
+        "version": "1.0.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-glob",
+        "version": "0.24.0",
+        "transitive_weight": 54,
+        "is_workspace": false,
+        "children": [
+          447,
+          529,
+          437,
+          86
+        ]
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.16.1",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          164,
+          362,
+          19
+        ]
+      },
+      {
+        "name": "foldhash",
+        "version": "0.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-ignore",
+        "version": "0.19.1",
+        "transitive_weight": 56,
+        "is_workspace": false,
+        "children": [
+          364,
+          529,
+          437,
+          47,
+          28
+        ]
+      },
+      {
+        "name": "eyre",
+        "version": "0.6.12",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          477,
+          104
+        ]
+      },
+      {
+        "name": "slab",
+        "version": "0.4.12",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "redox_syscall",
+        "version": "0.5.18",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          86
+        ]
+      },
+      {
+        "name": "gix-merge",
+        "version": "0.14.0",
+        "transitive_weight": 160,
+        "is_workspace": false,
+        "children": [
+          255,
+          429,
+          454,
+          79,
+          315,
+          321,
+          335,
+          223,
+          38,
+          428,
+          339,
+          106,
+          529,
+          437,
+          406,
+          60,
+          47,
+          213
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.2.17",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          404,
+          176,
+          498
+        ]
+      },
+      {
+        "name": "digest",
+        "version": "0.10.7",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          140,
+          528,
+          217
+        ]
+      },
+      {
+        "name": "rustc_version",
+        "version": "0.4.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          166
+        ]
+      },
+      {
+        "name": "jiff",
+        "version": "0.2.23",
+        "transitive_weight": 23,
+        "is_workspace": false,
+        "children": [
+          544,
+          395,
+          540,
+          502,
+          465,
+          520,
+          270
+        ]
+      },
+      {
+        "name": "ciborium",
+        "version": "0.2.2",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          42,
+          23,
+          350
+        ]
+      },
+      {
+        "name": "rustversion",
+        "version": "1.0.22",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "dunce",
+        "version": "1.0.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "hash32",
+        "version": "0.3.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          278
+        ]
+      },
+      {
+        "name": "jsonschema",
+        "version": "0.45.0",
+        "transitive_weight": 116,
+        "is_workspace": false,
+        "children": [
+          276,
+          300,
+          543,
+          473,
+          92,
+          534,
+          439,
+          254,
+          23,
+          5,
+          483,
+          487,
+          504,
+          410,
+          69,
+          233,
+          382,
+          506,
+          230
+        ]
+      },
+      {
+        "name": "nom",
+        "version": "8.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          423
+        ]
+      },
+      {
+        "name": "percent-encoding",
+        "version": "2.3.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "r-efi",
+        "version": "6.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "core-foundation-sys",
+        "version": "0.8.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ref-cast",
+        "version": "1.0.25",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          111
+        ]
+      },
+      {
+        "name": "beef",
+        "version": "0.5.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rand_core",
+        "version": "0.6.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "heck",
+        "version": "0.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "bitflags",
+        "version": "1.3.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "errno",
+        "version": "0.3.14",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          544,
+          176
+        ]
+      },
+      {
+        "name": "rand_core",
+        "version": "0.10.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wezterm-blob-leases",
+        "version": "0.1.1",
+        "transitive_weight": 76,
+        "is_workspace": false,
+        "children": [
+          58,
+          543,
+          156,
+          171,
+          194
+        ]
+      },
+      {
+        "name": "wezterm-dynamic-derive",
+        "version": "0.1.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          218,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "iana-time-zone",
+        "version": "0.1.65",
+        "transitive_weight": 28,
+        "is_workspace": false,
+        "children": [
+          84,
+          237,
+          112,
+          345,
+          88,
+          384,
+          520
+        ]
+      },
+      {
+        "name": "serde_core",
+        "version": "1.0.228",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          158
+        ]
+      },
+      {
+        "name": "toml_datetime",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          395
+        ]
+      },
+      {
+        "name": "jj-lib-proc-macros",
+        "version": "0.39.0",
+        "transitive_weight": 5,
+        "is_workspace": true,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "proptest",
+        "version": "1.10.0",
+        "transitive_weight": 82,
+        "is_workspace": false,
+        "children": [
+          459,
+          280,
+          102,
+          250,
+          61,
+          86,
+          148,
+          487,
+          133,
+          506,
+          207
+        ]
+      },
+      {
+        "name": "wezterm-dynamic",
+        "version": "0.2.1",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          194,
+          393,
+          184,
+          520,
+          206
+        ]
+      },
+      {
+        "name": "tracing",
+        "version": "0.1.44",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          25,
+          462,
+          478
+        ]
+      },
+      {
+        "name": "icu_properties",
+        "version": "2.1.2",
+        "transitive_weight": 23,
+        "is_workspace": false,
+        "children": [
+          228,
+          297,
+          9,
+          202,
+          356,
+          474
+        ]
+      },
+      {
+        "name": "gix-utils",
+        "version": "0.3.1",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          437,
+          456,
+          422
+        ]
+      },
+      {
+        "name": "pest",
+        "version": "2.8.6",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          423,
+          27
+        ]
+      },
+      {
+        "name": "cfg-if",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "aho-corasick",
+        "version": "1.1.4",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          423
+        ]
+      },
+      {
+        "name": "thiserror",
+        "version": "2.0.18",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          259
+        ]
+      },
+      {
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          311,
+          427,
+          225,
+          352,
+          308,
+          18,
+          331
+        ]
+      },
+      {
+        "name": "pollster",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "lock_api",
+        "version": "0.4.14",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          449
+        ]
+      },
+      {
+        "name": "data-encoding",
+        "version": "2.10.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "blake2",
+        "version": "0.10.6",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          373
+        ]
+      },
+      {
+        "name": "crunchy",
+        "version": "0.2.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "dashmap",
+        "version": "6.1.0",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [
+          305,
+          409,
+          404,
+          32,
+          265,
+          104
+        ]
+      },
+      {
+        "name": "nix",
+        "version": "0.29.0",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          86,
+          346,
+          404,
+          219,
+          176
+        ]
+      },
+      {
+        "name": "windows_aarch64_msvc",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "fancy-regex",
+        "version": "0.14.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          220,
+          148,
+          506
+        ]
+      },
+      {
+        "name": "memmem",
+        "version": "0.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "typeid",
+        "version": "1.0.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ppv-lite86",
+        "version": "0.2.21",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          354
+        ]
+      },
+      {
+        "name": "test-case-core",
+        "version": "3.3.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18,
+          404
+        ]
+      },
+      {
+        "name": "toml",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          357,
+          347,
+          396,
+          395,
+          241,
+          248,
+          267
+        ]
+      },
+      {
+        "name": "fastrand",
+        "version": "2.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "memchr",
+        "version": "2.8.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "litemap",
+        "version": "0.8.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "nu-ansi-term",
+        "version": "0.50.3",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          285
+        ]
+      },
+      {
+        "name": "typenum",
+        "version": "1.19.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wit-bindgen-core",
+        "version": "0.51.0",
+        "transitive_weight": 28,
+        "is_workspace": false,
+        "children": [
+          282,
+          331,
+          388
+        ]
+      },
+      {
+        "name": "gix-fs",
+        "version": "0.19.2",
+        "transitive_weight": 54,
+        "is_workspace": false,
+        "children": [
+          447,
+          529,
+          402,
+          437,
+          406,
+          422
+        ]
+      },
+      {
+        "name": "gix-worktree",
+        "version": "0.50.0",
+        "transitive_weight": 148,
+        "is_workspace": false,
+        "children": [
+          454,
+          223,
+          38,
+          486,
+          367,
+          428,
+          364,
+          529,
+          441,
+          437
+        ]
+      },
+      {
+        "name": "simdutf8",
+        "version": "0.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "logos-derive",
+        "version": "0.15.1",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          336
+        ]
+      },
+      {
+        "name": "windows-strings",
+        "version": "0.5.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          169
+        ]
+      },
+      {
+        "name": "anstyle-query",
+        "version": "1.1.5",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          129
+        ]
+      },
+      {
+        "name": "alloca",
+        "version": "0.4.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          330
+        ]
+      },
+      {
+        "name": "gix-protocol",
+        "version": "0.59.0",
+        "transitive_weight": 142,
+        "is_workspace": false,
+        "children": [
+          199,
+          467,
+          38,
+          271,
+          447,
+          463,
+          402,
+          437,
+          406,
+          344,
+          304,
+          213
+        ]
+      },
+      {
+        "name": "anstyle",
+        "version": "1.0.13",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "bstr",
+        "version": "1.12.1",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          23,
+          220,
+          423
+        ]
+      },
+      {
+        "name": "plotters",
+        "version": "0.3.7",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          274,
+          237,
+          487,
+          73,
+          249
+        ]
+      },
+      {
+        "name": "email_address",
+        "version": "0.2.9",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          23
+        ]
+      },
+      {
+        "name": "gen-protos",
+        "version": "0.39.0",
+        "transitive_weight": 79,
+        "is_workspace": true,
+        "children": [
+          12
+        ]
+      },
+      {
+        "name": "gix-validate",
+        "version": "0.11.0",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          437
+        ]
+      },
+      {
+        "name": "tokio",
+        "version": "1.50.0",
+        "transitive_weight": 48,
+        "is_workspace": false,
+        "children": [
+          40,
+          10,
+          80,
+          114,
+          503,
+          313,
+          547,
+          176,
+          478
+        ]
+      },
+      {
+        "name": "textwrap",
+        "version": "0.16.2",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          499,
+          279,
+          29
+        ]
+      },
+      {
+        "name": "crossbeam-channel",
+        "version": "0.5.15",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          32
+        ]
+      },
+      {
+        "name": "zerofrom-derive",
+        "version": "0.1.6",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          514,
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "criterion",
+        "version": "0.8.2",
+        "transitive_weight": 103,
+        "is_workspace": false,
+        "children": [
+          490,
+          438,
+          376,
+          54,
+          482,
+          92,
+          23,
+          198,
+          154,
+          5,
+          434,
+          466,
+          15,
+          487,
+          97,
+          359,
+          209
+        ]
+      },
+      {
+        "name": "gix-features",
+        "version": "0.46.2",
+        "transitive_weight": 53,
+        "is_workspace": false,
+        "children": [
+          341,
+          529,
+          402,
+          40,
+          54,
+          114,
+          406,
+          70,
+          444,
+          47,
+          176,
+          104,
+          545
+        ]
+      },
+      {
+        "name": "idna_adapter",
+        "version": "1.2.1",
+        "transitive_weight": 30,
+        "is_workspace": false,
+        "children": [
+          353,
+          401
+        ]
+      },
+      {
+        "name": "scopeguard",
+        "version": "1.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "vsimd",
+        "version": "0.8.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-error",
+        "version": "0.2.1",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          437
+        ]
+      },
+      {
+        "name": "signal-hook",
+        "version": "0.3.18",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          10,
+          176
+        ]
+      },
+      {
+        "name": "wit-component",
+        "version": "0.244.0",
+        "transitive_weight": 30,
+        "is_workspace": false,
+        "children": [
+          282,
+          262,
+          288,
+          476,
+          357,
+          92,
+          86,
+          23,
+          158,
+          331,
+          520
+        ]
+      },
+      {
+        "name": "gix-index",
+        "version": "0.49.0",
+        "transitive_weight": 140,
+        "is_workspace": false,
+        "children": [
+          286,
+          312,
+          223,
+          38,
+          428,
+          447,
+          457,
+          402,
+          329,
+          492,
+          441,
+          437,
+          496,
+          86,
+          406,
+          365,
+          65,
+          167,
+          69,
+          176
+        ]
+      },
+      {
+        "name": "rpassword",
+        "version": "7.4.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          138,
+          285,
+          176
+        ]
+      },
+      {
+        "name": "unicode-normalization",
+        "version": "0.1.25",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          63
+        ]
+      },
+      {
+        "name": "rustix",
+        "version": "1.1.4",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          390,
+          544,
+          86,
+          176,
+          20
+        ]
+      },
+      {
+        "name": "windows-result",
+        "version": "0.4.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          169
+        ]
+      },
+      {
+        "name": "rusty-fork",
+        "version": "0.3.1",
+        "transitive_weight": 68,
+        "is_workspace": false,
+        "children": [
+          280,
+          122,
+          167,
+          185
+        ]
+      },
+      {
+        "name": "ignore",
+        "version": "0.4.25",
+        "transitive_weight": 31,
+        "is_workspace": false,
+        "children": [
+          212,
+          54,
+          59,
+          275,
+          220,
+          238,
+          520,
+          423
+        ]
+      },
+      {
+        "name": "zerocopy-derive",
+        "version": "0.8.40",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "tracing-core",
+        "version": "0.1.36",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          104,
+          195
+        ]
+      },
+      {
+        "name": "gix-date",
+        "version": "0.15.1",
+        "transitive_weight": 33,
+        "is_workspace": false,
+        "children": [
+          375,
+          451,
+          437,
+          496,
+          69
+        ]
+      },
+      {
+        "name": "pest_derive",
+        "version": "2.8.6",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          258,
+          403
+        ]
+      },
+      {
+        "name": "portable-atomic-util",
+        "version": "0.2.6",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          270
+        ]
+      },
+      {
+        "name": "criterion-plot",
+        "version": "0.8.2",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          15,
+          359
+        ]
+      },
+      {
+        "name": "gix-shallow",
+        "version": "0.10.0",
+        "transitive_weight": 117,
+        "is_workspace": false,
+        "children": [
+          286,
+          38,
+          437,
+          406,
+          213
+        ]
+      },
+      {
+        "name": "toml_edit",
+        "version": "0.25.8+spec-1.1.0",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          357,
+          347,
+          396,
+          395,
+          241,
+          248,
+          267
+        ]
+      },
+      {
+        "name": "utf8_iter",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_gnu",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "jj-cli",
+        "version": "0.39.0",
+        "transitive_weight": 439,
+        "is_workspace": true,
+        "children": [
+          512,
+          309,
+          325,
+          49,
+          188,
+          280,
+          269,
+          137,
+          121,
+          37,
+          527,
+          516,
+          490,
+          442,
+          541,
+          310,
+          358,
+          281,
+          182,
+          464,
+          421,
+          468,
+          235,
+          212,
+          455,
+          437,
+          357,
+          21,
+          92,
+          400,
+          522,
+          22,
+          360,
+          23,
+          406,
+          5,
+          491,
+          443,
+          403,
+          317,
+          83,
+          378,
+          176,
+          332,
+          104,
+          408,
+          318,
+          369,
+          361,
+          29
+        ]
+      },
+      {
+        "name": "windows_x86_64_gnullvm",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "idna",
+        "version": "1.1.0",
+        "transitive_weight": 32,
+        "is_workspace": false,
+        "children": [
+          448,
+          496,
+          469
+        ]
+      },
+      {
+        "name": "icu_properties_data",
+        "version": "2.1.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-chunk",
+        "version": "0.7.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          451
+        ]
+      },
+      {
+        "name": "wasmparser",
+        "version": "0.244.0",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          357,
+          86,
+          290,
+          166
+        ]
+      },
+      {
+        "name": "indenter",
+        "version": "0.3.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "pin-project-lite",
+        "version": "0.2.17",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "anstream",
+        "version": "0.6.21",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [
+          130,
+          433,
+          36,
+          436,
+          99,
+          273,
+          538
+        ]
+      },
+      {
+        "name": "similar",
+        "version": "2.7.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "libredox",
+        "version": "0.1.14",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          232,
+          86,
+          176,
+          33
+        ]
+      },
+      {
+        "name": "tinytemplate",
+        "version": "1.2.1",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          92,
+          23
+        ]
+      },
+      {
+        "name": "uuid-simd",
+        "version": "0.8.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          128,
+          450
+        ]
+      },
+      {
+        "name": "petgraph",
+        "version": "0.8.3",
+        "transitive_weight": 16,
+        "is_workspace": false,
+        "children": [
+          357,
+          290,
+          75
+        ]
+      },
+      {
+        "name": "rand",
+        "version": "0.8.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          387
+        ]
+      },
+      {
+        "name": "gix-attributes",
+        "version": "0.31.0",
+        "transitive_weight": 60,
+        "is_workspace": false,
+        "children": [
+          364,
+          106,
+          529,
+          437,
+          496,
+          406,
+          531,
+          47,
+          28
+        ]
+      },
+      {
+        "name": "num-traits",
+        "version": "0.2.19",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          50
+        ]
+      },
+      {
+        "name": "windows_i686_gnullvm",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "camino",
+        "version": "1.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap",
+        "version": "4.6.0",
+        "transitive_weight": 48,
+        "is_workspace": false,
+        "children": [
+          242,
+          334
+        ]
+      },
+      {
+        "name": "etcetera",
+        "version": "0.11.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          547,
+          404
+        ]
+      },
+      {
+        "name": "filetime",
+        "version": "0.2.27",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          481,
+          404,
+          176
+        ]
+      },
+      {
+        "name": "potential_utf",
+        "version": "0.1.4",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          356
+        ]
+      },
+      {
+        "name": "signal-hook-mio",
+        "version": "0.2.5",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [
+          452,
+          503,
+          176
+        ]
+      },
+      {
+        "name": "windows_aarch64_msvc",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "smallvec",
+        "version": "1.15.1",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          23
+        ]
+      },
+      {
+        "name": "sha1",
+        "version": "0.10.6",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          373,
+          342,
+          404
+        ]
+      },
+      {
+        "name": "wasi",
+        "version": "0.11.1+wasi-snapshot-preview1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "smawk",
+        "version": "0.3.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "phf_shared",
+        "version": "0.11.3",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          363
+        ]
+      },
+      {
+        "name": "termios",
+        "version": "0.3.3",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          176
+        ]
+      },
+      {
+        "name": "jiff-tzdb-platform",
+        "version": "0.1.3",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          284
+        ]
+      },
+      {
+        "name": "mio",
+        "version": "1.1.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          547,
+          176,
+          520,
+          498
+        ]
+      },
+      {
+        "name": "bytecount",
+        "version": "0.6.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "lru",
+        "version": "0.16.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          365
+        ]
+      },
+      {
+        "name": "regex-syntax",
+        "version": "0.8.10",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-width",
+        "version": "0.1.14",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "phf_macros",
+        "version": "0.11.3",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          131,
+          352,
+          308,
+          500,
+          18
+        ]
+      },
+      {
+        "name": "lazy_static",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_bser",
+        "version": "0.4.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          114,
+          224,
+          23,
+          194,
+          331,
+          278
+        ]
+      },
+      {
+        "name": "zerofrom",
+        "version": "0.1.6",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          445
+        ]
+      },
+      {
+        "name": "jj-lib",
+        "version": "0.39.0",
+        "transitive_weight": 298,
+        "is_workspace": true,
+        "children": [
+          49,
+          264,
+          280,
+          442,
+          541,
+          268,
+          182,
+          460,
+          464,
+          457,
+          468,
+          235,
+          212,
+          16,
+          437,
+          357,
+          59,
+          67,
+          400,
+          22,
+          411,
+          496,
+          373,
+          23,
+          198,
+          385,
+          406,
+          113,
+          174,
+          397,
+          5,
+          491,
+          365,
+          403,
+          83,
+          378,
+          348,
+          332,
+          104,
+          408,
+          206
+        ]
+      },
+      {
+        "name": "windows_x86_64_msvc",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "synstructure",
+        "version": "0.13.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "predicates-tree",
+        "version": "1.0.13",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          87,
+          26
+        ]
+      },
+      {
+        "name": "clap-markdown",
+        "version": "0.1.5",
+        "transitive_weight": 49,
+        "is_workspace": false,
+        "children": [
+          490
+        ]
+      },
+      {
+        "name": "encoding_rs",
+        "version": "0.8.35",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          404
+        ]
+      },
+      {
+        "name": "gix-odb",
+        "version": "0.78.0",
+        "transitive_weight": 132,
+        "is_workspace": false,
+        "children": [
+          39,
+          223,
+          295,
+          38,
+          280,
+          428,
+          447,
+          106,
+          529,
+          40,
+          406,
+          222
+        ]
+      },
+      {
+        "name": "logos",
+        "version": "0.15.1",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          431
+        ]
+      },
+      {
+        "name": "log",
+        "version": "0.4.29",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "prost-types",
+        "version": "0.14.3",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          16
+        ]
+      },
+      {
+        "name": "erased-serde",
+        "version": "0.4.10",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          23,
+          395,
+          418
+        ]
+      },
+      {
+        "name": "half",
+        "version": "2.7.1",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          354,
+          404,
+          412
+        ]
+      },
+      {
+        "name": "hex",
+        "version": "0.4.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ryu",
+        "version": "1.0.23",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "assert_matches",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "crossterm",
+        "version": "0.29.0",
+        "transitive_weight": 50,
+        "is_workspace": false,
+        "children": [
+          457,
+          494,
+          40,
+          452,
+          355,
+          86,
+          503,
+          143,
+          257,
+          139
+        ]
+      },
+      {
+        "name": "crypto-common",
+        "version": "0.1.7",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          189,
+          426
+        ]
+      },
+      {
+        "name": "gix-path",
+        "version": "0.11.2",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          441,
+          437,
+          406,
+          47
+        ]
+      },
+      {
+        "name": "test-case-macros",
+        "version": "3.3.1",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          420,
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "kstring",
+        "version": "2.0.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          298
+        ]
+      },
+      {
+        "name": "gix-config-value",
+        "version": "0.17.1",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [
+          529,
+          437,
+          86,
+          406,
+          176
+        ]
+      },
+      {
+        "name": "sharded-slab",
+        "version": "0.1.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          509
+        ]
+      },
+      {
+        "name": "fraction",
+        "version": "0.15.3",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          115,
+          509
+        ]
+      },
+      {
+        "name": "gix-refspec",
+        "version": "0.39.0",
+        "transitive_weight": 95,
+        "is_workspace": false,
+        "children": [
+          321,
+          38,
+          364,
+          451,
+          441,
+          437,
+          496,
+          406
+        ]
+      },
+      {
+        "name": "objc2-core-foundation",
+        "version": "0.3.2",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          86
+        ]
+      },
+      {
+        "name": "chacha20",
+        "version": "0.10.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          95,
+          404,
+          391
+        ]
+      },
+      {
+        "name": "utf8parse",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasip3",
+        "version": "0.4.0+wasi-0.3.0-rc-2026-01-06",
+        "transitive_weight": 37,
+        "is_workspace": false,
+        "children": [
+          208
+        ]
+      },
+      {
+        "name": "jiff-static",
+        "version": "0.2.23",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          352,
+          308,
+          18
+        ]
+      },
+      {
+        "name": "rand",
+        "version": "0.10.0",
+        "transitive_weight": 46,
+        "is_workspace": false,
+        "children": [
+          77,
+          537,
+          391
+        ]
+      },
+      {
+        "name": "pretty_assertions",
+        "version": "1.4.1",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          11,
+          229
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.3.4",
+        "transitive_weight": 49,
+        "is_workspace": false,
+        "children": [
+          320,
+          84,
+          237,
+          404,
+          176,
+          301
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.52.0",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          165
+        ]
+      },
+      {
+        "name": "zlib-rs",
+        "version": "0.6.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "gix-worktree-state",
+        "version": "0.28.0",
+        "transitive_weight": 158,
+        "is_workspace": false,
+        "children": [
+          429,
+          454,
+          79,
+          223,
+          428,
+          447,
+          529,
+          437,
+          406,
+          110
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.61.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          169
+        ]
+      }
+    ],
+    "root_indices": [
+      471,
+      349,
+      512,
+      440,
+      397
+    ]
+  },
+  "unused_edges": [
+    [
+      "jj-cli",
+      "sapling-renderdag"
+    ],
+    [
+      "jj-cli",
+      "sapling-streampager"
+    ]
+  ],
+  "unused_direct_deps": [
+    {
+      "from_crate": "jj-cli",
+      "dep_name": "sapling-renderdag",
+      "dep_version": "0.1.0",
+      "real_deps_saved": 1,
+      "is_test_example": false
+    }
+  ]
+}

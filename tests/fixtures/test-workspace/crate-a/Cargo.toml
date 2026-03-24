@@ -1,0 +1,9 @@
+[package]
+name = "crate-a"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+crate-b = { path = "../crate-b" }
+regex = "1"
+once_cell = "1"
