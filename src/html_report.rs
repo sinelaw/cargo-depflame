@@ -11,7 +11,12 @@ pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> an
     // Generate SVG into a buffer.
     let svg_content = if let Some(tree) = &report.dep_tree {
         let mut buf = Vec::new();
-        flamegraph::render_flamegraph(tree, report.total_dependencies, &mut buf)?;
+        flamegraph::render_flamegraph_with_unused(
+            tree,
+            report.total_dependencies,
+            &report.unused_direct_deps,
+            &mut buf,
+        )?;
         String::from_utf8(buf)?
     } else {
         String::from("<p>No dependency tree data available.</p>")

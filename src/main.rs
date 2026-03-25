@@ -264,6 +264,121 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
         }
     }
 
+    // Phase 5d: Detect completely unused direct dependencies of workspace members.
+    eprintln!("Checking for unused direct dependencies...");
+    let mut unused_deps: Vec<metrics::UpstreamTarget> = Vec::new();
+    // Collect names already analyzed to avoid duplicates.
+    let already_analyzed: HashSet<(&str, &str)> = ranked
+        .iter()
+        .map(|t| (t.intermediate.name.as_str(), t.fat_dependency.name.as_str()))
+        .collect();
+
+    for ws_id in &dep_graph.workspace_members {
+        let ws_pkg = match metadata.packages.iter().find(|p| &p.id == ws_id) {
+            Some(p) => p,
+            None => continue,
+        };
+        let ws_dir: PathBuf = match ws_pkg.manifest_path.parent() {
+            Some(p) => p.into(),
+            None => continue,
+        };
+        let ws_rs_files = registry::collect_rs_files(&ws_dir);
+        if ws_rs_files.is_empty() {
+            continue;
+        }
+
+        let direct_deps = match dep_graph.forward.get(ws_id) {
+            Some(deps) => deps,
+            None => continue,
+        };
+
+        for dep_id in direct_deps {
+            let dep_node = match dep_graph.nodes.get(dep_id) {
+                Some(n) => n,
+                None => continue,
+            };
+            // Skip workspace members (internal deps) and already-analyzed pairs.
+            if dep_node.is_workspace_member {
+                continue;
+            }
+            if already_analyzed.contains(&(ws_pkg.name.as_str(), dep_node.name.as_str())) {
+                continue;
+            }
+            // Skip build-only deps — they won't appear in source.
+            if let Some(meta) = dep_graph.edge_meta.get(&(ws_id.clone(), dep_id.clone())) {
+                if meta.build_only {
+                    continue;
+                }
+            }
+
+            let scan = scanner::scan_files(&ws_rs_files, &dep_node.name);
+            if scan.ref_count == 0 && !scan.has_re_export_all {
+                let w_unique =
+                    dep_graph.unique_subtree_weight(ws_id, dep_id);
+                let dep_chain = vec![ws_pkg.name.clone(), dep_node.name.clone()];
+                let edge_meta = dep_graph
+                    .edge_meta
+                    .get(&(ws_id.clone(), dep_id.clone()))
+                    .cloned()
+                    .unwrap_or(graph::EdgeMeta {
+                        build_only: false,
+                        already_optional: false,
+                        platform_conditional: false,
+                    });
+
+                unused_deps.push(metrics::UpstreamTarget {
+                    intermediate: metrics::PackageInfo {
+                        name: ws_pkg.name.clone(),
+                        version: ws_pkg.version.to_string(),
+                    },
+                    fat_dependency: metrics::PackageInfo {
+                        name: dep_node.name.clone(),
+                        version: dep_node.version.clone(),
+                    },
+                    w_transitive: dep_node.transitive_weight,
+                    w_unique,
+                    c_ref: 0,
+                    hurrs: None,
+                    confidence: metrics::Confidence::High,
+                    scan_result: scan,
+                    suggestion: metrics::RemovalStrategy::Remove,
+                    edge_meta,
+                    dep_chain,
+                    required_by_sibling: None,
+                    phantom: !platform::is_real_dep(
+                        &real_deps,
+                        &dep_node.name,
+                        &dep_node.version,
+                    ),
+                    intermediate_is_workspace_member: true,
+                    fat_dep_loc: 0,
+                    fat_dep_own_deps: dep_graph.direct_dep_count(dep_id),
+                    has_re_export_all: false,
+                });
+            }
+        }
+    }
+
+    if !unused_deps.is_empty() {
+        eprintln!("  Found {} unused direct dependencies", unused_deps.len());
+        // Split into high-impact (actually saves deps) vs low-impact (also a
+        // transitive dep of something else, so removing from Cargo.toml won't
+        // shrink the build).
+        let (mut impactful, mut cosmetic): (Vec<_>, Vec<_>) =
+            unused_deps.into_iter().partition(|t| t.w_unique > 0);
+        impactful.sort_by(|a, b| b.w_unique.cmp(&a.w_unique));
+        cosmetic.sort_by(|a, b| b.w_transitive.cmp(&a.w_transitive));
+        // Deprioritize cosmetic removals: they clean up Cargo.toml but don't
+        // reduce the dependency count.
+        for t in &mut cosmetic {
+            t.confidence = metrics::Confidence::Low;
+        }
+        // Impactful unused deps go first, then existing ranked, then cosmetic.
+        impactful.append(&mut ranked);
+        impactful.append(&mut cosmetic);
+        ranked = impactful;
+    }
+
     // Phase 6: Report.
     let platform_deps = real_deps.as_ref().map(|s| s.len());
     let phantom_deps = platform_deps
@@ -273,6 +388,16 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
     // Build serializable dep tree for flamegraph rendering.
     eprintln!("Building dependency tree for visualization...");
     let dep_tree = flamegraph::build_dep_tree(&dep_graph);
+
+    let unused_dep_names: Vec<String> = ranked
+        .iter()
+        .filter(|t| {
+            matches!(t.suggestion, metrics::RemovalStrategy::Remove)
+                && t.intermediate_is_workspace_member
+                && t.c_ref == 0
+        })
+        .map(|t| t.fat_dependency.name.clone())
+        .collect();
 
     let analysis = AnalysisReport {
         tool_version: env!("CARGO_PKG_VERSION").to_string(),
@@ -285,6 +410,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
         fat_nodes_found: fat_nodes.len(),
         targets: ranked,
         dep_tree: Some(dep_tree),
+        unused_direct_deps: unused_dep_names,
     };
 
     let mut writer: Box<dyn Write> = match &args.output {

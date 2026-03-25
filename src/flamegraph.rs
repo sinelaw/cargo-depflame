@@ -274,7 +274,10 @@ fn xml_escape(s: &str) -> String {
 ///   - shared deps → colour based on weight but with purple tint
 ///   - leaf (weight=1) → cool green
 ///   - heavy → warm red/orange
-fn rect_fill(r: &LayoutRect, max_weight: usize) -> String {
+fn rect_fill(r: &LayoutRect, max_weight: usize, is_unused: bool) -> String {
+    if is_unused {
+        return "rgb(220,20,80)".to_string(); // bright magenta-red for unused deps
+    }
     if r.is_workspace {
         return "rgb(70,130,180)".to_string();
     }
@@ -294,10 +297,11 @@ fn rect_fill(r: &LayoutRect, max_weight: usize) -> String {
         return format!("hsl({hue:.0},{sat:.0}%,{lit:.0}%)");
     }
 
-    // Green → yellow → orange → red
-    let hue = 120.0 * (1.0 - ratio);
-    let sat = 65.0 + 15.0 * ratio;
-    let lit = 55.0 - 10.0 * ratio;
+    // Green → yellow → orange heat gradient based on transitive dep count.
+    // Green = leaf (1 dep), orange = many transitive deps.
+    let hue = 120.0 - 90.0 * ratio; // 120 (green) → 30 (orange)
+    let sat = 55.0 + 20.0 * ratio;
+    let lit = 58.0 - 8.0 * ratio;
     format!("hsl({hue:.0},{sat:.0}%,{lit:.0}%)")
 }
 
@@ -358,11 +362,22 @@ pub fn render_flamegraph(
     total_deps: usize,
     writer: &mut dyn Write,
 ) -> anyhow::Result<()> {
+    render_flamegraph_with_unused(tree, total_deps, &[], writer)
+}
+
+pub fn render_flamegraph_with_unused(
+    tree: &DepTreeData,
+    total_deps: usize,
+    unused_deps: &[String],
+    writer: &mut dyn Write,
+) -> anyhow::Result<()> {
     let rects = layout(tree);
     if rects.is_empty() {
         writeln!(writer, "<svg xmlns='http://www.w3.org/2000/svg'/>")?;
         return Ok(());
     }
+
+    let unused_set: HashSet<&str> = unused_deps.iter().map(|s| s.as_str()).collect();
 
     let max_depth = rects.iter().map(|r| r.depth).max().unwrap_or(0);
     let max_weight = tree
@@ -390,6 +405,7 @@ pub fn render_flamegraph(
   .frame text {{ pointer-events: none; }}
   rect.shared {{ stroke-dasharray: 4,2; stroke: rgba(100,70,130,0.5); stroke-width: 0.5; }}
   rect.normal {{ stroke: rgba(0,0,0,0.12); stroke-width: 0.5; }}
+  rect.unused {{ stroke: rgba(220,20,80,0.8); stroke-width: 1.5; }}
   rect.workspace {{ stroke: rgba(0,0,0,0.3); stroke-width: 1; }}
   text.title {{ font-size: 15px; font-weight: bold; fill: #333; }}
   text.subtitle {{ font-size: 11px; fill: #888; }}
@@ -522,10 +538,11 @@ pub fn render_flamegraph(
     }
     let legend_items = [
         LegendItem { label: "workspace", fill: "rgb(70,130,180)", dash: false },
-        LegendItem { label: "few deps", fill: "hsl(110,65%,55%)", dash: false },
-        LegendItem { label: "moderate", fill: "hsl(40,72%,50%)", dash: false },
-        LegendItem { label: "heavy", fill: "hsl(5,78%,47%)", dash: false },
+        LegendItem { label: "leaf (0 deps)", fill: "hsl(120,55%,58%)", dash: false },
+        LegendItem { label: "some deps", fill: "hsl(75,65%,54%)", dash: false },
+        LegendItem { label: "many deps", fill: "hsl(30,75%,50%)", dash: false },
         LegendItem { label: "shared", fill: "hsl(270,50%,65%)", dash: true },
+        LegendItem { label: "unused", fill: "rgb(220,20,80)", dash: false },
     ];
 
     // Compute total legend width so we can right-align it.
@@ -592,9 +609,12 @@ pub fn render_flamegraph(
     svg.push_str("<g id=\"frames\">\n");
 
     for r in &rects {
-        let fill = rect_fill(r, max_weight);
-        let tc = text_color(r);
-        let cls = if r.is_workspace {
+        let is_unused = unused_set.contains(r.name.as_str());
+        let fill = rect_fill(r, max_weight, is_unused);
+        let tc = if is_unused { "#fff" } else { text_color(r) };
+        let cls = if is_unused {
+            "unused"
+        } else if r.is_workspace {
             "workspace"
         } else if r.is_shared {
             "shared"
