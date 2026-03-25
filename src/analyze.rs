@@ -4,6 +4,7 @@ use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
 use crate::cli::AnalyzeArgs;
+use crate::crate_fetch;
 use crate::flamegraph;
 use crate::graph::{DepGraph, EdgeMeta, IntermediateEdge};
 use crate::metrics::{self, ComputeTargetInput, Confidence, PackageInfo, RemovalStrategy, UpstreamTarget};
@@ -15,10 +16,23 @@ use crate::{platform, registry, scanner};
 /// This function does NOT handle output formatting or writing — the caller
 /// is responsible for rendering/writing the returned `AnalysisReport`.
 pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
+    // If --crate is specified, fetch from crates.io and analyze the extracted crate.
+    let _temp_dir; // keep tempdir alive for the duration of analysis
+    let manifest_path = if let Some(ref spec_str) = args.common.crate_spec {
+        let spec = crate_fetch::parse_crate_spec(spec_str)?;
+        let tmp = tempfile::tempdir().context("failed to create temp directory")?;
+        let crate_dir = crate_fetch::fetch_and_extract(&spec, tmp.path())?;
+        _temp_dir = Some(tmp);
+        crate_dir.join("Cargo.toml")
+    } else {
+        _temp_dir = None;
+        args.common.manifest_path.clone()
+    };
+
     // Phase 1: Load metadata.
     eprintln!("Loading workspace metadata...");
     let metadata = cargo_metadata::MetadataCommand::new()
-        .manifest_path(&args.common.manifest_path)
+        .manifest_path(&manifest_path)
         .exec()
         .context("failed to run cargo metadata")?;
 
@@ -52,7 +66,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
 
     // Phase 2c: Resolve real platform deps to detect phantom deps.
     eprintln!("Resolving platform-specific dependency tree...");
-    let real_deps = platform::resolve_real_deps(&args.common.manifest_path);
+    let real_deps = platform::resolve_real_deps(&manifest_path);
     if real_deps.is_none() {
         eprintln!("  [WARN] Could not resolve platform deps, phantom detection disabled");
     }
