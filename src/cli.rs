@@ -34,6 +34,12 @@ pub struct CommonArgs {
     #[arg(long, default_value = "Cargo.toml")]
     pub manifest_path: PathBuf,
 
+    /// Analyze a crate from crates.io instead of a local workspace.
+    /// Accepts: crate name (e.g. "serde"), name@version (e.g. "serde@1.0.228"),
+    /// or a crates.io URL (e.g. "https://crates.io/crates/serde").
+    #[arg(long = "crate", value_name = "SPEC")]
+    pub crate_spec: Option<String>,
+
     /// Minimum hURRS score to include in the report.
     #[arg(long, default_value_t = 3.0)]
     pub threshold: f64,
@@ -55,6 +61,7 @@ impl Default for CommonArgs {
     fn default() -> Self {
         Self {
             manifest_path: PathBuf::from("Cargo.toml"),
+            crate_spec: None,
             threshold: 3.0,
             top: 10,
             fat_threshold: 10,

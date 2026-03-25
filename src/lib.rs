@@ -1,5 +1,6 @@
 pub mod analyze;
 pub mod cli;
+pub mod crate_fetch;
 pub mod flamegraph;
 pub mod graph;
 pub mod html_report;
