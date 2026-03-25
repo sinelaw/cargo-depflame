@@ -1,6 +1,6 @@
 {
   "tool_version": "0.1.0",
-  "timestamp": "2026-03-25T21:28:09.860162022+00:00",
+  "timestamp": "2026-03-25T23:48:11.902461835+00:00",
   "workspace_root": "/tmp/rust-projects/rkyv",
   "threshold": 3.0,
   "total_dependencies": 69,
@@ -336,73 +336,8 @@
   "dep_tree": {
     "nodes": [
       {
-        "name": "wasip2",
-        "version": "1.0.2+wasi-0.2.9",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          44
-        ]
-      },
-      {
-        "name": "ptr_meta",
-        "version": "0.3.1",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          29
-        ]
-      },
-      {
-        "name": "bumpalo",
-        "version": "3.20.2",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "windows-link",
-        "version": "0.2.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "hashbrown",
-        "version": "0.16.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "equivalent",
-        "version": "1.0.2",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "munge",
-        "version": "0.4.7",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          15
-        ]
-      },
-      {
-        "name": "clap_builder",
-        "version": "4.6.0",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          69,
-          58
-        ]
-      },
-      {
-        "name": "version_check",
-        "version": "0.9.5",
+        "name": "anstyle",
+        "version": "1.0.14",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
@@ -413,562 +348,27 @@
         "transitive_weight": 14,
         "is_workspace": false,
         "children": [
-          49,
-          43
+          53,
+          48
         ]
       },
       {
-        "name": "windows-sys",
-        "version": "0.61.2",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          3
-        ]
-      },
-      {
-        "name": "termcolor",
-        "version": "1.4.1",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          28
-        ]
-      },
-      {
-        "name": "rancor",
-        "version": "0.1.1",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          1
-        ]
-      },
-      {
-        "name": "serde",
-        "version": "1.0.228",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          47
-        ]
-      },
-      {
-        "name": "bytecheck_derive",
-        "version": "0.8.2",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        "name": "munge_macro",
-        "version": "0.4.7",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        "name": "simdutf8",
-        "version": "0.1.5",
+        "name": "equivalent",
+        "version": "1.0.2",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "rkyv_derive",
-        "version": "0.8.15",
-        "transitive_weight": 5,
-        "is_workspace": true,
-        "children": [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        "name": "serde_json",
-        "version": "1.0.149",
-        "transitive_weight": 11,
-        "is_workspace": false,
-        "children": [
-          13,
-          47,
-          20,
-          52,
-          53
-        ]
-      },
-      {
-        "name": "wasm-bindgen-shared",
-        "version": "0.2.114",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          70
-        ]
-      },
-      {
-        "name": "itoa",
-        "version": "1.0.18",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "proc-macro2",
-        "version": "1.0.106",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          70
-        ]
-      },
-      {
-        "name": "quote",
-        "version": "1.0.45",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          21
-        ]
-      },
-      {
-        "name": "divan-macros",
-        "version": "0.1.21",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        "name": "bytecheck",
-        "version": "0.8.2",
-        "transitive_weight": 10,
-        "is_workspace": false,
-        "children": [
-          12,
-          1,
-          14,
-          16
-        ]
-      },
-      {
-        "name": "zerocopy-derive",
-        "version": "0.8.47",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        "name": "benchlib",
-        "version": "0.8.15",
-        "transitive_weight": 18,
-        "is_workspace": true,
-        "children": [
-          41,
-          35,
-          39
-        ]
-      },
-      {
-        "name": "tinyvec_macros",
-        "version": "0.1.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "winapi-util",
-        "version": "0.1.11",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          10
-        ]
-      },
-      {
-        "name": "ptr_meta_derive",
-        "version": "0.3.1",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        "name": "rend",
-        "version": "0.5.3",
-        "transitive_weight": 11,
-        "is_workspace": false,
-        "children": [
-          24
-        ]
-      },
-      {
-        "name": "condtype",
-        "version": "1.3.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "libc",
-        "version": "0.2.183",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "once_cell",
-        "version": "1.21.4",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "serde_spanned",
-        "version": "1.1.0",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          47
-        ]
-      },
-      {
-        "name": "rand",
-        "version": "0.8.5",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          42
-        ]
-      },
-      {
-        "name": "toml_datetime",
-        "version": "1.1.0+spec-1.1.0",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          47
-        ]
-      },
-      {
-        "name": "tinyvec",
-        "version": "1.11.0",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          27
-        ]
-      },
-      {
-        "name": "trybuild",
-        "version": "1.0.116",
-        "transitive_weight": 27,
-        "is_workspace": false,
-        "children": [
-          64,
-          18,
-          13,
-          55,
-          11,
-          63,
-          71
-        ]
-      },
-      {
-        "name": "rand_pcg",
-        "version": "0.3.1",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          42
-        ]
-      },
-      {
-        "name": "rkyv",
-        "version": "0.8.15",
-        "transitive_weight": 31,
-        "is_workspace": true,
-        "children": [
-          9,
-          30,
-          24,
-          12,
-          6,
-          1,
-          17,
-          46,
-          37,
-          66,
-          4
-        ]
-      },
-      {
-        "name": "divan",
-        "version": "0.1.21",
-        "transitive_weight": 14,
-        "is_workspace": false,
-        "children": [
-          23,
-          54,
-          67,
-          31,
-          32,
-          50
-        ]
-      },
-      {
-        "name": "rand_core",
-        "version": "0.6.4",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "wasm-bindgen",
-        "version": "0.2.114",
-        "transitive_weight": 12,
-        "is_workspace": false,
-        "children": [
-          59,
-          19,
-          67,
-          33,
-          68
-        ]
-      },
-      {
-        "name": "wit-bindgen",
-        "version": "0.51.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "ahash",
-        "version": "0.8.12",
-        "transitive_weight": 15,
-        "is_workspace": false,
-        "children": [
-          62,
-          61,
-          67,
-          33,
-          8
-        ]
-      },
-      {
-        "name": "indexmap",
-        "version": "2.13.0",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          5,
-          4
-        ]
-      },
-      {
-        "name": "serde_core",
-        "version": "1.0.228",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          55
-        ]
-      },
-      {
-        "name": "toml_writer",
-        "version": "1.1.0+spec-1.1.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "js-sys",
-        "version": "0.3.91",
-        "transitive_weight": 13,
-        "is_workspace": false,
-        "children": [
-          43,
-          33
-        ]
-      },
-      {
-        "name": "regex-lite",
-        "version": "0.1.9",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "syn",
-        "version": "2.0.117",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          22,
-          21,
-          70
-        ]
-      },
-      {
-        "name": "memchr",
-        "version": "2.8.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "zmij",
-        "version": "1.0.21",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "clap",
-        "version": "4.6.0",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          7
-        ]
-      },
-      {
-        "name": "serde_derive",
-        "version": "1.0.228",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        "name": "wasm-bindgen-macro-support",
-        "version": "0.2.114",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          51,
-          22,
-          21,
-          19,
-          2
-        ]
-      },
-      {
-        "name": "r-efi",
-        "version": "5.3.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "clap_lex",
-        "version": "1.1.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "wasm-bindgen-macro",
-        "version": "0.2.114",
-        "transitive_weight": 8,
-        "is_workspace": false,
-        "children": [
-          56,
-          22
-        ]
-      },
-      {
-        "name": "winnow",
+        "name": "target-triple",
         "version": "1.0.0",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "zerocopy",
-        "version": "0.8.47",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          25
-        ]
-      },
-      {
-        "name": "getrandom",
-        "version": "0.3.4",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          0,
-          67,
-          32,
-          57
-        ]
-      },
-      {
-        "name": "glob",
-        "version": "0.3.3",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "toml",
-        "version": "1.1.0+spec-1.1.0",
-        "transitive_weight": 15,
-        "is_workspace": false,
-        "children": [
-          34,
-          36,
-          47,
-          46,
-          65,
-          48,
-          60
-        ]
-      },
-      {
-        "name": "toml_parser",
-        "version": "1.1.0+spec-1.1.0",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          60
-        ]
-      },
-      {
-        "name": "bytes",
-        "version": "1.11.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "cfg-if",
-        "version": "1.0.4",
+        "name": "tinyvec_macros",
+        "version": "0.1.1",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
@@ -981,8 +381,158 @@
         "children": []
       },
       {
-        "name": "anstyle",
-        "version": "1.0.14",
+        "name": "termcolor",
+        "version": "1.4.1",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          21
+        ]
+      },
+      {
+        "name": "memchr",
+        "version": "2.8.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerocopy-derive",
+        "version": "0.8.47",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        "name": "clap_lex",
+        "version": "1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ptr_meta_derive",
+        "version": "0.3.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        "name": "libc",
+        "version": "0.2.183",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "cfg-if",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "quote",
+        "version": "1.0.45",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          16
+        ]
+      },
+      {
+        "name": "glob",
+        "version": "0.3.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde",
+        "version": "1.0.228",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          43
+        ]
+      },
+      {
+        "name": "proc-macro2",
+        "version": "1.0.106",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          23
+        ]
+      },
+      {
+        "name": "rkyv",
+        "version": "0.8.15",
+        "transitive_weight": 31,
+        "is_workspace": true,
+        "children": [
+          1,
+          65,
+          64,
+          68,
+          59,
+          25,
+          29,
+          39,
+          27,
+          35,
+          47
+        ]
+      },
+      {
+        "name": "benchlib",
+        "version": "0.8.15",
+        "transitive_weight": 18,
+        "is_workspace": true,
+        "children": [
+          32,
+          54,
+          60
+        ]
+      },
+      {
+        "name": "clap",
+        "version": "4.6.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          45
+        ]
+      },
+      {
+        "name": "serde_spanned",
+        "version": "1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          43
+        ]
+      },
+      {
+        "name": "winapi-util",
+        "version": "0.1.11",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          34
+        ]
+      },
+      {
+        "name": "rand_core",
+        "version": "0.6.4",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
@@ -995,17 +545,467 @@
         "children": []
       },
       {
-        "name": "target-triple",
+        "name": "windows-link",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ptr_meta",
+        "version": "0.3.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          10
+        ]
+      },
+      {
+        "name": "divan-macros",
+        "version": "0.1.21",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        "name": "tinyvec",
+        "version": "1.11.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          4
+        ]
+      },
+      {
+        "name": "once_cell",
+        "version": "1.21.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rkyv_derive",
+        "version": "0.8.15",
+        "transitive_weight": 5,
+        "is_workspace": true,
+        "children": [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        "name": "toml_parser",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          38
+        ]
+      },
+      {
+        "name": "wasip2",
+        "version": "1.0.2+wasi-0.2.9",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          52
+        ]
+      },
+      {
+        "name": "divan",
+        "version": "0.1.21",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          26,
+          19,
+          12,
+          58,
+          11,
+          33
+        ]
+      },
+      {
+        "name": "regex-lite",
+        "version": "0.1.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.61.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          24
+        ]
+      },
+      {
+        "name": "bytes",
+        "version": "1.11.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-shared",
+        "version": "0.2.114",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          23
+        ]
+      },
+      {
+        "name": "wasm-bindgen-macro-support",
+        "version": "0.2.114",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          70,
+          13,
+          16,
+          36,
+          63
+        ]
+      },
+      {
+        "name": "winnow",
         "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "indexmap",
+        "version": "2.13.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          2,
+          47
+        ]
+      },
+      {
+        "name": "munge_macro",
+        "version": "0.4.7",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        "name": "toml_writer",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "version_check",
+        "version": "0.9.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_core",
+        "version": "1.0.228",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          66
+        ]
+      },
+      {
+        "name": "wasm-bindgen-macro",
+        "version": "0.2.114",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          37,
+          13
+        ]
+      },
+      {
+        "name": "clap_builder",
+        "version": "4.6.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          0,
+          9
+        ]
+      },
+      {
+        "name": "zerocopy",
+        "version": "0.8.47",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          8
+        ]
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.16.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen",
+        "version": "0.2.114",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          44,
+          36,
+          12,
+          28,
+          5
+        ]
+      },
+      {
+        "name": "zmij",
+        "version": "1.0.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "simdutf8",
+        "version": "0.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "toml_datetime",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          43
+        ]
+      },
+      {
+        "name": "wit-bindgen",
+        "version": "0.51.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "js-sys",
+        "version": "0.3.91",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          48,
+          28
+        ]
+      },
+      {
+        "name": "rand",
+        "version": "0.8.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          22
+        ]
+      },
+      {
+        "name": "r-efi",
+        "version": "5.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "getrandom",
+        "version": "0.3.4",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          31,
+          12,
+          11,
+          55
+        ]
+      },
+      {
+        "name": "ahash",
+        "version": "0.8.12",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          56,
+          46,
+          12,
+          28,
+          42
+        ]
+      },
+      {
+        "name": "condtype",
+        "version": "1.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "munge",
+        "version": "0.4.7",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          40
+        ]
+      },
+      {
+        "name": "rand_pcg",
+        "version": "0.3.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          22
+        ]
+      },
+      {
+        "name": "bytecheck_derive",
+        "version": "0.8.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        "name": "trybuild",
+        "version": "1.0.116",
+        "transitive_weight": 27,
+        "is_workspace": false,
+        "children": [
+          67,
+          69,
+          15,
+          66,
+          6,
+          14,
+          3
+        ]
+      },
+      {
+        "name": "bumpalo",
+        "version": "3.20.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "bytecheck",
+        "version": "0.8.2",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          68,
+          25,
+          61,
+          50
+        ]
+      },
+      {
+        "name": "rend",
+        "version": "0.5.3",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          64
+        ]
+      },
+      {
+        "name": "serde_derive",
+        "version": "1.0.228",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        "name": "toml",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          20,
+          51,
+          43,
+          39,
+          30,
+          41,
+          38
+        ]
+      },
+      {
+        "name": "rancor",
+        "version": "0.1.1",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          25
+        ]
+      },
+      {
+        "name": "serde_json",
+        "version": "1.0.149",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          15,
+          43,
+          71,
+          7,
+          49
+        ]
+      },
+      {
+        "name": "syn",
+        "version": "2.0.117",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          13,
+          16,
+          23
+        ]
+      },
+      {
+        "name": "itoa",
+        "version": "1.0.18",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       }
     ],
     "root_indices": [
-      40,
-      26,
-      17
+      17,
+      18,
+      29
     ]
   },
   "unused_edges": [
@@ -1021,5 +1021,28 @@
       "rkyv",
       "bytes"
     ]
+  ],
+  "unused_direct_deps": [
+    {
+      "from_crate": "rkyv",
+      "dep_name": "bytes",
+      "dep_version": "1.11.1",
+      "real_deps_saved": 1,
+      "is_test_example": false
+    },
+    {
+      "from_crate": "rkyv",
+      "dep_name": "indexmap",
+      "dep_version": "2.13.0",
+      "real_deps_saved": 2,
+      "is_test_example": false
+    },
+    {
+      "from_crate": "rkyv",
+      "dep_name": "tinyvec",
+      "dep_version": "1.11.0",
+      "real_deps_saved": 2,
+      "is_test_example": false
+    }
   ]
 }

@@ -132,14 +132,14 @@ body {
     <span title="Dependencies actually compiled for your current platform/target. This is the number that matters for your build times.">127 platform deps</span>
     <span title="Dependencies that appear in metadata but are not compiled on your current platform (e.g. windows-only crates on linux). These are typically not actionable.">113 phantom deps</span>
     <span title="Crates with a high transitive dependency count (above the --fat-threshold). These are the heavy hitters that the tool analyzes for removal opportunities.">62 heavy crates analyzed</span>
-    <span title="Number of upstream edges identified as potential optimization targets, ranked by impact.">22 targets found</span>
-    <span style="color:#aaa">v0.1.0 &middot; 2026-03-25T21:28:09.999463209+00:00</span>
+    <span title="Number of upstream edges identified as potential optimization targets, ranked by impact.">27 targets found</span>
+    <span style="color:#aaa">v0.1.0 &middot; 2026-03-25T23:48:06.843033344+00:00</span>
   </div>
 </div>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('flamegraph')">Flamegraph</button>
-  <button class="tab-btn" onclick="showTab('targets')">Suggestions (22)</button>
+  <button class="tab-btn" onclick="showTab('targets')">Suggestions (27)</button>
   <button class="tab-btn" onclick="showTab('json')">Raw JSON</button>
 </div>
 
@@ -5298,6 +5298,11 @@ depth 1</title>
 <li>(-25 deps) Propose making <a href="https://crates.io/crates/idna" target="_blank" style="color:inherit;text-decoration:underline dotted">idna</a> optional in <a href="https://crates.io/crates/url" target="_blank" style="color:inherit;text-decoration:underline dotted">url</a> &mdash; submit a PR to put it behind a feature flag <span title="This change would be a PR to an upstream library, not your own code" style="cursor:help">📤</span></li>
 <li>(-22 deps) Propose making <a href="https://crates.io/crates/getrandom" target="_blank" style="color:inherit;text-decoration:underline dotted">getrandom</a> optional in <a href="https://crates.io/crates/jobserver" target="_blank" style="color:inherit;text-decoration:underline dotted">jobserver</a> &mdash; submit a PR to put it behind a feature flag <span title="This change would be a PR to an upstream library, not your own code" style="cursor:help">📤</span></li>
 <li>(-20 deps) Propose making <a href="https://crates.io/crates/wasip2" target="_blank" style="color:inherit;text-decoration:underline dotted">wasip2</a> optional in <a href="https://crates.io/crates/getrandom" target="_blank" style="color:inherit;text-decoration:underline dotted">getrandom</a> &mdash; submit a PR to put it behind a feature flag <span title="This change would be a PR to an upstream library, not your own code" style="cursor:help">📤</span></li>
+<li>(-7 deps) Propose making <a href="https://crates.io/crates/redox_users" target="_blank" style="color:inherit;text-decoration:underline dotted">redox_users</a> optional in <a href="https://crates.io/crates/dirs-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">dirs-sys</a> &mdash; submit a PR to put it behind a feature flag <span title="This change would be a PR to an upstream library, not your own code" style="cursor:help">📤</span></li>
+<li>(-5 deps) Propose making <a href="https://crates.io/crates/wit-bindgen-rust" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust</a> optional in <a href="https://crates.io/crates/wit-bindgen-rust-macro" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust-macro</a> &mdash; submit a PR to put it behind a feature flag <span title="This change would be a PR to an upstream library, not your own code" style="cursor:help">📤</span></li>
+<li>(-1 deps) Propose making <a href="https://crates.io/crates/iana-time-zone-haiku" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone-haiku</a> optional in <a href="https://crates.io/crates/iana-time-zone" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone</a> &mdash; submit a PR to put it behind a feature flag <span title="This change would be a PR to an upstream library, not your own code" style="cursor:help">📤</span></li>
+<li>(-1 deps) Propose making <a href="https://crates.io/crates/wit-component" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-component</a> optional in <a href="https://crates.io/crates/wit-bindgen-rust" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust</a> &mdash; submit a PR to put it behind a feature flag <span title="This change would be a PR to an upstream library, not your own code" style="cursor:help">📤</span></li>
+<li>(-1 deps) Propose making <a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a> optional in <a href="https://crates.io/crates/iana-time-zone" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone</a> &mdash; submit a PR to put it behind a feature flag <span title="This change would be a PR to an upstream library, not your own code" style="cursor:help">📤</span></li>
 </ul>
 </div>
 
@@ -5782,6 +5787,111 @@ depth 1</title>
 </div>
 </div></td>
 </tr>
+<tr class="expandable" onclick="toggleDetail(23)">
+  <td>23</td>
+  <td><code><a href="https://crates.io/crates/dirs-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">dirs-sys</a></code> <span title="Requires a PR to this upstream library">📤</span></td>
+  <td><code><a href="https://crates.io/crates/redox_users" target="_blank" style="color:inherit;text-decoration:underline dotted">redox_users</a></code></td>
+  <td>7</td><td>14</td><td>3</td><td>4.7</td>
+  <td><span class="badge badge-noise">NOISE</span></td>
+  <td>FEATURE GATE</td>
+</tr>
+<tr class="detail-row" id="detail-23">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/dirs-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">dirs-sys</a> v0.5.0 &rarr; <a href="https://crates.io/crates/redox_users" target="_blank" style="color:inherit;text-decoration:underline dotted">redox_users</a> v0.5.2</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">PLATFORM-CONDITIONAL</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/eza" target="_blank" style="color:inherit;text-decoration:underline dotted">eza</a> &rarr; <a href="https://crates.io/crates/dirs" target="_blank" style="color:inherit;text-decoration:underline dotted">dirs</a> &rarr; <a href="https://crates.io/crates/dirs-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">dirs-sys</a> &rarr; <a href="https://crates.io/crates/redox_users" target="_blank" style="color:inherit;text-decoration:underline dotted">redox_users</a></div>
+  <div style="margin-top:8px"><span class="label">References (3):</span></div>
+  <div style="margin-left:8px"><div class="ref-file">/root/.cargo/registry/src/.../dirs-sys-0.5.0/src/lib.rs:79</div>
+<div class="ref-line"><code>extern crate redox_users;</code></div>
+<div class="ref-file">/root/.cargo/registry/src/.../dirs-sys-0.5.0/src/lib.rs:86</div>
+<div class="ref-line"><code>use super::redox_users::{All, AllUsers, Config};</code></div>
+<div class="ref-file">/root/.cargo/registry/src/.../dirs-sys-0.5.0/src/lib.rs:89</div>
+<div class="ref-line"><code>let current_uid = redox_users::get_uid().ok()?;</code></div>
+</div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(24)">
+  <td>24</td>
+  <td><code><a href="https://crates.io/crates/wit-bindgen-rust-macro" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust-macro</a></code> <span title="Requires a PR to this upstream library">📤</span></td>
+  <td><code><a href="https://crates.io/crates/wit-bindgen-rust" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust</a></code></td>
+  <td>5</td><td>32</td><td>3</td><td>10.7</td>
+  <td><span class="badge badge-noise">NOISE</span></td>
+  <td>FEATURE GATE</td>
+</tr>
+<tr class="detail-row" id="detail-24">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/wit-bindgen-rust-macro" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust-macro</a> v0.51.0 &rarr; <a href="https://crates.io/crates/wit-bindgen-rust" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust</a> v0.51.0</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/eza" target="_blank" style="color:inherit;text-decoration:underline dotted">eza</a> &rarr; <a href="https://crates.io/crates/git2" target="_blank" style="color:inherit;text-decoration:underline dotted">git2</a> &rarr; <a href="https://crates.io/crates/libgit2-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">libgit2-sys</a> &rarr; <a href="https://crates.io/crates/cc" target="_blank" style="color:inherit;text-decoration:underline dotted">cc</a> &rarr; <a href="https://crates.io/crates/jobserver" target="_blank" style="color:inherit;text-decoration:underline dotted">jobserver</a> &rarr; <a href="https://crates.io/crates/getrandom" target="_blank" style="color:inherit;text-decoration:underline dotted">getrandom</a> &rarr; <a href="https://crates.io/crates/wasip2" target="_blank" style="color:inherit;text-decoration:underline dotted">wasip2</a> &rarr; <a href="https://crates.io/crates/wit-bindgen" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen</a> &rarr; <a href="https://crates.io/crates/wit-bindgen-rust-macro" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust-macro</a> &rarr; <a href="https://crates.io/crates/wit-bindgen-rust" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust</a></div>
+  <div style="margin-top:8px"><span class="label">References (3):</span></div>
+  <div style="margin-left:8px"><div class="ref-file">/root/.cargo/registry/src/.../wit-bindgen-rust-macro-0.51.0/src/lib.rs:13</div>
+<div class="ref-line"><code>use wit_bindgen_rust::{Opts, Ownership, WithOption};</code></div>
+<div class="ref-file">/root/.cargo/registry/src/.../wit-bindgen-rust-macro-0.51.0/src/lib.rs:33</div>
+<div class="ref-line"><code>if let Some(e) = err.downcast_ref::&lt;wit_bindgen_rust::MissingWith&gt;() {</code></div>
+<div class="ref-file">/root/.cargo/registry/src/.../wit-bindgen-rust-macro-0.51.0/src/lib.rs:340</div>
+<div class="ref-line"><code>impl From&lt;ExportKey&gt; for wit_bindgen_rust::ExportKey {</code></div>
+</div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(25)">
+  <td>25</td>
+  <td><code><a href="https://crates.io/crates/iana-time-zone" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone</a></code> <span title="Requires a PR to this upstream library">📤</span></td>
+  <td><code><a href="https://crates.io/crates/iana-time-zone-haiku" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone-haiku</a></code></td>
+  <td>1</td><td>44</td><td>1</td><td>44.0</td>
+  <td><span class="badge badge-noise">NOISE</span></td>
+  <td>FEATURE GATE</td>
+</tr>
+<tr class="detail-row" id="detail-25">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/iana-time-zone" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone</a> v0.1.65 &rarr; <a href="https://crates.io/crates/iana-time-zone-haiku" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone-haiku</a> v0.1.2</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">PLATFORM-CONDITIONAL</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/eza" target="_blank" style="color:inherit;text-decoration:underline dotted">eza</a> &rarr; <a href="https://crates.io/crates/chrono" target="_blank" style="color:inherit;text-decoration:underline dotted">chrono</a> &rarr; <a href="https://crates.io/crates/iana-time-zone" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone</a> &rarr; <a href="https://crates.io/crates/iana-time-zone-haiku" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone-haiku</a></div>
+  <div style="margin-top:8px"><span class="label">References (1):</span></div>
+  <div style="margin-left:8px"><div class="ref-file">/root/.cargo/registry/src/.../iana-time-zone-0.1.65/src/tz_haiku.rs:2</div>
+<div class="ref-line"><code>iana_time_zone_haiku::get_timezone().ok_or(crate::GetTimezoneError::OsError)</code></div>
+</div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(26)">
+  <td>26</td>
+  <td><code><a href="https://crates.io/crates/wit-bindgen-rust" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust</a></code> <span title="Requires a PR to this upstream library">📤</span></td>
+  <td><code><a href="https://crates.io/crates/wit-component" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-component</a></code></td>
+  <td>1</td><td>28</td><td>2</td><td>14.0</td>
+  <td><span class="badge badge-noise">NOISE</span></td>
+  <td>FEATURE GATE</td>
+</tr>
+<tr class="detail-row" id="detail-26">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/wit-bindgen-rust" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust</a> v0.51.0 &rarr; <a href="https://crates.io/crates/wit-component" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-component</a> v0.244.0</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/eza" target="_blank" style="color:inherit;text-decoration:underline dotted">eza</a> &rarr; <a href="https://crates.io/crates/git2" target="_blank" style="color:inherit;text-decoration:underline dotted">git2</a> &rarr; <a href="https://crates.io/crates/libgit2-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">libgit2-sys</a> &rarr; <a href="https://crates.io/crates/cc" target="_blank" style="color:inherit;text-decoration:underline dotted">cc</a> &rarr; <a href="https://crates.io/crates/jobserver" target="_blank" style="color:inherit;text-decoration:underline dotted">jobserver</a> &rarr; <a href="https://crates.io/crates/getrandom" target="_blank" style="color:inherit;text-decoration:underline dotted">getrandom</a> &rarr; <a href="https://crates.io/crates/wasip2" target="_blank" style="color:inherit;text-decoration:underline dotted">wasip2</a> &rarr; <a href="https://crates.io/crates/wit-bindgen" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen</a> &rarr; <a href="https://crates.io/crates/wit-bindgen-rust-macro" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust-macro</a> &rarr; <a href="https://crates.io/crates/wit-bindgen-rust" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-bindgen-rust</a> &rarr; <a href="https://crates.io/crates/wit-component" target="_blank" style="color:inherit;text-decoration:underline dotted">wit-component</a></div>
+  <div style="margin-top:8px"><span class="label">References (2):</span></div>
+  <div style="margin-left:8px"><div class="ref-file">/root/.cargo/registry/src/.../wit-bindgen-rust-0.51.0/src/lib.rs:929</div>
+<div class="ref-line"><code>let component_type = wit_component::metadata::encode(</code></div>
+<div class="ref-file">/root/.cargo/registry/src/.../wit-bindgen-rust-0.51.0/src/lib.rs:932</div>
+<div class="ref-line"><code>wit_component::StringEncoding::UTF8,</code></div>
+</div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(27)">
+  <td>27</td>
+  <td><code><a href="https://crates.io/crates/iana-time-zone" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone</a></code> <span title="Requires a PR to this upstream library">📤</span></td>
+  <td><code><a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a></code></td>
+  <td>1</td><td>13</td><td>1</td><td>13.0</td>
+  <td><span class="badge badge-noise">NOISE</span></td>
+  <td>FEATURE GATE</td>
+</tr>
+<tr class="detail-row" id="detail-27">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/iana-time-zone" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone</a> v0.1.65 &rarr; <a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a> v0.3.85</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">PLATFORM-CONDITIONAL</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/eza" target="_blank" style="color:inherit;text-decoration:underline dotted">eza</a> &rarr; <a href="https://crates.io/crates/chrono" target="_blank" style="color:inherit;text-decoration:underline dotted">chrono</a> &rarr; <a href="https://crates.io/crates/iana-time-zone" target="_blank" style="color:inherit;text-decoration:underline dotted">iana-time-zone</a> &rarr; <a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a></div>
+  <div style="margin-top:8px"><span class="label">References (1):</span></div>
+  <div style="margin-left:8px"><div class="ref-file">/root/.cargo/registry/src/.../iana-time-zone-0.1.65/src/tz_wasm32_unknown.rs:1</div>
+<div class="ref-line"><code>use js_sys::{Array, Intl, Object, Reflect};</code></div>
+</div>
+</div></td>
+</tr>
 </tbody>
 </table>
 
@@ -5792,7 +5902,7 @@ depth 1</title>
   <button class="copy-btn" onclick="copyJson()">Copy</button>
   <pre><code>{
   &quot;tool_version&quot;: &quot;0.1.0&quot;,
-  &quot;timestamp&quot;: &quot;2026-03-25T21:28:09.999463209+00:00&quot;,
+  &quot;timestamp&quot;: &quot;2026-03-25T23:48:06.843033344+00:00&quot;,
   &quot;workspace_root&quot;: &quot;/tmp/rust-projects/eza&quot;,
   &quot;threshold&quot;: 3.0,
   &quot;total_dependencies&quot;: 240,
@@ -7155,38 +7265,349 @@ depth 1</title>
       &quot;fat_dep_loc&quot;: 2843,
       &quot;fat_dep_own_deps&quot;: 7,
       &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;dirs-sys&quot;,
+        &quot;version&quot;: &quot;0.5.0&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;redox_users&quot;,
+        &quot;version&quot;: &quot;0.5.2&quot;
+      },
+      &quot;w_transitive&quot;: 14,
+      &quot;w_unique&quot;: 7,
+      &quot;c_ref&quot;: 3,
+      &quot;hurrs&quot;: 4.666666666666667,
+      &quot;confidence&quot;: &quot;Noise&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;redox_users&quot;,
+        &quot;searched_names&quot;: [
+          &quot;redox_users&quot;
+        ],
+        &quot;ref_count&quot;: 3,
+        &quot;file_matches&quot;: [
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dirs-sys-0.5.0/src/lib.rs&quot;,
+            &quot;line_number&quot;: 79,
+            &quot;line_content&quot;: &quot;extern crate redox_users;&quot;,
+            &quot;in_generated_file&quot;: false
+          },
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dirs-sys-0.5.0/src/lib.rs&quot;,
+            &quot;line_number&quot;: 86,
+            &quot;line_content&quot;: &quot;use super::redox_users::{All, AllUsers, Config};&quot;,
+            &quot;in_generated_file&quot;: false
+          },
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dirs-sys-0.5.0/src/lib.rs&quot;,
+            &quot;line_number&quot;: 89,
+            &quot;line_content&quot;: &quot;let current_uid = redox_users::get_uid().ok()?;&quot;,
+            &quot;in_generated_file&quot;: false
+          }
+        ],
+        &quot;files_with_matches&quot;: 1,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [
+          &quot;All&quot;,
+          &quot;AllUsers&quot;,
+          &quot;Config&quot;,
+          &quot;get_uid&quot;
+        ],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: &quot;FeatureGate&quot;,
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: false,
+        &quot;platform_conditional&quot;: true
+      },
+      &quot;dep_chain&quot;: [
+        &quot;eza&quot;,
+        &quot;dirs&quot;,
+        &quot;dirs-sys&quot;,
+        &quot;redox_users&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: false,
+      &quot;fat_dep_loc&quot;: 1128,
+      &quot;fat_dep_own_deps&quot;: 3,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;wit-bindgen-rust-macro&quot;,
+        &quot;version&quot;: &quot;0.51.0&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;wit-bindgen-rust&quot;,
+        &quot;version&quot;: &quot;0.51.0&quot;
+      },
+      &quot;w_transitive&quot;: 32,
+      &quot;w_unique&quot;: 5,
+      &quot;c_ref&quot;: 3,
+      &quot;hurrs&quot;: 10.666666666666666,
+      &quot;confidence&quot;: &quot;Noise&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;wit-bindgen-rust&quot;,
+        &quot;searched_names&quot;: [
+          &quot;wit_bindgen_rust&quot;
+        ],
+        &quot;ref_count&quot;: 3,
+        &quot;file_matches&quot;: [
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs&quot;,
+            &quot;line_number&quot;: 13,
+            &quot;line_content&quot;: &quot;use wit_bindgen_rust::{Opts, Ownership, WithOption};&quot;,
+            &quot;in_generated_file&quot;: false
+          },
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs&quot;,
+            &quot;line_number&quot;: 33,
+            &quot;line_content&quot;: &quot;if let Some(e) = err.downcast_ref::&lt;wit_bindgen_rust::MissingWith&gt;() {&quot;,
+            &quot;in_generated_file&quot;: false
+          },
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs&quot;,
+            &quot;line_number&quot;: 340,
+            &quot;line_content&quot;: &quot;impl From&lt;ExportKey&gt; for wit_bindgen_rust::ExportKey {&quot;,
+            &quot;in_generated_file&quot;: false
+          }
+        ],
+        &quot;files_with_matches&quot;: 1,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [
+          &quot;ExportKey&quot;,
+          &quot;MissingWith&quot;,
+          &quot;Opts&quot;,
+          &quot;Ownership&quot;,
+          &quot;WithOption&quot;
+        ],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: &quot;FeatureGate&quot;,
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: false,
+        &quot;platform_conditional&quot;: false
+      },
+      &quot;dep_chain&quot;: [
+        &quot;eza&quot;,
+        &quot;git2&quot;,
+        &quot;libgit2-sys&quot;,
+        &quot;cc&quot;,
+        &quot;jobserver&quot;,
+        &quot;getrandom&quot;,
+        &quot;wasip2&quot;,
+        &quot;wit-bindgen&quot;,
+        &quot;wit-bindgen-rust-macro&quot;,
+        &quot;wit-bindgen-rust&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: false,
+      &quot;fat_dep_loc&quot;: 5141,
+      &quot;fat_dep_own_deps&quot;: 8,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;iana-time-zone&quot;,
+        &quot;version&quot;: &quot;0.1.65&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;iana-time-zone-haiku&quot;,
+        &quot;version&quot;: &quot;0.1.2&quot;
+      },
+      &quot;w_transitive&quot;: 44,
+      &quot;w_unique&quot;: 1,
+      &quot;c_ref&quot;: 1,
+      &quot;hurrs&quot;: 44.0,
+      &quot;confidence&quot;: &quot;Noise&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;iana-time-zone-haiku&quot;,
+        &quot;searched_names&quot;: [
+          &quot;iana_time_zone_haiku&quot;
+        ],
+        &quot;ref_count&quot;: 1,
+        &quot;file_matches&quot;: [
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iana-time-zone-0.1.65/src/tz_haiku.rs&quot;,
+            &quot;line_number&quot;: 2,
+            &quot;line_content&quot;: &quot;iana_time_zone_haiku::get_timezone().ok_or(crate::GetTimezoneError::OsError)&quot;,
+            &quot;in_generated_file&quot;: false
+          }
+        ],
+        &quot;files_with_matches&quot;: 1,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [
+          &quot;get_timezone&quot;
+        ],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: &quot;FeatureGate&quot;,
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: false,
+        &quot;platform_conditional&quot;: true
+      },
+      &quot;dep_chain&quot;: [
+        &quot;eza&quot;,
+        &quot;chrono&quot;,
+        &quot;iana-time-zone&quot;,
+        &quot;iana-time-zone-haiku&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: false,
+      &quot;fat_dep_loc&quot;: 62,
+      &quot;fat_dep_own_deps&quot;: 1,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;wit-bindgen-rust&quot;,
+        &quot;version&quot;: &quot;0.51.0&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;wit-component&quot;,
+        &quot;version&quot;: &quot;0.244.0&quot;
+      },
+      &quot;w_transitive&quot;: 28,
+      &quot;w_unique&quot;: 1,
+      &quot;c_ref&quot;: 2,
+      &quot;hurrs&quot;: 14.0,
+      &quot;confidence&quot;: &quot;Noise&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;wit-component&quot;,
+        &quot;searched_names&quot;: [
+          &quot;wit_component&quot;
+        ],
+        &quot;ref_count&quot;: 2,
+        &quot;file_matches&quot;: [
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-0.51.0/src/lib.rs&quot;,
+            &quot;line_number&quot;: 929,
+            &quot;line_content&quot;: &quot;let component_type = wit_component::metadata::encode(&quot;,
+            &quot;in_generated_file&quot;: false
+          },
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-0.51.0/src/lib.rs&quot;,
+            &quot;line_number&quot;: 932,
+            &quot;line_content&quot;: &quot;wit_component::StringEncoding::UTF8,&quot;,
+            &quot;in_generated_file&quot;: false
+          }
+        ],
+        &quot;files_with_matches&quot;: 1,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [
+          &quot;StringEncoding&quot;,
+          &quot;metadata&quot;
+        ],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: &quot;FeatureGate&quot;,
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: false,
+        &quot;platform_conditional&quot;: false
+      },
+      &quot;dep_chain&quot;: [
+        &quot;eza&quot;,
+        &quot;git2&quot;,
+        &quot;libgit2-sys&quot;,
+        &quot;cc&quot;,
+        &quot;jobserver&quot;,
+        &quot;getrandom&quot;,
+        &quot;wasip2&quot;,
+        &quot;wit-bindgen&quot;,
+        &quot;wit-bindgen-rust-macro&quot;,
+        &quot;wit-bindgen-rust&quot;,
+        &quot;wit-component&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: false,
+      &quot;fat_dep_loc&quot;: 11183,
+      &quot;fat_dep_own_deps&quot;: 11,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;iana-time-zone&quot;,
+        &quot;version&quot;: &quot;0.1.65&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;js-sys&quot;,
+        &quot;version&quot;: &quot;0.3.85&quot;
+      },
+      &quot;w_transitive&quot;: 13,
+      &quot;w_unique&quot;: 1,
+      &quot;c_ref&quot;: 1,
+      &quot;hurrs&quot;: 13.0,
+      &quot;confidence&quot;: &quot;Noise&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;js-sys&quot;,
+        &quot;searched_names&quot;: [
+          &quot;js_sys&quot;
+        ],
+        &quot;ref_count&quot;: 1,
+        &quot;file_matches&quot;: [
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iana-time-zone-0.1.65/src/tz_wasm32_unknown.rs&quot;,
+            &quot;line_number&quot;: 1,
+            &quot;line_content&quot;: &quot;use js_sys::{Array, Intl, Object, Reflect};&quot;,
+            &quot;in_generated_file&quot;: false
+          }
+        ],
+        &quot;files_with_matches&quot;: 1,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [
+          &quot;Array&quot;,
+          &quot;Intl&quot;,
+          &quot;Object&quot;,
+          &quot;Reflect&quot;
+        ],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: &quot;FeatureGate&quot;,
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: false,
+        &quot;platform_conditional&quot;: true
+      },
+      &quot;dep_chain&quot;: [
+        &quot;eza&quot;,
+        &quot;chrono&quot;,
+        &quot;iana-time-zone&quot;,
+        &quot;js-sys&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: false,
+      &quot;fat_dep_loc&quot;: 3338,
+      &quot;fat_dep_own_deps&quot;: 2,
+      &quot;has_re_export_all&quot;: false
     }
   ],
   &quot;dep_tree&quot;: {
     &quot;nodes&quot;: [
       {
-        &quot;name&quot;: &quot;indexmap&quot;,
-        &quot;version&quot;: &quot;2.13.0&quot;,
-        &quot;transitive_weight&quot;: 10,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          60,
-          5,
-          175,
-          39
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;page_size&quot;,
-        &quot;version&quot;: &quot;0.6.0&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          85,
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;utf8_iter&quot;,
-        &quot;version&quot;: &quot;1.0.4&quot;,
+        &quot;name&quot;: &quot;find-msvc-tools&quot;,
+        &quot;version&quot;: &quot;0.1.9&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;addr2line&quot;,
+        &quot;version&quot;: &quot;0.25.1&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          64
+        ]
       },
       {
         &quot;name&quot;: &quot;serde_spanned&quot;,
@@ -7194,574 +7615,20 @@ depth 1</title>
         &quot;transitive_weight&quot;: 7,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          5
+          144
         ]
       },
       {
-        &quot;name&quot;: &quot;syn&quot;,
-        &quot;version&quot;: &quot;2.0.116&quot;,
-        &quot;transitive_weight&quot;: 4,
+        &quot;name&quot;: &quot;rustix&quot;,
+        &quot;version&quot;: &quot;1.1.3&quot;,
+        &quot;transitive_weight&quot;: 7,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          140,
-          170,
-          220
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;serde_core&quot;,
-        &quot;version&quot;: &quot;1.0.228&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          27
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;windows_aarch64_msvc&quot;,
-        &quot;version&quot;: &quot;0.53.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;once_cell_polyfill&quot;,
-        &quot;version&quot;: &quot;1.70.2&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;crunchy&quot;,
-        &quot;version&quot;: &quot;0.2.4&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;iana-time-zone-haiku&quot;,
-        &quot;version&quot;: &quot;0.1.2&quot;,
-        &quot;transitive_weight&quot;: 44,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          43
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;regex-automata&quot;,
-        &quot;version&quot;: &quot;0.4.14&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          34,
-          178,
-          222
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;phf_macros&quot;,
-        &quot;version&quot;: &quot;0.13.1&quot;,
-        &quot;transitive_weight&quot;: 9,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          36,
-          4,
-          140,
-          72,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;normalize-line-endings&quot;,
-        &quot;version&quot;: &quot;0.3.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;anes&quot;,
-        &quot;version&quot;: &quot;0.1.6&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;fast-srgb8&quot;,
-        &quot;version&quot;: &quot;1.0.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;potential_utf&quot;,
-        &quot;version&quot;: &quot;0.1.4&quot;,
-        &quot;transitive_weight&quot;: 13,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          181
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;humantime-serde&quot;,
-        &quot;version&quot;: &quot;1.1.1&quot;,
-        &quot;transitive_weight&quot;: 9,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          60,
-          162
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;os_pipe&quot;,
-        &quot;version&quot;: &quot;1.2.3&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          229,
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;crossbeam-epoch&quot;,
-        &quot;version&quot;: &quot;0.9.18&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          209
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasm-encoder&quot;,
-        &quot;version&quot;: &quot;0.244.0&quot;,
-        &quot;transitive_weight&quot;: 17,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          136,
-          32
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;unsafe-libyaml-norway&quot;,
-        &quot;version&quot;: &quot;0.2.15&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;icu_locale_core&quot;,
-        &quot;version&quot;: &quot;2.1.1&quot;,
-        &quot;transitive_weight&quot;: 17,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          189,
-          181,
-          137,
-          113,
-          240
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;percent-encoding&quot;,
-        &quot;version&quot;: &quot;2.3.2&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;time-core&quot;,
-        &quot;version&quot;: &quot;0.1.8&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;itertools&quot;,
-        &quot;version&quot;: &quot;0.13.0&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          204
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;thiserror-impl&quot;,
-        &quot;version&quot;: &quot;2.0.18&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;idna_adapter&quot;,
-        &quot;version&quot;: &quot;1.2.1&quot;,
-        &quot;transitive_weight&quot;: 27,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          185,
-          55
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;serde_derive&quot;,
-        &quot;version&quot;: &quot;1.0.228&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;path-clean&quot;,
-        &quot;version&quot;: &quot;1.0.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;once_cell&quot;,
-        &quot;version&quot;: &quot;1.21.3&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;zerofrom-derive&quot;,
-        &quot;version&quot;: &quot;0.1.6&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          33,
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;windows-targets&quot;,
-        &quot;version&quot;: &quot;0.53.5&quot;,
-        &quot;transitive_weight&quot;: 10,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          42,
-          100,
-          6,
-          167,
-          217,
-          139,
-          168,
-          180,
-          38
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;leb128fmt&quot;,
-        &quot;version&quot;: &quot;0.1.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;synstructure&quot;,
-        &quot;version&quot;: &quot;0.13.2&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;aho-corasick&quot;,
-        &quot;version&quot;: &quot;1.1.4&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          178
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;terminal_size&quot;,
-        &quot;version&quot;: &quot;0.4.3&quot;,
-        &quot;transitive_weight&quot;: 18,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          201,
-          73
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;phf_generator&quot;,
-        &quot;version&quot;: &quot;0.13.1&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          72,
-          151
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;content_inspector&quot;,
-        &quot;version&quot;: &quot;0.2.4&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          178
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;windows_x86_64_msvc&quot;,
-        &quot;version&quot;: &quot;0.53.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;hashbrown&quot;,
-        &quot;version&quot;: &quot;0.16.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;stable_deref_trait&quot;,
-        &quot;version&quot;: &quot;1.2.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;yoke&quot;,
-        &quot;version&quot;: &quot;0.8.1&quot;,
-        &quot;transitive_weight&quot;: 10,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          212,
-          171,
-          40
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;windows-link&quot;,
-        &quot;version&quot;: &quot;0.2.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;cc&quot;,
-        &quot;version&quot;: &quot;1.2.56&quot;,
-        &quot;transitive_weight&quot;: 43,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          172,
+          174,
+          26,
+          16,
           149,
-          94,
-          186
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;itoa&quot;,
-        &quot;version&quot;: &quot;1.0.17&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;filetime&quot;,
-        &quot;version&quot;: &quot;0.2.27&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          232,
-          105,
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;partition-identity&quot;,
-        &quot;version&quot;: &quot;0.3.0&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          188
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;uutils_term_grid&quot;,
-        &quot;version&quot;: &quot;0.7.0&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          104
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;zmij&quot;,
-        &quot;version&quot;: &quot;1.0.21&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;tempfile&quot;,
-        &quot;version&quot;: &quot;3.25.0&quot;,
-        &quot;transitive_weight&quot;: 48,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          95,
-          73,
-          229,
-          151,
-          29
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasm-bindgen-macro-support&quot;,
-        &quot;version&quot;: &quot;0.2.108&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170,
-          115,
-          65
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;windows-strings&quot;,
-        &quot;version&quot;: &quot;0.5.1&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          42
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;prettyplease&quot;,
-        &quot;version&quot;: &quot;0.2.37&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;unicode-width&quot;,
-        &quot;version&quot;: &quot;0.2.2&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;wit-bindgen-core&quot;,
-        &quot;version&quot;: &quot;0.51.0&quot;,
-        &quot;transitive_weight&quot;: 26,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          92,
-          61,
-          107
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;icu_properties&quot;,
-        &quot;version&quot;: &quot;2.1.2&quot;,
-        &quot;transitive_weight&quot;: 23,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          67,
-          21,
-          225,
-          239,
-          181,
-          210
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rustc-demangle&quot;,
-        &quot;version&quot;: &quot;0.1.27&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;wait-timeout&quot;,
-        &quot;version&quot;: &quot;0.2.1&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;base64&quot;,
-        &quot;version&quot;: &quot;0.22.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;serde_norway&quot;,
-        &quot;version&quot;: &quot;0.9.42&quot;,
-        &quot;transitive_weight&quot;: 14,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          0,
-          60,
-          44,
-          219,
-          20
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;serde&quot;,
-        &quot;version&quot;: &quot;1.0.228&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          5,
-          27
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;anyhow&quot;,
-        &quot;version&quot;: &quot;1.0.101&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;strsim&quot;,
-        &quot;version&quot;: &quot;0.11.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;form_urlencoded&quot;,
-        &quot;version&quot;: &quot;1.2.2&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          22
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;uzers&quot;,
-        &quot;version&quot;: &quot;0.12.2&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          94,
-          198
+          5
         ]
       },
       {
@@ -7772,750 +7639,56 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;automod&quot;,
-        &quot;version&quot;: &quot;1.0.16&quot;,
-        &quot;transitive_weight&quot;: 5,
+        &quot;name&quot;: &quot;linux-raw-sys&quot;,
+        &quot;version&quot;: &quot;0.11.0&quot;,
+        &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170
-        ]
+        &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;icu_provider&quot;,
+        &quot;name&quot;: &quot;icu_normalizer&quot;,
         &quot;version&quot;: &quot;2.1.1&quot;,
-        &quot;transitive_weight&quot;: 19,
+        &quot;transitive_weight&quot;: 26,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          21,
-          239,
-          181,
-          41,
-          212,
-          137,
-          240
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;windows-core&quot;,
-        &quot;version&quot;: &quot;0.62.2&quot;,
-        &quot;transitive_weight&quot;: 10,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          110,
-          183,
-          236,
-          51,
-          42
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;option-ext&quot;,
-        &quot;version&quot;: &quot;0.2.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;natord-plus-plus&quot;,
-        &quot;version&quot;: &quot;2.0.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;clap_derive&quot;,
-        &quot;version&quot;: &quot;4.5.55&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170,
-          107
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;phf_shared&quot;,
-        &quot;version&quot;: &quot;0.13.1&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          146
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rustix&quot;,
-        &quot;version&quot;: &quot;1.1.3&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          126,
-          229,
-          79,
-          94,
-          153
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;anstyle&quot;,
-        &quot;version&quot;: &quot;1.0.13&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;serde_json&quot;,
-        &quot;version&quot;: &quot;1.0.149&quot;,
-        &quot;transitive_weight&quot;: 11,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          60,
-          5,
-          44,
-          178,
-          48
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;tinytemplate&quot;,
-        &quot;version&quot;: &quot;1.2.1&quot;,
-        &quot;transitive_weight&quot;: 12,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          75,
-          60
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;deranged&quot;,
-        &quot;version&quot;: &quot;0.5.6&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          235
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;getrandom&quot;,
-        &quot;version&quot;: &quot;0.3.4&quot;,
-        &quot;transitive_weight&quot;: 39,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          207,
-          105,
-          94,
-          82
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;bitflags&quot;,
-        &quot;version&quot;: &quot;2.11.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;anstyle-parse&quot;,
-        &quot;version&quot;: &quot;0.2.7&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          195
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;timeago&quot;,
-        &quot;version&quot;: &quot;0.6.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;r-efi&quot;,
-        &quot;version&quot;: &quot;5.3.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;unicode-xid&quot;,
-        &quot;version&quot;: &quot;0.2.6&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;id-arena&quot;,
-        &quot;version&quot;: &quot;2.3.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;winapi&quot;,
-        &quot;version&quot;: &quot;0.3.9&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          218,
-          109
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;snapbox-macros&quot;,
-        &quot;version&quot;: &quot;1.0.0&quot;,
-        &quot;transitive_weight&quot;: 12,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          206
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;time-macros&quot;,
-        &quot;version&quot;: &quot;0.2.27&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          120,
-          23
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasm-bindgen-macro&quot;,
-        &quot;version&quot;: &quot;0.2.108&quot;,
-        &quot;transitive_weight&quot;: 8,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          50,
-          140
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;getrandom&quot;,
-        &quot;version&quot;: &quot;0.2.17&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          105,
-          94,
-          116
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;phf&quot;,
-        &quot;version&quot;: &quot;0.13.1&quot;,
-        &quot;transitive_weight&quot;: 13,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          11,
-          60,
-          72
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasm-bindgen&quot;,
-        &quot;version&quot;: &quot;0.2.108&quot;,
-        &quot;transitive_weight&quot;: 12,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          88,
-          115,
-          105,
-          29,
-          98
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wit-parser&quot;,
-        &quot;version&quot;: &quot;0.244.0&quot;,
-        &quot;transitive_weight&quot;: 24,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          136,
-          75,
-          0,
-          60,
-          27,
-          61,
-          84,
-          198,
-          211,
-          83
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;approx&quot;,
-        &quot;version&quot;: &quot;0.5.1&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          117
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;libc&quot;,
-        &quot;version&quot;: &quot;0.2.182&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;getrandom&quot;,
-        &quot;version&quot;: &quot;0.4.1&quot;,
-        &quot;transitive_weight&quot;: 40,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          207,
-          159,
-          105,
-          94,
-          82
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;plotters-svg&quot;,
-        &quot;version&quot;: &quot;0.3.7&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          142
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;zerocopy-derive&quot;,
-        &quot;version&quot;: &quot;0.8.39&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rustversion&quot;,
-        &quot;version&quot;: &quot;1.0.22&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;oorandom&quot;,
-        &quot;version&quot;: &quot;11.1.5&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;windows_aarch64_gnullvm&quot;,
-        &quot;version&quot;: &quot;0.53.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;is_terminal_polyfill&quot;,
-        &quot;version&quot;: &quot;1.70.2&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;redox_users&quot;,
-        &quot;version&quot;: &quot;0.5.2&quot;,
-        &quot;transitive_weight&quot;: 14,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
+          234,
           226,
-          89,
-          232
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;icu_normalizer_data&quot;,
-        &quot;version&quot;: &quot;2.1.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;ansi-width&quot;,
-        &quot;version&quot;: &quot;0.1.0&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          147
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;cfg-if&quot;,
-        &quot;version&quot;: &quot;1.0.4&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;anstyle-wincon&quot;,
-        &quot;version&quot;: &quot;3.0.11&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          229,
-          74,
-          7
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;heck&quot;,
-        &quot;version&quot;: &quot;0.5.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;zerovec-derive&quot;,
-        &quot;version&quot;: &quot;0.11.2&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;winapi-x86_64-pc-windows-gnu&quot;,
-        &quot;version&quot;: &quot;0.4.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;windows-implement&quot;,
-        &quot;version&quot;: &quot;0.60.2&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;android_system_properties&quot;,
-        &quot;version&quot;: &quot;0.1.5&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;adler2&quot;,
-        &quot;version&quot;: &quot;2.0.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;litemap&quot;,
-        &quot;version&quot;: &quot;0.8.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;snapbox&quot;,
-        &quot;version&quot;: &quot;1.0.0&quot;,
-        &quot;transitive_weight&quot;: 81,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          49,
-          86,
-          206,
-          201,
-          45,
-          182,
-          17,
-          37,
-          57,
-          74,
-          233,
-          94,
-          12,
-          187
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasm-bindgen-shared&quot;,
-        &quot;version&quot;: &quot;0.2.108&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          220
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasi&quot;,
-        &quot;version&quot;: &quot;0.11.1+wasi-snapshot-preview1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;num-traits&quot;,
-        &quot;version&quot;: &quot;0.2.19&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          150
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;crossbeam-deque&quot;,
-        &quot;version&quot;: &quot;0.8.6&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          18,
-          209
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;git2&quot;,
-        &quot;version&quot;: &quot;0.20.4&quot;,
-        &quot;transitive_weight&quot;: 76,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          179,
-          197,
-          79,
-          94,
-          198
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;num-conv&quot;,
-        &quot;version&quot;: &quot;0.2.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;ciborium&quot;,
-        &quot;version&quot;: &quot;0.2.2&quot;,
-        &quot;transitive_weight&quot;: 15,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          173,
-          60,
-          193
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;smallvec&quot;,
-        &quot;version&quot;: &quot;1.15.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;object&quot;,
-        &quot;version&quot;: &quot;0.37.3&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          178
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wit-bindgen-rust-macro&quot;,
-        &quot;version&quot;: &quot;0.51.0&quot;,
-        &quot;transitive_weight&quot;: 33,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          228,
-          54,
-          52,
-          4,
-          140,
-          170,
-          61
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;core-foundation-sys&quot;,
-        &quot;version&quot;: &quot;0.8.7&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;errno&quot;,
-        &quot;version&quot;: &quot;0.3.14&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          229,
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;criterion-plot&quot;,
-        &quot;version&quot;: &quot;0.8.2&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          24,
-          230
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;quick-xml&quot;,
-        &quot;version&quot;: &quot;0.38.4&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          178
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;dirs-sys&quot;,
-        &quot;version&quot;: &quot;0.5.0&quot;,
-        &quot;transitive_weight&quot;: 18,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          102,
-          229,
-          94,
-          69
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;toml_edit&quot;,
-        &quot;version&quot;: &quot;0.23.10+spec-1.0.0&quot;,
-        &quot;transitive_weight&quot;: 17,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          0,
-          3,
-          190,
-          5,
-          200,
-          221,
-          205
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;anstyle-query&quot;,
-        &quot;version&quot;: &quot;1.1.5&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          229
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;proc-mounts&quot;,
-        &quot;version&quot;: &quot;0.3.0&quot;,
-        &quot;transitive_weight&quot;: 8,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          46
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;eza&quot;,
-        &quot;version&quot;: &quot;0.23.4&quot;,
-        &quot;transitive_weight&quot;: 189,
-        &quot;is_workspace&quot;: true,
-        &quot;children&quot;: [
-          119,
-          154,
-          144,
-          194,
-          216,
-          35,
-          59,
-          90,
-          134,
-          164,
-          231,
-          132,
-          60,
-          196,
-          47,
-          64,
-          104,
-          238,
-          229,
-          156,
-          94,
-          198,
-          70,
-          28,
-          22,
-          81,
-          53,
-          223
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;backtrace&quot;,
-        &quot;version&quot;: &quot;0.3.76&quot;,
-        &quot;transitive_weight&quot;: 11,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          161,
-          141,
-          123,
-          105,
-          94,
-          56,
-          42
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;plotters&quot;,
-        &quot;version&quot;: &quot;0.3.7&quot;,
-        &quot;transitive_weight&quot;: 19,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
           224,
-          91,
-          117,
-          96,
-          142
+          181,
+          111,
+          154
         ]
       },
       {
-        &quot;name&quot;: &quot;wasmparser&quot;,
-        &quot;version&quot;: &quot;0.244.0&quot;,
-        &quot;transitive_weight&quot;: 15,
+        &quot;name&quot;: &quot;form_urlencoded&quot;,
+        &quot;version&quot;: &quot;1.2.2&quot;,
+        &quot;transitive_weight&quot;: 2,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          0,
-          158,
-          79,
-          211
+          8
         ]
       },
       {
-        &quot;name&quot;: &quot;displaydoc&quot;,
-        &quot;version&quot;: &quot;0.2.5&quot;,
-        &quot;transitive_weight&quot;: 5,
+        &quot;name&quot;: &quot;percent-encoding&quot;,
+        &quot;version&quot;: &quot;2.3.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;regex-automata&quot;,
+        &quot;version&quot;: &quot;0.4.14&quot;,
+        &quot;transitive_weight&quot;: 4,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          4,
-          140,
-          170
+          121,
+          85,
+          53
         ]
       },
       {
-        &quot;name&quot;: &quot;by_address&quot;,
-        &quot;version&quot;: &quot;1.2.1&quot;,
+        &quot;name&quot;: &quot;shlex&quot;,
+        &quot;version&quot;: &quot;1.3.0&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
@@ -8528,197 +7701,274 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;quote&quot;,
-        &quot;version&quot;: &quot;1.0.44&quot;,
-        &quot;transitive_weight&quot;: 3,
+        &quot;name&quot;: &quot;crossbeam-utils&quot;,
+        &quot;version&quot;: &quot;0.8.21&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;yoke&quot;,
+        &quot;version&quot;: &quot;0.8.1&quot;,
+        &quot;transitive_weight&quot;: 10,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          170
+          94,
+          73,
+          100
         ]
       },
       {
-        &quot;name&quot;: &quot;miniz_oxide&quot;,
-        &quot;version&quot;: &quot;0.8.9&quot;,
+        &quot;name&quot;: &quot;winapi-x86_64-pc-windows-gnu&quot;,
+        &quot;version&quot;: &quot;0.4.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;android_system_properties&quot;,
+        &quot;version&quot;: &quot;0.1.5&quot;,
         &quot;transitive_weight&quot;: 2,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          112
+          149
         ]
       },
       {
-        &quot;name&quot;: &quot;plotters-backend&quot;,
-        &quot;version&quot;: &quot;0.3.7&quot;,
+        &quot;name&quot;: &quot;bitflags&quot;,
+        &quot;version&quot;: &quot;2.11.0&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;regex&quot;,
-        &quot;version&quot;: &quot;1.12.3&quot;,
-        &quot;transitive_weight&quot;: 5,
+        &quot;name&quot;: &quot;clap_derive&quot;,
+        &quot;version&quot;: &quot;4.5.55&quot;,
+        &quot;transitive_weight&quot;: 6,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          10,
-          34,
-          178,
-          222
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;clap&quot;,
-        &quot;version&quot;: &quot;4.5.59&quot;,
-        &quot;transitive_weight&quot;: 21,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          145,
-          71
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;clap_builder&quot;,
-        &quot;version&quot;: &quot;4.5.59&quot;,
-        &quot;transitive_weight&quot;: 14,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          206,
-          74,
-          214,
-          62
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;siphasher&quot;,
-        &quot;version&quot;: &quot;1.0.2&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;unicode-width&quot;,
-        &quot;version&quot;: &quot;0.1.14&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;vcpkg&quot;,
-        &quot;version&quot;: &quot;0.2.15&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;find-msvc-tools&quot;,
-        &quot;version&quot;: &quot;0.1.9&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;autocfg&quot;,
-        &quot;version&quot;: &quot;1.5.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;fastrand&quot;,
-        &quot;version&quot;: &quot;2.3.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;half&quot;,
-        &quot;version&quot;: &quot;2.7.1&quot;,
-        &quot;transitive_weight&quot;: 9,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          184,
+          20,
+          75,
           105,
-          8
+          189
         ]
       },
       {
-        &quot;name&quot;: &quot;linux-raw-sys&quot;,
-        &quot;version&quot;: &quot;0.11.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;chrono&quot;,
-        &quot;version&quot;: &quot;0.4.43&quot;,
-        &quot;transitive_weight&quot;: 64,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          227,
-          117,
-          42
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;js-sys&quot;,
-        &quot;version&quot;: &quot;0.3.85&quot;,
-        &quot;transitive_weight&quot;: 13,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          91,
-          29
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;glob&quot;,
-        &quot;version&quot;: &quot;0.3.3&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;winapi-util&quot;,
-        &quot;version&quot;: &quot;0.1.11&quot;,
+        &quot;name&quot;: &quot;crossbeam-deque&quot;,
+        &quot;version&quot;: &quot;0.8.6&quot;,
         &quot;transitive_weight&quot;: 3,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          229
+          43,
+          12
         ]
       },
       {
-        &quot;name&quot;: &quot;hashbrown&quot;,
-        &quot;version&quot;: &quot;0.15.5&quot;,
+        &quot;name&quot;: &quot;quick-xml&quot;,
+        &quot;version&quot;: &quot;0.38.4&quot;,
         &quot;transitive_weight&quot;: 2,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          202
+          85
         ]
       },
       {
-        &quot;name&quot;: &quot;wasip3&quot;,
-        &quot;version&quot;: &quot;0.4.0+wasi-0.3.0-rc-2026-01-06&quot;,
-        &quot;transitive_weight&quot;: 35,
+        &quot;name&quot;: &quot;syn&quot;,
+        &quot;version&quot;: &quot;2.0.116&quot;,
+        &quot;transitive_weight&quot;: 4,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          199
+          75,
+          105,
+          78
         ]
       },
       {
-        &quot;name&quot;: &quot;thiserror-impl&quot;,
-        &quot;version&quot;: &quot;1.0.69&quot;,
+        &quot;name&quot;: &quot;synstructure&quot;,
+        &quot;version&quot;: &quot;0.13.2&quot;,
         &quot;transitive_weight&quot;: 5,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          4,
-          140,
-          170
+          20,
+          75,
+          105
         ]
       },
       {
-        &quot;name&quot;: &quot;addr2line&quot;,
-        &quot;version&quot;: &quot;0.25.1&quot;,
+        &quot;name&quot;: &quot;libgit2-sys&quot;,
+        &quot;version&quot;: &quot;0.18.3+1.9.2&quot;,
+        &quot;transitive_weight&quot;: 47,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          67,
+          208,
+          149,
+          83
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;winnow&quot;,
+        &quot;version&quot;: &quot;0.7.14&quot;,
         &quot;transitive_weight&quot;: 2,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          208
+          85
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;snapbox&quot;,
+        &quot;version&quot;: &quot;1.0.0&quot;,
+        &quot;transitive_weight&quot;: 81,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          61,
+          230,
+          40,
+          122,
+          168,
+          147,
+          74,
+          56,
+          39,
+          145,
+          48,
+          149,
+          37,
+          128
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;timeago&quot;,
+        &quot;version&quot;: &quot;0.6.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;windows-sys&quot;,
+        &quot;version&quot;: &quot;0.61.2&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          115
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;nu-ansi-term&quot;,
+        &quot;version&quot;: &quot;0.50.3&quot;,
+        &quot;transitive_weight&quot;: 10,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          182,
+          26
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;once_cell&quot;,
+        &quot;version&quot;: &quot;1.21.3&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;by_address&quot;,
+        &quot;version&quot;: &quot;1.2.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;rustc-demangle&quot;,
+        &quot;version&quot;: &quot;0.1.27&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;ryu&quot;,
+        &quot;version&quot;: &quot;1.0.23&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;winapi-i686-pc-windows-gnu&quot;,
+        &quot;version&quot;: &quot;0.4.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;windows_aarch64_msvc&quot;,
+        &quot;version&quot;: &quot;0.53.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;windows_x86_64_msvc&quot;,
+        &quot;version&quot;: &quot;0.53.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wit-bindgen&quot;,
+        &quot;version&quot;: &quot;0.51.0&quot;,
+        &quot;transitive_weight&quot;: 34,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          225
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;dirs-sys&quot;,
+        &quot;version&quot;: &quot;0.5.0&quot;,
+        &quot;transitive_weight&quot;: 18,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          213,
+          26,
+          149,
+          211
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;normalize-line-endings&quot;,
+        &quot;version&quot;: &quot;0.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;core-foundation-sys&quot;,
+        &quot;version&quot;: &quot;0.8.7&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wait-timeout&quot;,
+        &quot;version&quot;: &quot;0.2.1&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          149
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;anstream&quot;,
+        &quot;version&quot;: &quot;0.6.21&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          233,
+          175,
+          54,
+          145,
+          228,
+          126,
+          173
         ]
       },
       {
@@ -8729,54 +7979,385 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
+        &quot;name&quot;: &quot;displaydoc&quot;,
+        &quot;version&quot;: &quot;0.2.5&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;crossbeam-epoch&quot;,
+        &quot;version&quot;: &quot;0.9.18&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          12
+        ]
+      },
+      {
         &quot;name&quot;: &quot;trycmd&quot;,
         &quot;version&quot;: &quot;1.0.0&quot;,
         &quot;transitive_weight&quot;: 99,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          114,
-          130,
-          206,
-          16,
-          60,
-          196,
-          66,
+          24,
+          79,
+          40,
+          63,
+          182,
           156,
-          162,
-          186
+          227,
+          137,
+          41,
+          10
         ]
       },
       {
-        &quot;name&quot;: &quot;palette&quot;,
-        &quot;version&quot;: &quot;0.7.5&quot;,
-        &quot;transitive_weight&quot;: 11,
+        &quot;name&quot;: &quot;winapi-util&quot;,
+        &quot;version&quot;: &quot;0.1.11&quot;,
+        &quot;transitive_weight&quot;: 3,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          169,
-          93,
-          14
+          26
         ]
       },
       {
-        &quot;name&quot;: &quot;colorchoice&quot;,
+        &quot;name&quot;: &quot;wasmparser&quot;,
+        &quot;version&quot;: &quot;0.244.0&quot;,
+        &quot;transitive_weight&quot;: 15,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          130,
+          200,
+          16,
+          59
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;adler2&quot;,
+        &quot;version&quot;: &quot;2.0.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;dunce&quot;,
+        &quot;version&quot;: &quot;1.0.5&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;num-traits&quot;,
+        &quot;version&quot;: &quot;0.2.19&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          96
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;equivalent&quot;,
+        &quot;version&quot;: &quot;1.0.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;thiserror-impl&quot;,
+        &quot;version&quot;: &quot;1.0.69&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;toml_parser&quot;,
+        &quot;version&quot;: &quot;1.0.9+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          23
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;regex-syntax&quot;,
+        &quot;version&quot;: &quot;0.8.9&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;anstyle-parse&quot;,
+        &quot;version&quot;: &quot;0.2.7&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          173
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;clap_lex&quot;,
+        &quot;version&quot;: &quot;1.0.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;content_inspector&quot;,
+        &quot;version&quot;: &quot;0.2.4&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          85
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;uzers&quot;,
+        &quot;version&quot;: &quot;0.12.2&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          149,
+          152
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;plist&quot;,
+        &quot;version&quot;: &quot;1.8.0&quot;,
+        &quot;transitive_weight&quot;: 21,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          66,
+          130,
+          19,
+          215
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;semver&quot;,
+        &quot;version&quot;: &quot;1.0.27&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;path-clean&quot;,
+        &quot;version&quot;: &quot;1.0.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;tempfile&quot;,
+        &quot;version&quot;: &quot;3.25.0&quot;,
+        &quot;transitive_weight&quot;: 48,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          62,
+          3,
+          26,
+          210,
+          28
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;getrandom&quot;,
+        &quot;version&quot;: &quot;0.4.1&quot;,
+        &quot;transitive_weight&quot;: 40,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          148,
+          68,
+          149,
+          76
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;humantime-serde&quot;,
+        &quot;version&quot;: &quot;1.1.1&quot;,
+        &quot;transitive_weight&quot;: 9,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          182,
+          41
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;gimli&quot;,
+        &quot;version&quot;: &quot;0.32.3&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;litemap&quot;,
+        &quot;version&quot;: &quot;0.8.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;time&quot;,
+        &quot;version&quot;: &quot;0.3.47&quot;,
+        &quot;transitive_weight&quot;: 13,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          144,
+          114,
+          97,
+          159,
+          132,
+          238,
+          110
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;libz-sys&quot;,
+        &quot;version&quot;: &quot;1.1.23&quot;,
+        &quot;transitive_weight&quot;: 46,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          208,
+          149,
+          83,
+          138
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;cfg-if&quot;,
         &quot;version&quot;: &quot;1.0.4&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;idna&quot;,
-        &quot;version&quot;: &quot;1.1.0&quot;,
-        &quot;transitive_weight&quot;: 29,
+        &quot;name&quot;: &quot;tinystr&quot;,
+        &quot;version&quot;: &quot;0.8.2&quot;,
+        &quot;transitive_weight&quot;: 14,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          26,
-          122,
-          2
+          181,
+          42
         ]
       },
       {
-        &quot;name&quot;: &quot;windows_i686_gnu&quot;,
+        &quot;name&quot;: &quot;wasip2&quot;,
+        &quot;version&quot;: &quot;1.0.2+wasi-0.2.9&quot;,
+        &quot;transitive_weight&quot;: 35,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          35
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;potential_utf&quot;,
+        &quot;version&quot;: &quot;0.1.4&quot;,
+        &quot;transitive_weight&quot;: 13,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          181
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;toml_datetime&quot;,
+        &quot;version&quot;: &quot;0.7.5+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          144
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;yoke-derive&quot;,
+        &quot;version&quot;: &quot;0.8.1&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          21,
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;os_pipe&quot;,
+        &quot;version&quot;: &quot;1.2.3&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          26,
+          149
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;quote&quot;,
+        &quot;version&quot;: &quot;1.0.44&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;r-efi&quot;,
+        &quot;version&quot;: &quot;5.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;js-sys&quot;,
+        &quot;version&quot;: &quot;0.3.85&quot;,
+        &quot;transitive_weight&quot;: 13,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          92,
+          28
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;unicode-ident&quot;,
+        &quot;version&quot;: &quot;1.0.24&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;toml_edit&quot;,
+        &quot;version&quot;: &quot;0.23.10+spec-1.0.0&quot;,
+        &quot;transitive_weight&quot;: 17,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          130,
+          2,
+          72,
+          144,
+          52,
+          23,
+          158
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;terminal_size&quot;,
+        &quot;version&quot;: &quot;0.4.3&quot;,
+        &quot;transitive_weight&quot;: 18,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          122,
+          3
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;windows_aarch64_gnullvm&quot;,
         &quot;version&quot;: &quot;0.53.1&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
@@ -8790,113 +8371,18 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;palette_derive&quot;,
-        &quot;version&quot;: &quot;0.7.6&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170,
-          138
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;proc-macro2&quot;,
-        &quot;version&quot;: &quot;1.0.106&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          220
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;yoke-derive&quot;,
-        &quot;version&quot;: &quot;0.8.1&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          33,
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;jobserver&quot;,
-        &quot;version&quot;: &quot;0.1.34&quot;,
-        &quot;transitive_weight&quot;: 40,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          78,
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;ciborium-ll&quot;,
-        &quot;version&quot;: &quot;0.2.2&quot;,
-        &quot;transitive_weight&quot;: 11,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          152,
-          193
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;time&quot;,
-        &quot;version&quot;: &quot;0.3.47&quot;,
-        &quot;transitive_weight&quot;: 13,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          5,
-          87,
-          77,
-          44,
-          120,
-          235,
-          23
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;equivalent&quot;,
-        &quot;version&quot;: &quot;1.0.2&quot;,
+        &quot;name&quot;: &quot;pkg-config&quot;,
+        &quot;version&quot;: &quot;0.3.32&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;criterion&quot;,
-        &quot;version&quot;: &quot;0.8.2&quot;,
-        &quot;transitive_weight&quot;: 105,
+        &quot;name&quot;: &quot;id-arena&quot;,
+        &quot;version&quot;: &quot;2.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          203,
-          144,
-          135,
-          121,
-          76,
-          75,
-          60,
-          196,
-          1,
-          143,
-          182,
-          127,
-          24,
-          117,
-          13,
-          230,
-          99
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;same-file&quot;,
-        &quot;version&quot;: &quot;1.0.6&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          157
-        ]
+        &quot;children&quot;: []
       },
       {
         &quot;name&quot;: &quot;memchr&quot;,
@@ -8906,16 +8392,33 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;libgit2-sys&quot;,
-        &quot;version&quot;: &quot;0.18.3+1.9.2&quot;,
-        &quot;transitive_weight&quot;: 47,
+        &quot;name&quot;: &quot;ciborium&quot;,
+        &quot;version&quot;: &quot;0.2.2&quot;,
+        &quot;transitive_weight&quot;: 15,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          213,
-          43,
-          94,
-          234
+          116,
+          182,
+          103
         ]
+      },
+      {
+        &quot;name&quot;: &quot;serde_derive&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;siphasher&quot;,
+        &quot;version&quot;: &quot;1.0.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
       },
       {
         &quot;name&quot;: &quot;windows_x86_64_gnullvm&quot;,
@@ -8925,121 +8428,126 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;zerovec&quot;,
-        &quot;version&quot;: &quot;0.11.5&quot;,
+        &quot;name&quot;: &quot;tinytemplate&quot;,
+        &quot;version&quot;: &quot;1.2.1&quot;,
         &quot;transitive_weight&quot;: 12,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          41,
-          212,
-          108
+          192,
+          182
         ]
       },
       {
-        &quot;name&quot;: &quot;walkdir&quot;,
-        &quot;version&quot;: &quot;2.5.0&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          177,
-          157
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;windows-interface&quot;,
-        &quot;version&quot;: &quot;0.59.3&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;zerocopy&quot;,
-        &quot;version&quot;: &quot;0.8.39&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          97
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;icu_normalizer&quot;,
-        &quot;version&quot;: &quot;2.1.1&quot;,
-        &quot;transitive_weight&quot;: 26,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          55,
-          67,
-          225,
-          181,
-          103,
-          122
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;shlex&quot;,
-        &quot;version&quot;: &quot;1.3.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;similar&quot;,
-        &quot;version&quot;: &quot;2.7.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;thiserror&quot;,
-        &quot;version&quot;: &quot;1.0.69&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          160
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;tinystr&quot;,
-        &quot;version&quot;: &quot;0.8.2&quot;,
+        &quot;name&quot;: &quot;web-sys&quot;,
+        &quot;version&quot;: &quot;0.3.85&quot;,
         &quot;transitive_weight&quot;: 14,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          181,
-          137
+          77,
+          92
         ]
       },
       {
-        &quot;name&quot;: &quot;toml_datetime&quot;,
-        &quot;version&quot;: &quot;0.7.5+spec-1.1.0&quot;,
+        &quot;name&quot;: &quot;wasm-bindgen&quot;,
+        &quot;version&quot;: &quot;0.2.108&quot;,
+        &quot;transitive_weight&quot;: 12,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          163,
+          101,
+          68,
+          28,
+          166
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zerocopy-derive&quot;,
+        &quot;version&quot;: &quot;0.8.39&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zerofrom&quot;,
+        &quot;version&quot;: &quot;0.1.6&quot;,
         &quot;transitive_weight&quot;: 7,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          5
+          177
         ]
       },
       {
-        &quot;name&quot;: &quot;redox_syscall&quot;,
-        &quot;version&quot;: &quot;0.7.1&quot;,
+        &quot;name&quot;: &quot;iana-time-zone-haiku&quot;,
+        &quot;version&quot;: &quot;0.1.2&quot;,
+        &quot;transitive_weight&quot;: 44,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          208
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;autocfg&quot;,
+        &quot;version&quot;: &quot;1.5.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;deranged&quot;,
+        &quot;version&quot;: &quot;0.5.6&quot;,
         &quot;transitive_weight&quot;: 2,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          79
+          238
         ]
       },
       {
-        &quot;name&quot;: &quot;wasm-metadata&quot;,
-        &quot;version&quot;: &quot;0.244.0&quot;,
-        &quot;transitive_weight&quot;: 19,
+        &quot;name&quot;: &quot;leb128fmt&quot;,
+        &quot;version&quot;: &quot;0.1.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;partition-identity&quot;,
+        &quot;version&quot;: &quot;0.3.0&quot;,
+        &quot;transitive_weight&quot;: 7,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          19,
-          136,
-          0,
-          61
+          205
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;stable_deref_trait&quot;,
+        &quot;version&quot;: &quot;1.2.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-shared&quot;,
+        &quot;version&quot;: &quot;0.2.108&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          78
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;icu_locale_core&quot;,
+        &quot;version&quot;: &quot;2.1.1&quot;,
+        &quot;transitive_weight&quot;: 17,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          69,
+          181,
+          42,
+          65,
+          196
         ]
       },
       {
@@ -9050,94 +8558,51 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;plist&quot;,
-        &quot;version&quot;: &quot;1.8.0&quot;,
-        &quot;transitive_weight&quot;: 21,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          174,
-          0,
-          128,
-          58
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;utf8parse&quot;,
-        &quot;version&quot;: &quot;0.2.2&quot;,
+        &quot;name&quot;: &quot;anes&quot;,
+        &quot;version&quot;: &quot;0.1.6&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;rayon&quot;,
-        &quot;version&quot;: &quot;1.11.0&quot;,
-        &quot;transitive_weight&quot;: 6,
+        &quot;name&quot;: &quot;proc-macro2&quot;,
+        &quot;version&quot;: &quot;1.0.106&quot;,
+        &quot;transitive_weight&quot;: 2,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          237,
-          204
+          78
         ]
       },
       {
-        &quot;name&quot;: &quot;url&quot;,
-        &quot;version&quot;: &quot;2.5.8&quot;,
-        &quot;transitive_weight&quot;: 35,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          166,
-          60,
-          63,
-          22
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;log&quot;,
-        &quot;version&quot;: &quot;0.4.29&quot;,
+        &quot;name&quot;: &quot;wasi&quot;,
+        &quot;version&quot;: &quot;0.11.1+wasi-snapshot-preview1&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;wit-bindgen&quot;,
-        &quot;version&quot;: &quot;0.51.0&quot;,
-        &quot;transitive_weight&quot;: 34,
+        &quot;name&quot;: &quot;criterion&quot;,
+        &quot;version&quot;: &quot;0.8.2&quot;,
+        &quot;transitive_weight&quot;: 105,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          124
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;toml_parser&quot;,
-        &quot;version&quot;: &quot;1.0.9+spec-1.1.0&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          221
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;windows-sys&quot;,
-        &quot;version&quot;: &quot;0.60.2&quot;,
-        &quot;transitive_weight&quot;: 11,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          31
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;foldhash&quot;,
-        &quot;version&quot;: &quot;0.1.5&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;alloca&quot;,
-        &quot;version&quot;: &quot;0.4.0&quot;,
-        &quot;transitive_weight&quot;: 44,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          43
+          161,
+          178,
+          190,
+          86,
+          90,
+          192,
+          182,
+          156,
+          109,
+          172,
+          147,
+          191,
+          219,
+          49,
+          104,
+          143,
+          223
         ]
       },
       {
@@ -9148,6 +8613,476 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
+        &quot;name&quot;: &quot;page_size&quot;,
+        &quot;version&quot;: &quot;0.6.0&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          179,
+          149
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;time-core&quot;,
+        &quot;version&quot;: &quot;0.1.8&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;icu_normalizer_data&quot;,
+        &quot;version&quot;: &quot;2.1.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;windows_i686_gnu&quot;,
+        &quot;version&quot;: &quot;0.53.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;eza&quot;,
+        &quot;version&quot;: &quot;0.23.4&quot;,
+        &quot;transitive_weight&quot;: 189,
+        &quot;is_workspace&quot;: true,
+        &quot;children&quot;: [
+          222,
+          231,
+          178,
+          58,
+          199,
+          80,
+          139,
+          198,
+          209,
+          194,
+          27,
+          155,
+          182,
+          156,
+          142,
+          57,
+          150,
+          123,
+          26,
+          137,
+          149,
+          152,
+          118,
+          60,
+          8,
+          25,
+          237,
+          216
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;time-macros&quot;,
+        &quot;version&quot;: &quot;0.2.27&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          132,
+          110
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;windows-link&quot;,
+        &quot;version&quot;: &quot;0.2.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;ciborium-ll&quot;,
+        &quot;version&quot;: &quot;0.2.2&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          183,
+          103
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;iana-time-zone&quot;,
+        &quot;version&quot;: &quot;0.1.65&quot;,
+        &quot;transitive_weight&quot;: 61,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          95,
+          77,
+          92,
+          193,
+          15,
+          38,
+          152
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;natord-plus-plus&quot;,
+        &quot;version&quot;: &quot;2.0.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;thiserror-impl&quot;,
+        &quot;version&quot;: &quot;2.0.18&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zmij&quot;,
+        &quot;version&quot;: &quot;1.0.21&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;aho-corasick&quot;,
+        &quot;version&quot;: &quot;1.1.4&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          85
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;windows-sys&quot;,
+        &quot;version&quot;: &quot;0.60.2&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          206
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;locale&quot;,
+        &quot;version&quot;: &quot;0.2.2&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          149
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;phf_macros&quot;,
+        &quot;version&quot;: &quot;0.13.1&quot;,
+        &quot;transitive_weight&quot;: 9,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          212,
+          20,
+          75,
+          165,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;utf8_iter&quot;,
+        &quot;version&quot;: &quot;1.0.4&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;is_terminal_polyfill&quot;,
+        &quot;version&quot;: &quot;1.70.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;object&quot;,
+        &quot;version&quot;: &quot;0.37.3&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          85
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;similar&quot;,
+        &quot;version&quot;: &quot;2.7.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;unsafe-libyaml-norway&quot;,
+        &quot;version&quot;: &quot;0.2.15&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;indexmap&quot;,
+        &quot;version&quot;: &quot;2.13.0&quot;,
+        &quot;transitive_weight&quot;: 10,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          182,
+          144,
+          50,
+          239
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zerotrie&quot;,
+        &quot;version&quot;: &quot;0.2.3&quot;,
+        &quot;transitive_weight&quot;: 12,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          13,
+          94,
+          42
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;num-conv&quot;,
+        &quot;version&quot;: &quot;0.2.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wasm-encoder&quot;,
+        &quot;version&quot;: &quot;0.244.0&quot;,
+        &quot;transitive_weight&quot;: 17,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          46,
+          98
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;once_cell_polyfill&quot;,
+        &quot;version&quot;: &quot;1.70.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;windows-result&quot;,
+        &quot;version&quot;: &quot;0.4.1&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          115
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;same-file&quot;,
+        &quot;version&quot;: &quot;1.0.6&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          45
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;glob&quot;,
+        &quot;version&quot;: &quot;0.3.3&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;vcpkg&quot;,
+        &quot;version&quot;: &quot;0.2.15&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;serde_norway&quot;,
+        &quot;version&quot;: &quot;0.9.42&quot;,
+        &quot;transitive_weight&quot;: 14,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          130,
+          182,
+          159,
+          31,
+          129
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;unicode-xid&quot;,
+        &quot;version&quot;: &quot;0.2.6&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;idna&quot;,
+        &quot;version&quot;: &quot;1.1.0&quot;,
+        &quot;transitive_weight&quot;: 29,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          203,
+          154,
+          125
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;uutils_term_grid&quot;,
+        &quot;version&quot;: &quot;0.7.0&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          150
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;cast&quot;,
+        &quot;version&quot;: &quot;0.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;serde_core&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          87
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;anstyle&quot;,
+        &quot;version&quot;: &quot;1.0.13&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wit-parser&quot;,
+        &quot;version&quot;: &quot;0.244.0&quot;,
+        &quot;transitive_weight&quot;: 24,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          46,
+          192,
+          130,
+          182,
+          87,
+          236,
+          84,
+          152,
+          59,
+          140
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;walkdir&quot;,
+        &quot;version&quot;: &quot;2.5.0&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          136,
+          45
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wasip3&quot;,
+        &quot;version&quot;: &quot;0.4.0+wasi-0.3.0-rc-2026-01-06&quot;,
+        &quot;transitive_weight&quot;: 35,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          35
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;libc&quot;,
+        &quot;version&quot;: &quot;0.2.182&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;ansi-width&quot;,
+        &quot;version&quot;: &quot;0.1.0&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          229
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;getrandom&quot;,
+        &quot;version&quot;: &quot;0.3.4&quot;,
+        &quot;transitive_weight&quot;: 39,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          68,
+          149,
+          76
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;log&quot;,
+        &quot;version&quot;: &quot;0.4.29&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;prettyplease&quot;,
+        &quot;version&quot;: &quot;0.2.37&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;smallvec&quot;,
+        &quot;version&quot;: &quot;1.15.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;proc-mounts&quot;,
+        &quot;version&quot;: &quot;0.3.0&quot;,
+        &quot;transitive_weight&quot;: 8,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          99
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rayon&quot;,
+        &quot;version&quot;: &quot;1.11.0&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          207,
+          108
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;approx&quot;,
+        &quot;version&quot;: &quot;0.5.1&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          49
+        ]
+      },
+      {
         &quot;name&quot;: &quot;toml_writer&quot;,
         &quot;version&quot;: &quot;1.0.6+spec-1.1.0&quot;,
         &quot;transitive_weight&quot;: 1,
@@ -9155,39 +9090,373 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;anstream&quot;,
-        &quot;version&quot;: &quot;0.6.21&quot;,
-        &quot;transitive_weight&quot;: 11,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          106,
-          131,
-          80,
-          74,
-          165,
-          101,
-          195
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasip2&quot;,
-        &quot;version&quot;: &quot;1.0.2+wasi-0.2.9&quot;,
-        &quot;transitive_weight&quot;: 35,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          199
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;gimli&quot;,
-        &quot;version&quot;: &quot;0.32.3&quot;,
+        &quot;name&quot;: &quot;itoa&quot;,
+        &quot;version&quot;: &quot;1.0.17&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;crossbeam-utils&quot;,
-        &quot;version&quot;: &quot;0.8.21&quot;,
+        &quot;name&quot;: &quot;jobserver&quot;,
+        &quot;version&quot;: &quot;0.1.34&quot;,
+        &quot;transitive_weight&quot;: 40,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          151,
+          149
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;alloca&quot;,
+        &quot;version&quot;: &quot;0.4.0&quot;,
+        &quot;transitive_weight&quot;: 44,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          208
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;strsim&quot;,
+        &quot;version&quot;: &quot;0.11.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-macro&quot;,
+        &quot;version&quot;: &quot;0.2.108&quot;,
+        &quot;transitive_weight&quot;: 8,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          184,
+          75
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;libredox&quot;,
+        &quot;version&quot;: &quot;0.1.12&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          176,
+          16,
+          149
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;phf_shared&quot;,
+        &quot;version&quot;: &quot;0.13.1&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          88
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rustversion&quot;,
+        &quot;version&quot;: &quot;1.0.22&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;windows-interface&quot;,
+        &quot;version&quot;: &quot;0.59.3&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;filetime&quot;,
+        &quot;version&quot;: &quot;0.2.27&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          164,
+          68,
+          149
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;windows-implement&quot;,
+        &quot;version&quot;: &quot;0.60.2&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;crunchy&quot;,
+        &quot;version&quot;: &quot;0.2.4&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;miniz_oxide&quot;,
+        &quot;version&quot;: &quot;0.8.9&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          47
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;regex&quot;,
+        &quot;version&quot;: &quot;1.12.3&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          9,
+          121,
+          85,
+          53
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;utf8parse&quot;,
+        &quot;version&quot;: &quot;0.2.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;errno&quot;,
+        &quot;version&quot;: &quot;0.3.14&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          26,
+          149
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;anstyle-query&quot;,
+        &quot;version&quot;: &quot;1.1.5&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          26
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;redox_syscall&quot;,
+        &quot;version&quot;: &quot;0.7.1&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zerofrom-derive&quot;,
+        &quot;version&quot;: &quot;0.1.6&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          21,
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;clap&quot;,
+        &quot;version&quot;: &quot;4.5.59&quot;,
+        &quot;transitive_weight&quot;: 21,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          214,
+          17
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;winapi&quot;,
+        &quot;version&quot;: &quot;0.3.9&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          32,
+          14
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;foldhash&quot;,
+        &quot;version&quot;: &quot;0.1.5&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;zerovec&quot;,
+        &quot;version&quot;: &quot;0.11.5&quot;,
+        &quot;transitive_weight&quot;: 12,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          13,
+          94,
+          185
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          144,
+          87
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;half&quot;,
+        &quot;version&quot;: &quot;2.7.1&quot;,
+        &quot;transitive_weight&quot;: 9,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          187,
+          68,
+          170
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-macro-support&quot;,
+        &quot;version&quot;: &quot;0.2.108&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105,
+          101,
+          4
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zerovec-derive&quot;,
+        &quot;version&quot;: &quot;0.11.2&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;plotters-backend&quot;,
+        &quot;version&quot;: &quot;0.3.7&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;zerocopy&quot;,
+        &quot;version&quot;: &quot;0.8.39&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          93
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;thiserror&quot;,
+        &quot;version&quot;: &quot;2.0.18&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          119
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;heck&quot;,
+        &quot;version&quot;: &quot;0.5.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;plotters&quot;,
+        &quot;version&quot;: &quot;0.3.7&quot;,
+        &quot;transitive_weight&quot;: 19,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          91,
+          92,
+          49,
+          221,
+          186
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;criterion-plot&quot;,
+        &quot;version&quot;: &quot;0.8.2&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          219,
+          143
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde_json&quot;,
+        &quot;version&quot;: &quot;1.0.149&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          182,
+          144,
+          159,
+          85,
+          120
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;windows-core&quot;,
+        &quot;version&quot;: &quot;0.62.2&quot;,
+        &quot;transitive_weight&quot;: 10,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          169,
+          167,
+          135,
+          235,
+          115
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;palette&quot;,
+        &quot;version&quot;: &quot;0.7.5&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          201,
+          157,
+          220
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wasm-metadata&quot;,
+        &quot;version&quot;: &quot;0.244.0&quot;,
+        &quot;transitive_weight&quot;: 19,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          133,
+          46,
+          130,
+          236
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;writeable&quot;,
+        &quot;version&quot;: &quot;0.6.2&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
@@ -9200,57 +9469,14 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;semver&quot;,
-        &quot;version&quot;: &quot;1.0.27&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;zerofrom&quot;,
-        &quot;version&quot;: &quot;0.1.6&quot;,
-        &quot;transitive_weight&quot;: 7,
+        &quot;name&quot;: &quot;phf&quot;,
+        &quot;version&quot;: &quot;0.13.1&quot;,
+        &quot;transitive_weight&quot;: 13,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          30
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;libz-sys&quot;,
-        &quot;version&quot;: &quot;1.1.23&quot;,
-        &quot;transitive_weight&quot;: 46,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          43,
-          94,
-          234,
-          148
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;clap_lex&quot;,
-        &quot;version&quot;: &quot;1.0.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;wit-component&quot;,
-        &quot;version&quot;: &quot;0.244.0&quot;,
-        &quot;transitive_weight&quot;: 28,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          92,
-          192,
-          19,
-          136,
-          75,
-          0,
-          60,
-          27,
-          61,
-          79,
-          198
+          124,
+          182,
+          165
         ]
       },
       {
@@ -9259,49 +9485,175 @@ depth 1</title>
         &quot;transitive_weight&quot;: 19,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          129
+          36
         ]
       },
       {
-        &quot;name&quot;: &quot;windows_i686_gnullvm&quot;,
-        &quot;version&quot;: &quot;0.53.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;winapi-i686-pc-windows-gnu&quot;,
-        &quot;version&quot;: &quot;0.4.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;ryu&quot;,
-        &quot;version&quot;: &quot;1.0.23&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;unicode-ident&quot;,
-        &quot;version&quot;: &quot;1.0.24&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;winnow&quot;,
-        &quot;version&quot;: &quot;0.7.14&quot;,
+        &quot;name&quot;: &quot;hashbrown&quot;,
+        &quot;version&quot;: &quot;0.15.5&quot;,
         &quot;transitive_weight&quot;: 2,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          178
+          180
         ]
       },
       {
-        &quot;name&quot;: &quot;regex-syntax&quot;,
-        &quot;version&quot;: &quot;0.8.9&quot;,
+        &quot;name&quot;: &quot;palette_derive&quot;,
+        &quot;version&quot;: &quot;0.7.6&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105,
+          29
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wit-bindgen-core&quot;,
+        &quot;version&quot;: &quot;0.51.0&quot;,
+        &quot;transitive_weight&quot;: 26,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          146,
+          236,
+          189
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;idna_adapter&quot;,
+        &quot;version&quot;: &quot;1.2.1&quot;,
+        &quot;transitive_weight&quot;: 27,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          6,
+          234
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;getrandom&quot;,
+        &quot;version&quot;: &quot;0.2.17&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          68,
+          149,
+          106
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;thiserror&quot;,
+        &quot;version&quot;: &quot;1.0.69&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          51
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;windows-targets&quot;,
+        &quot;version&quot;: &quot;0.53.5&quot;,
+        &quot;transitive_weight&quot;: 10,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          115,
+          81,
+          33,
+          112,
+          217,
+          11,
+          82,
+          89,
+          34
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rayon-core&quot;,
+        &quot;version&quot;: &quot;1.13.0&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          18,
+          12
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;cc&quot;,
+        &quot;version&quot;: &quot;1.2.56&quot;,
+        &quot;transitive_weight&quot;: 43,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          160,
+          0,
+          149,
+          10
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;backtrace&quot;,
+        &quot;version&quot;: &quot;0.3.76&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          1,
+          171,
+          127,
+          68,
+          149,
+          30,
+          115
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;fastrand&quot;,
+        &quot;version&quot;: &quot;2.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;option-ext&quot;,
+        &quot;version&quot;: &quot;0.2.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;phf_generator&quot;,
+        &quot;version&quot;: &quot;0.13.1&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          165,
+          210
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;redox_users&quot;,
+        &quot;version&quot;: &quot;0.5.2&quot;,
+        &quot;transitive_weight&quot;: 14,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          188,
+          204,
+          164
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;clap_builder&quot;,
+        &quot;version&quot;: &quot;4.5.59&quot;,
+        &quot;transitive_weight&quot;: 14,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          40,
+          145,
+          55,
+          162
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;base64&quot;,
+        &quot;version&quot;: &quot;0.22.1&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
@@ -9314,51 +9666,11 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;web-sys&quot;,
-        &quot;version&quot;: &quot;0.3.85&quot;,
-        &quot;transitive_weight&quot;: 14,
+        &quot;name&quot;: &quot;windows_i686_gnullvm&quot;,
+        &quot;version&quot;: &quot;0.53.1&quot;,
+        &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          155,
-          91
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;icu_collections&quot;,
-        &quot;version&quot;: &quot;2.1.1&quot;,
-        &quot;transitive_weight&quot;: 15,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          15,
-          181,
-          41,
-          212,
-          137
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;thiserror&quot;,
-        &quot;version&quot;: &quot;2.0.18&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          25
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;iana-time-zone&quot;,
-        &quot;version&quot;: &quot;0.1.65&quot;,
-        &quot;transitive_weight&quot;: 61,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          9,
-          155,
-          91,
-          68,
-          111,
-          125,
-          198
-        ]
+        &quot;children&quot;: []
       },
       {
         &quot;name&quot;: &quot;wit-bindgen-rust&quot;,
@@ -9366,63 +9678,212 @@ depth 1</title>
         &quot;transitive_weight&quot;: 32,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          215,
-          54,
-          192,
-          0,
-          52,
-          4,
-          61,
-          107
+          232,
+          202,
+          195,
+          130,
+          153,
+          20,
+          236,
+          189
         ]
       },
       {
-        &quot;name&quot;: &quot;windows-sys&quot;,
-        &quot;version&quot;: &quot;0.61.2&quot;,
+        &quot;name&quot;: &quot;itertools&quot;,
+        &quot;version&quot;: &quot;0.13.0&quot;,
         &quot;transitive_weight&quot;: 2,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
+          108
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;fast-srgb8&quot;,
+        &quot;version&quot;: &quot;1.0.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;plotters-svg&quot;,
+        &quot;version&quot;: &quot;0.3.7&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          186
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;git2&quot;,
+        &quot;version&quot;: &quot;0.20.4&quot;,
+        &quot;transitive_weight&quot;: 76,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          22,
+          240,
+          16,
+          149,
+          152
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;oorandom&quot;,
+        &quot;version&quot;: &quot;11.1.5&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;icu_collections&quot;,
+        &quot;version&quot;: &quot;2.1.1&quot;,
+        &quot;transitive_weight&quot;: 15,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          71,
+          181,
+          13,
+          94,
           42
         ]
       },
       {
-        &quot;name&quot;: &quot;cast&quot;,
-        &quot;version&quot;: &quot;0.3.0&quot;,
+        &quot;name&quot;: &quot;wit-bindgen-rust-macro&quot;,
+        &quot;version&quot;: &quot;0.51.0&quot;,
+        &quot;transitive_weight&quot;: 33,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          218,
+          202,
+          153,
+          20,
+          75,
+          105,
+          236
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;icu_provider&quot;,
+        &quot;version&quot;: &quot;2.1.1&quot;,
+        &quot;transitive_weight&quot;: 19,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          102,
+          131,
+          181,
+          13,
+          94,
+          42,
+          196
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;automod&quot;,
+        &quot;version&quot;: &quot;1.0.16&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;colorchoice&quot;,
+        &quot;version&quot;: &quot;1.0.4&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;nu-ansi-term&quot;,
-        &quot;version&quot;: &quot;0.50.3&quot;,
-        &quot;transitive_weight&quot;: 10,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          60,
-          229
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;libredox&quot;,
-        &quot;version&quot;: &quot;0.1.12&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          191,
-          79,
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;dunce&quot;,
-        &quot;version&quot;: &quot;1.0.5&quot;,
+        &quot;name&quot;: &quot;unicode-width&quot;,
+        &quot;version&quot;: &quot;0.1.14&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;pkg-config&quot;,
-        &quot;version&quot;: &quot;0.3.32&quot;,
+        &quot;name&quot;: &quot;snapbox-macros&quot;,
+        &quot;version&quot;: &quot;1.0.0&quot;,
+        &quot;transitive_weight&quot;: 12,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          40
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;chrono&quot;,
+        &quot;version&quot;: &quot;0.4.43&quot;,
+        &quot;transitive_weight&quot;: 64,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          117,
+          49,
+          115
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wit-component&quot;,
+        &quot;version&quot;: &quot;0.244.0&quot;,
+        &quot;transitive_weight&quot;: 28,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          146,
+          195,
+          133,
+          46,
+          192,
+          130,
+          182,
+          87,
+          236,
+          16,
+          152
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;anstyle-wincon&quot;,
+        &quot;version&quot;: &quot;3.0.11&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          26,
+          145,
+          134
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;icu_properties&quot;,
+        &quot;version&quot;: &quot;2.1.2&quot;,
+        &quot;transitive_weight&quot;: 23,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          226,
+          102,
+          224,
+          131,
+          181,
+          197
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;windows-strings&quot;,
+        &quot;version&quot;: &quot;0.5.1&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          115
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;anyhow&quot;,
+        &quot;version&quot;: &quot;1.0.101&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;unicode-width&quot;,
+        &quot;version&quot;: &quot;0.2.2&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
@@ -9435,54 +9896,27 @@ depth 1</title>
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;windows-result&quot;,
-        &quot;version&quot;: &quot;0.4.1&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          42
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rayon-core&quot;,
-        &quot;version&quot;: &quot;1.13.0&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          118,
-          209
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;locale&quot;,
-        &quot;version&quot;: &quot;0.2.2&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          94
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;zerotrie&quot;,
-        &quot;version&quot;: &quot;0.2.3&quot;,
-        &quot;transitive_weight&quot;: 12,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          41,
-          212,
-          137
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;writeable&quot;,
-        &quot;version&quot;: &quot;0.6.2&quot;,
+        &quot;name&quot;: &quot;hashbrown&quot;,
+        &quot;version&quot;: &quot;0.16.1&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;url&quot;,
+        &quot;version&quot;: &quot;2.5.8&quot;,
+        &quot;transitive_weight&quot;: 35,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          141,
+          182,
+          7,
+          8
+        ]
       }
     ],
     &quot;root_indices&quot;: [
-      133
+      113
     ]
   },
   &quot;unused_edges&quot;: [
@@ -9498,6 +9932,22 @@ depth 1</title>
       &quot;eza&quot;,
       &quot;backtrace&quot;
     ]
+  ],
+  &quot;unused_direct_deps&quot;: [
+    {
+      &quot;from_crate&quot;: &quot;eza&quot;,
+      &quot;dep_name&quot;: &quot;natord-plus-plus&quot;,
+      &quot;dep_version&quot;: &quot;2.0.0&quot;,
+      &quot;real_deps_saved&quot;: 1,
+      &quot;is_test_example&quot;: false
+    },
+    {
+      &quot;from_crate&quot;: &quot;eza&quot;,
+      &quot;dep_name&quot;: &quot;uutils_term_grid&quot;,
+      &quot;dep_version&quot;: &quot;0.7.0&quot;,
+      &quot;real_deps_saved&quot;: 1,
+      &quot;is_test_example&quot;: false
+    }
   ]
 }</code></pre>
 </div>
