@@ -14,7 +14,7 @@ pub struct Cli {
     _subcommand_name: Option<String>,
 
     #[command(subcommand)]
-    pub command: Command,
+    pub command: Option<Command>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -99,6 +99,18 @@ pub struct FlameArgs {
     /// Show detailed analysis (file matches, dep chains, metrics).
     #[arg(long, short)]
     pub verbose: bool,
+}
+
+impl Default for FlameArgs {
+    fn default() -> Self {
+        Self {
+            manifest_path: PathBuf::from("Cargo.toml"),
+            threshold: 3.0,
+            top: 10,
+            fat_threshold: 10,
+            verbose: false,
+        }
+    }
 }
 
 #[derive(Debug, Clone, clap::ValueEnum)]

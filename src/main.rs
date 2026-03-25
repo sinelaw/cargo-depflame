@@ -14,7 +14,7 @@ use std::sync::Mutex;
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    match cli.command {
+    match cli.command.unwrap_or(Command::Flame(FlameArgs::default())) {
         Command::Analyze(args) => run_analyze(args),
         Command::Report(args) => run_report(args),
         Command::Flame(args) => run_flame(args),
