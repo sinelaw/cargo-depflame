@@ -2,7 +2,7 @@
 
 ## Overview
 
-A **stable-Rust-compatible** Cargo subcommand (`cargo-upstream-triage`) that identifies
+A **stable-Rust-compatible** Cargo subcommand (`cargo-depflame`) that identifies
 high-ROI opportunities to reduce transitive dependency bloat by submitting upstream PRs.
 Instead of compiler-level MIR analysis, it uses dependency graph weighting and
 lexical/AST heuristics to find intermediate crates that pull in massive dependency
@@ -27,8 +27,8 @@ Set up the Cargo subcommand binary, CLI argument parsing, and basic project stru
 ### Tasks
 
 1. **Initialize Cargo project**
-   - `cargo init --name cargo-upstream-triage`
-   - Binary crate; Cargo will invoke it as `cargo upstream-triage` via the
+   - `cargo init --name cargo-depflame`
+   - Binary crate; Cargo will invoke it as `cargo depflame` via the
      `cargo-<subcommand>` naming convention.
 
 2. **Add core dependencies to `Cargo.toml`**
@@ -68,12 +68,12 @@ Set up the Cargo subcommand binary, CLI argument parsing, and basic project stru
 
 5. **Wire up a smoke-test end-to-end path**
    - `analyze` subcommand calls stubs for each phase and prints a placeholder message.
-   - Confirm `cargo install --path .` works and `cargo upstream-triage analyze`
+   - Confirm `cargo install --path .` works and `cargo depflame analyze`
      runs without error.
 
 ### Acceptance Criteria
-- `cargo upstream-triage --help` prints usage.
-- `cargo upstream-triage analyze` exits cleanly (no-op) on any Cargo workspace.
+- `cargo depflame --help` prints usage.
+- `cargo depflame analyze` exits cleanly (no-op) on any Cargo workspace.
 
 ---
 
@@ -346,7 +346,7 @@ Render results as human-readable terminal output and machine-readable JSON.
      | # | Upstream Crate | Fat Dep | W_trans | C_ref | hURRS | Action |
 
 4. **Report subcommand**
-   - `cargo upstream-triage report --input analysis.json` reads a saved JSON
+   - `cargo depflame report --input analysis.json` reads a saved JSON
      and re-renders it (useful for CI pipelines that separate analysis from display).
 
 5. **Tests**

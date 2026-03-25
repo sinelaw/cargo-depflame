@@ -1,5 +1,5 @@
 [package]
-name = "cargo-upstream-triage"
+name = "cargo-depflame"
 version = "0.1.0"
 edition = "2021"
 description = "Find high-ROI upstream dependency reduction opportunities"

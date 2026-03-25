@@ -3,13 +3,13 @@ use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "cargo-upstream-triage",
+    name = "cargo-depflame",
     about = "Find high-ROI upstream dependency reduction opportunities",
     version
 )]
 pub struct Cli {
-    /// When invoked as `cargo upstream-triage`, cargo passes
-    /// "upstream-triage" as the first positional arg. We consume it here.
+    /// When invoked as `cargo depflame`, cargo passes
+    /// "depflame" as the first positional arg. We consume it here.
     #[arg(hide = true, required = false)]
     _subcommand_name: Option<String>,
 

@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
-use cargo_upstream_triage::cli::{AnalyzeArgs, Cli, Command, FlameArgs, OutputFormat, ReportArgs};
-use cargo_upstream_triage::report::AnalysisReport;
-use cargo_upstream_triage::{analyze, flamegraph, report};
+use cargo_depflame::cli::{AnalyzeArgs, Cli, Command, FlameArgs, OutputFormat, ReportArgs};
+use cargo_depflame::report::AnalysisReport;
+use cargo_depflame::{analyze, flamegraph, report};
 use clap::Parser;
 use std::io::Write;
 
@@ -53,7 +53,7 @@ fn run_flame(args: FlameArgs) -> Result<()> {
     // Create a named temp file for the HTML output.
     // Use keep() so the file persists for the browser to read.
     let tmp_file = tempfile::Builder::new()
-        .prefix("upstream-triage-")
+        .prefix("depflame-")
         .suffix(".html")
         .tempfile()
         .context("failed to create temp file")?;
@@ -130,7 +130,7 @@ fn write_output(
             flamegraph::render_flamegraph(tree, analysis.total_dependencies, writer)?;
         }
         OutputFormat::Html => {
-            cargo_upstream_triage::html_report::render_html_report(analysis, writer)?;
+            cargo_depflame::html_report::render_html_report(analysis, writer)?;
         }
     }
     Ok(())

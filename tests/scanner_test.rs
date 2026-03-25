@@ -26,7 +26,7 @@ fn main() {
 "#,
     );
 
-    let result = cargo_upstream_triage::scanner::scan_files(&[p], "regex");
+    let result = cargo_depflame::scanner::scan_files(&[p], "regex");
     // `use regex::Regex` matches \bregex::, but `Regex::new` does not.
     assert_eq!(result.ref_count, 1);
     assert_eq!(result.files_with_matches, 1);
@@ -46,7 +46,7 @@ fn main() {
 "#,
     );
 
-    let result = cargo_upstream_triage::scanner::scan_files(&[p], "regex");
+    let result = cargo_depflame::scanner::scan_files(&[p], "regex");
     assert_eq!(result.ref_count, 2);
 }
 
@@ -62,7 +62,7 @@ use serde::Serialize;
 "#,
     );
 
-    let result = cargo_upstream_triage::scanner::scan_files(&[p], "serde");
+    let result = cargo_depflame::scanner::scan_files(&[p], "serde");
     assert_eq!(result.ref_count, 2);
 }
 
@@ -78,7 +78,7 @@ fn main() {}
 "#,
     );
 
-    let result = cargo_upstream_triage::scanner::scan_files(&[p], "regex");
+    let result = cargo_depflame::scanner::scan_files(&[p], "regex");
     assert_eq!(result.ref_count, 0);
 }
 
@@ -94,7 +94,7 @@ use lazy_static::lazy_static;
     );
 
     // Search with the hyphenated name; scanner normalizes to underscores.
-    let result = cargo_upstream_triage::scanner::scan_files(&[p], "lazy-static");
+    let result = cargo_depflame::scanner::scan_files(&[p], "lazy-static");
     assert_eq!(result.ref_count, 1);
 }
 
@@ -111,7 +111,7 @@ fn main() {
 "#,
     );
 
-    let result = cargo_upstream_triage::scanner::scan_files(&[p], "regex");
+    let result = cargo_depflame::scanner::scan_files(&[p], "regex");
     assert_eq!(result.ref_count, 0);
     assert_eq!(result.files_with_matches, 0);
 }
@@ -123,7 +123,7 @@ fn test_scan_multiple_files() {
     let p2 = write_file(dir.path(), "b.rs", "use serde::Deserialize;\n");
     let p3 = write_file(dir.path(), "c.rs", "fn main() {}\n");
 
-    let result = cargo_upstream_triage::scanner::scan_files(&[p1, p2, p3], "serde");
+    let result = cargo_depflame::scanner::scan_files(&[p1, p2, p3], "serde");
     assert_eq!(result.ref_count, 2);
     assert_eq!(result.files_with_matches, 2);
 }
