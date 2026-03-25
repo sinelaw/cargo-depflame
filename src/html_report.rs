@@ -157,7 +157,7 @@ body {{
 
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('flamegraph')">Flamegraph</button>
-  <button class="tab-btn" onclick="showTab('targets')">Targets ({n_targets})</button>
+  <button class="tab-btn" onclick="showTab('targets')">Suggestions ({n_targets})</button>
   <button class="tab-btn" onclick="showTab('json')">Raw JSON</button>
 </div>
 
@@ -232,54 +232,79 @@ function copyJson() {{
 fn build_targets_html(report: &AnalysisReport) -> String {
     let mut html = String::new();
 
-    // --- Action summary (grouped by suggestion type) ---
+    // --- Disclaimer banner ---
+    html.push_str(
+        "<div style=\"background:#fff3cd;border:1px solid #ffc107;border-radius:6px;\
+         padding:12px 16px;margin-bottom:20px;font-size:13px;color:#664d03\">\
+         <strong>\u{26a0} Use your judgement.</strong> \
+         These suggestions are based on automated analysis of dependency metadata and source references. \
+         They may be wrong or impractical. Before acting on any suggestion, make sure you understand \
+         why the dependency exists, what features it provides, and whether removing it would break \
+         functionality or degrade the library for other users.\
+         </div>\n",
+    );
+
+    // --- Action summary ---
     html.push_str("<div class=\"action-summary\">\n");
-    html.push_str("<h3>Action Summary</h3>\n<ul>\n");
+    html.push_str("<h3>What you can do</h3>\n<p style=\"font-size:13px;color:#666;margin-bottom:8px\">Each suggestion below can reduce your dependency count. Items are ranked by impact (most deps saved first). Some changes are in your own crates; others require <strong>contributing a PR to an upstream library</strong> (marked with \u{1f4e4}).</p>\n<ul>\n");
 
     let mut has_items = false;
     for (i, t) in report.targets.iter().enumerate() {
+        let upstream_badge = if t.intermediate_is_workspace_member {
+            ""
+        } else {
+            " <span title=\"This change would be a PR to an upstream library, not your own code\" style=\"cursor:help\">\u{1f4e4}</span>"
+        };
         let prefix = format!("(-{} deps)", t.w_unique);
         let fat_link = crate_link(&t.fat_dependency.name);
         let int_link = crate_link(&t.intermediate.name);
         let action_line = match &t.suggestion {
             RemovalStrategy::Remove => {
-                format!("{prefix} Remove {fat_link} from {int_link}")
+                format!("{prefix} Remove {fat_link} from {int_link} &mdash; it appears unused")
             }
             RemovalStrategy::InlineUpstream {
                 fat_loc,
                 api_items_used,
             } => {
                 format!(
-                    "{prefix} Inline {fat_link} into {int_link} ({fat_loc} LOC, {api_items_used} items)"
+                    "{prefix} Copy the code you need from {fat_link} directly into {int_link} \
+                     &mdash; only {api_items_used} API items used from a {fat_loc}-line crate"
                 )
             }
             RemovalStrategy::ReplaceWithStd { suggestion } => {
                 format!(
-                    "{prefix} Replace {fat_link} with <code>{}</code> in {int_link}",
+                    "{prefix} Replace {fat_link} with <code>{}</code> in {int_link} \
+                     &mdash; the standard library now covers this",
                     html_escape(suggestion),
                 )
             }
             RemovalStrategy::AlreadyGated { detail } => {
                 format!(
-                    "{prefix} {fat_link} is optional in {int_link} ({detail})"
+                    "{prefix} Check whether you actually need {fat_link} enabled in {int_link} \
+                     &mdash; it's already optional ({detail})"
                 )
             }
             RemovalStrategy::FeatureGate => {
-                format!("{prefix} Feature-gate {fat_link} in {int_link}")
+                format!(
+                    "{prefix} Propose making {fat_link} optional in {int_link} \
+                     &mdash; put it behind a Cargo feature flag"
+                )
             }
             RemovalStrategy::ReplaceWithLighter { alternative } => {
                 format!(
-                    "{prefix} Replace {fat_link} with <code>{}</code> in {int_link}",
+                    "{prefix} Switch from {fat_link} to <code>{}</code> in {int_link} \
+                     &mdash; a lighter alternative",
                     html_escape(alternative),
                 )
             }
             RemovalStrategy::RequiredBySibling { sibling } => {
                 format!(
-                    "{prefix} {fat_link} required by sibling {}", crate_link(sibling)
+                    "{prefix} {fat_link} can't be removed &mdash; \
+                     it's also required by sibling dep {}", crate_link(sibling)
                 )
             }
         };
-        html.push_str(&format!("<li>#{} {action_line}</li>\n", i + 1));
+        html.push_str(&format!("<li>#{} {action_line}{upstream_badge}</li>\n", i + 1));
         has_items = true;
     }
     if !has_items {
@@ -290,8 +315,8 @@ fn build_targets_html(report: &AnalysisReport) -> String {
     // --- Ranked targets table ---
     html.push_str(
         r#"<div style="margin-bottom:12px">
-<p style="font-size:14px;color:#444;margin-bottom:4px"><strong>Ranked targets</strong></p>
-<p style="font-size:13px;color:#666">Each row is an edge <em>Upstream Crate &rarr; Heavy Dep</em> where removing or gating the dependency would eliminate <em>Deps Saved</em> transitive crates from your build. Click a row to see source references and the full dependency chain.</p>
+<p style="font-size:14px;color:#444;margin-bottom:4px"><strong>Detailed breakdown</strong></p>
+<p style="font-size:13px;color:#666">Each row below is a dependency edge you could optimize. <em>Upstream Crate</em> is where the change would happen; <em>Heavy Dep</em> is the dependency to reduce. Rows marked \u{1f4e4} require contributing a PR upstream. Click any row to see exactly where the dependency is used in the source code.</p>
 </div>
 <table class="targets-table">
 <thead><tr>
@@ -323,11 +348,17 @@ fn build_targets_html(report: &AnalysisReport) -> String {
             None => "\u{221e}".to_string(), // infinity
         };
 
+        let upstream_indicator = if t.intermediate_is_workspace_member {
+            ""
+        } else {
+            " <span title=\"Requires a PR to this upstream library\">\u{1f4e4}</span>"
+        };
+
         // Summary row (clickable).
         html.push_str(&format!(
             r#"<tr class="expandable" onclick="toggleDetail({idx})">
   <td>{idx}</td>
-  <td><code>{intermediate_link}</code></td>
+  <td><code>{intermediate_link}</code>{upstream_indicator}</td>
   <td><code>{fat_link}</code></td>
   <td>{w_uniq}</td><td>{w_trans}</td><td>{c_ref}</td><td>{hurrs}</td>
   <td><span class="badge {conf_class}">{confidence}</span></td>
