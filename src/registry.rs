@@ -1,5 +1,8 @@
 use std::path::{Path, PathBuf};
 
+/// Maximum file size to scan (10 MB). Covers most generated files.
+const MAX_FILE_SIZE: u64 = 10_000_000;
+
 /// Locate the Cargo registry source directory.
 pub fn cargo_registry_src_dirs() -> Vec<PathBuf> {
     let cargo_home = std::env::var("CARGO_HOME")
@@ -56,9 +59,8 @@ fn collect_rs_files_recursive(dir: &Path, files: &mut Vec<PathBuf>) {
         if path.is_dir() {
             collect_rs_files_recursive(&path, files);
         } else if path.extension().is_some_and(|ext| ext == "rs") {
-            // Skip very large files (likely generated).
             if let Ok(meta) = path.metadata() {
-                if meta.len() <= 1_000_000 {
+                if meta.len() <= MAX_FILE_SIZE {
                     files.push(path);
                 }
             }

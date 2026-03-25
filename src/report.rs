@@ -1,4 +1,4 @@
-use crate::metrics::{RemovalStrategy, UpstreamTarget};
+use crate::metrics::{Confidence, RemovalStrategy, UpstreamTarget};
 use crate::scanner::display_path;
 use colored::Colorize;
 use comfy_table::{modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Table};
@@ -62,6 +62,13 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
             format!("{:.1}", target.hurrs.unwrap_or(0.0))
         };
 
+        let confidence_colored = match target.confidence {
+            Confidence::High => format!("{}", target.confidence).green(),
+            Confidence::Medium => format!("{}", target.confidence).yellow(),
+            Confidence::Low => format!("{}", target.confidence).red(),
+            Confidence::Noise => format!("{}", target.confidence).dimmed(),
+        };
+
         writeln!(
             writer,
             "{}",
@@ -82,10 +89,11 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
         )?;
         writeln!(
             writer,
-            "{}  {} (brings in {} transitive crates)",
+            "{}  {} (brings in {} transitive crates, {} unique)",
             "Offending Dep:".bold(),
             target.fat_dependency.name.red(),
-            target.w_transitive
+            target.w_transitive,
+            target.w_unique,
         )?;
         writeln!(
             writer,
@@ -94,6 +102,69 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
             target.c_ref,
             target.scan_result.files_with_matches
         )?;
+        writeln!(
+            writer,
+            "{}    {}",
+            "Confidence:".bold(),
+            confidence_colored
+        )?;
+
+        // Edge metadata badges.
+        let mut badges = Vec::new();
+        if target.edge_meta.build_only {
+            badges.push("BUILD-ONLY".dimmed().to_string());
+        }
+        if target.edge_meta.already_optional {
+            badges.push("ALREADY-OPTIONAL".dimmed().to_string());
+        }
+        if target.edge_meta.platform_conditional {
+            badges.push("PLATFORM-CONDITIONAL".dimmed().to_string());
+        }
+        if target.scan_result.generated_file_refs > 0 {
+            badges.push(
+                format!(
+                    "{} refs in generated files",
+                    target.scan_result.generated_file_refs
+                )
+                .dimmed()
+                .to_string(),
+            );
+        }
+        if !badges.is_empty() {
+            writeln!(
+                writer,
+                "{}       [{}]",
+                "Flags:".bold(),
+                badges.join(", ")
+            )?;
+        }
+
+        // Dependency chain.
+        if !target.dep_chain.is_empty() {
+            writeln!(
+                writer,
+                "{}    {}",
+                "Dep Chain:".bold(),
+                target
+                    .dep_chain
+                    .iter()
+                    .map(|s| s.as_str())
+                    .collect::<Vec<_>>()
+                    .join(" -> ")
+                    .dimmed()
+            )?;
+        }
+
+        // Searched names (if aliases were used).
+        if target.scan_result.searched_names.len() > 1 {
+            writeln!(
+                writer,
+                "{}  {}",
+                "Searched Names:".bold(),
+                target.scan_result.searched_names.join(", ").dimmed()
+            )?;
+        }
+
         writeln!(writer)?;
 
         if !target.scan_result.file_matches.is_empty() {
@@ -102,7 +173,12 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
             for m in &target.scan_result.file_matches {
                 let display = display_path(&m.path);
                 if display != current_file {
-                    writeln!(writer, "    {}", display.dimmed())?;
+                    let label = if m.in_generated_file {
+                        format!("{} {}", display, "(generated)".dimmed())
+                    } else {
+                        display.clone()
+                    };
+                    writeln!(writer, "    {}", label.dimmed())?;
                     current_file = display;
                 }
                 writeln!(
@@ -136,8 +212,10 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
             "Upstream Crate",
             "Fat Dep",
             "W_trans",
+            "W_uniq",
             "C_ref",
             "hURRS",
+            "Confidence",
             "Action",
         ]);
 
@@ -149,16 +227,40 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
         };
         table.add_row(vec![
             format!("{}", i + 1),
-            format!("{} v{}", target.intermediate.name, target.intermediate.version),
-            format!("{} v{}", target.fat_dependency.name, target.fat_dependency.version),
+            format!(
+                "{} v{}",
+                target.intermediate.name, target.intermediate.version
+            ),
+            format!(
+                "{} v{}",
+                target.fat_dependency.name, target.fat_dependency.version
+            ),
             format!("{}", target.w_transitive),
+            format!("{}", target.w_unique),
             format!("{}", target.c_ref),
             hurrs_display,
+            format!("{}", target.confidence),
             format!("{}", target.suggestion),
         ]);
     }
 
     writeln!(writer, "{table}")?;
+    writeln!(writer)?;
+
+    // Legend.
+    writeln!(writer, "{}", "Legend:".bold())?;
+    writeln!(writer, "  W_trans  = total transitive dependencies of the fat dep")?;
+    writeln!(writer, "  W_uniq   = deps that would actually disappear if this edge were cut")?;
+    writeln!(writer, "  C_ref    = source code references found")?;
+    writeln!(writer, "  hURRS    = W_transitive / C_ref (higher = more bloat per use)")?;
+    writeln!(
+        writer,
+        "  Confidence: {} = actionable, {} = check manually, {} = likely false positive, {} = skip",
+        "HIGH".green(),
+        "MEDIUM".yellow(),
+        "LOW".red(),
+        "NOISE".dimmed()
+    )?;
     writeln!(writer)?;
 
     Ok(())
@@ -179,8 +281,9 @@ fn render_action_detail(writer: &mut dyn Write, target: &UpstreamTarget) -> anyh
             )?;
             writeln!(
                 writer,
-                "    This would drop {} transitive crates from builds.",
-                target.w_transitive
+                "    This would drop ~{} crates from builds ({} shared with other deps).",
+                target.w_unique,
+                target.w_transitive.saturating_sub(target.w_unique),
             )?;
         }
         RemovalStrategy::FeatureGate => {
@@ -204,8 +307,8 @@ fn render_action_detail(writer: &mut dyn Write, target: &UpstreamTarget) -> anyh
             writeln!(writer)?;
             writeln!(
                 writer,
-                "    This would drop {} transitive crates for users who don't need",
-                target.w_transitive
+                "    This would drop ~{} crates for users who don't need",
+                target.w_unique
             )?;
             writeln!(
                 writer,
@@ -221,8 +324,8 @@ fn render_action_detail(writer: &mut dyn Write, target: &UpstreamTarget) -> anyh
             )?;
             writeln!(
                 writer,
-                "    This would drop {} transitive crates.",
-                target.w_transitive
+                "    This would drop ~{} crates.",
+                target.w_unique
             )?;
         }
         RemovalStrategy::ReplaceWithLighter { alternative } => {
@@ -233,8 +336,19 @@ fn render_action_detail(writer: &mut dyn Write, target: &UpstreamTarget) -> anyh
             )?;
             writeln!(
                 writer,
-                "    This would drop {} transitive crates.",
-                target.w_transitive
+                "    This would drop ~{} crates.",
+                target.w_unique
+            )?;
+        }
+        RemovalStrategy::AlreadyGated { detail } => {
+            writeln!(
+                writer,
+                "    The dependency `{}` is {} in `{}`.",
+                target.fat_dependency.name, detail, target.intermediate.name
+            )?;
+            writeln!(
+                writer,
+                "    Check if your Cargo.toml enables this feature unnecessarily."
             )?;
         }
     }
