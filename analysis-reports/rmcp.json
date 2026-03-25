@@ -1,0 +1,5667 @@
+{
+  "tool_version": "0.1.0",
+  "timestamp": "2026-03-25T21:28:11.693483505+00:00",
+  "workspace_root": "/tmp/rust-projects/rmcp",
+  "threshold": 3.0,
+  "total_dependencies": 341,
+  "platform_dependencies": 52,
+  "phantom_dependencies": 289,
+  "fat_nodes_found": 111,
+  "targets": [
+    {
+      "intermediate": {
+        "name": "futures",
+        "version": "0.3.32"
+      },
+      "fat_dependency": {
+        "name": "futures-executor",
+        "version": "0.3.32"
+      },
+      "w_transitive": 15,
+      "w_unique": 1,
+      "c_ref": 4,
+      "hurrs": 3.75,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "futures-executor",
+        "searched_names": [
+          "futures_executor"
+        ],
+        "ref_count": 4,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-0.3.32/src/lib.rs",
+            "line_number": 190,
+            "line_content": "pub use futures_executor::{",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-0.3.32/src/lib.rs",
+            "line_number": 197,
+            "line_content": "pub use futures_executor::{ThreadPool, ThreadPoolBuilder};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-0.3.32/tests/stream_try_stream.rs",
+            "line_number": 9,
+            "line_content": "use futures_executor::block_on;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-0.3.32/tests/stream.rs",
+            "line_number": 17,
+            "line_content": "use futures_executor::ThreadPool;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 3,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ThreadPool",
+          "ThreadPoolBuilder",
+          "block_on"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "executor",
+            "futures-executor",
+            "thread-pool"
+          ],
+          "recommended_defaults": [
+            "std",
+            "async-await"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "futures",
+        "futures-executor"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 1079,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "reqwest",
+        "version": "0.13.2"
+      },
+      "fat_dependency": {
+        "name": "rustls-platform-verifier",
+        "version": "0.6.2"
+      },
+      "w_transitive": 109,
+      "w_unique": 27,
+      "c_ref": 2,
+      "hurrs": 54.5,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "rustls-platform-verifier",
+        "searched_names": [
+          "rustls_platform_verifier"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.2/src/async_impl/client.rs",
+            "line_number": 752,
+            "line_content": "rustls_platform_verifier::Verifier::new(provider.clone())",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.2/src/async_impl/client.rs",
+            "line_number": 760,
+            "line_content": "rustls_platform_verifier::Verifier::new_with_extra_roots(",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Verifier"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "optional + platform-conditional",
+          "enabling_features": [
+            "rustls",
+            "rustls-no-provider"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "reqwest",
+        "rustls-platform-verifier"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 2096,
+      "fat_dep_own_deps": 13,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "url",
+        "version": "2.5.8"
+      },
+      "fat_dependency": {
+        "name": "idna",
+        "version": "1.1.0"
+      },
+      "w_transitive": 29,
+      "w_unique": 24,
+      "c_ref": 5,
+      "hurrs": 5.8,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "idna",
+        "searched_names": [
+          "idna"
+        ],
+        "ref_count": 5,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/url-2.5.8/src/host.rs",
+            "line_number": 109,
+            "line_content": "let domain = idna::domain_to_ascii_from_cow(domain, idna::AsciiDenyList::URL)?;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/url-2.5.8/src/quirks.rs",
+            "line_number": 74,
+            "line_content": "let (unicode, _errors) = idna::domain_to_unicode(domain);",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/url-2.5.8/src/origin.rs",
+            "line_number": 98,
+            "line_content": "let (domain, _errors) = idna::domain_to_unicode(domain);",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/url-2.5.8/src/parser.rs",
+            "line_number": 101,
+            "line_content": "impl From<::idna::Errors> for ParseError {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/url-2.5.8/src/parser.rs",
+            "line_number": 102,
+            "line_content": "fn from(_: ::idna::Errors) -> Self {",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 4,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "AsciiDenyList",
+          "Errors",
+          "domain_to_ascii_from_cow",
+          "domain_to_unicode"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "url",
+        "idna"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 2905,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "idna",
+        "version": "1.1.0"
+      },
+      "fat_dependency": {
+        "name": "idna_adapter",
+        "version": "1.2.1"
+      },
+      "w_transitive": 27,
+      "w_unique": 22,
+      "c_ref": 3,
+      "hurrs": 9.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "idna_adapter",
+        "searched_names": [
+          "idna_adapter"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/idna-1.1.0/src/uts46.rs",
+            "line_number": 29,
+            "line_content": "use idna_adapter::*;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/idna-1.1.0/src/uts46.rs",
+            "line_number": 490,
+            "line_content": "data: idna_adapter::Adapter,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/idna-1.1.0/src/uts46.rs",
+            "line_number": 505,
+            "line_content": "data: idna_adapter::Adapter::new(),",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Adapter"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "url",
+        "idna",
+        "idna_adapter"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 180,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rustls-platform-verifier",
+        "version": "0.6.2"
+      },
+      "fat_dependency": {
+        "name": "jni",
+        "version": "0.21.1"
+      },
+      "w_transitive": 30,
+      "w_unique": 18,
+      "c_ref": 5,
+      "hurrs": 6.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "jni",
+        "searched_names": [
+          "jni"
+        ],
+        "ref_count": 5,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.6.2/src/verification/android.rs",
+            "line_number": 3,
+            "line_content": "use jni::{",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.6.2/src/android.rs",
+            "line_number": 22,
+            "line_content": "use jni::errors::Error as JNIError;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.6.2/src/android.rs",
+            "line_number": 23,
+            "line_content": "use jni::objects::{GlobalRef, JClass, JObject, JValue};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.6.2/src/android.rs",
+            "line_number": 24,
+            "line_content": "use jni::{AttachGuard, JNIEnv, JavaVM};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.6.2/src/tests/ffi.rs",
+            "line_number": 18,
+            "line_content": "use jni::{",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 3,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "AttachGuard",
+          "JNIEnv",
+          "JavaVM",
+          "errors",
+          "objects"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "optional + platform-conditional",
+          "enabling_features": [
+            "docsrs",
+            "jni"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "reqwest",
+        "rustls-platform-verifier",
+        "jni"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 7357,
+      "fat_dep_own_deps": 8,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "mcp-conformance",
+        "version": "0.1.0"
+      },
+      "fat_dependency": {
+        "name": "p256",
+        "version": "0.13.2"
+      },
+      "w_transitive": 45,
+      "w_unique": 17,
+      "c_ref": 3,
+      "hurrs": 15.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "p256",
+        "searched_names": [
+          "p256"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/rmcp/conformance/src/bin/client.rs",
+            "line_number": 653,
+            "line_content": "let secret_key = p256::ecdsa::SigningKey::from_bytes(raw_key.as_slice().into())",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/conformance/src/bin/client.rs",
+            "line_number": 655,
+            "line_content": "use p256::ecdsa::signature::Signer;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/conformance/src/bin/client.rs",
+            "line_number": 656,
+            "line_content": "let sig: p256::ecdsa::Signature = secret_key.sign(signing_input.as_bytes());",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ecdsa"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-conformance",
+        "p256"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 2790,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "reqwest",
+        "version": "0.13.2"
+      },
+      "fat_dependency": {
+        "name": "quinn",
+        "version": "0.11.9"
+      },
+      "w_transitive": 123,
+      "w_unique": 16,
+      "c_ref": 5,
+      "hurrs": 24.6,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "quinn",
+        "searched_names": [
+          "quinn"
+        ],
+        "ref_count": 5,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.2/src/async_impl/h3_client/connect.rs",
+            "line_number": 9,
+            "line_content": "use quinn::crypto::rustls::QuicClientConfig;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.2/src/async_impl/h3_client/connect.rs",
+            "line_number": 10,
+            "line_content": "use quinn::{ClientConfig, Endpoint, TransportConfig};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.2/src/async_impl/client.rs",
+            "line_number": 57,
+            "line_content": "use quinn::TransportConfig;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.2/src/async_impl/client.rs",
+            "line_number": 59,
+            "line_content": "use quinn::VarInt;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.2/src/async_impl/client.rs",
+            "line_number": 483,
+            "line_content": "let factory = Arc::new(quinn::congestion::BbrConfig::default());",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ClientConfig",
+          "Endpoint",
+          "TransportConfig",
+          "VarInt",
+          "congestion",
+          "crypto"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "optional + platform-conditional",
+          "enabling_features": [
+            "http3"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "reqwest",
+        "quinn"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 4741,
+      "fat_dep_own_deps": 12,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "wit-bindgen",
+        "version": "0.51.0"
+      },
+      "fat_dependency": {
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0"
+      },
+      "w_transitive": 33,
+      "w_unique": 15,
+      "c_ref": 1,
+      "hurrs": 33.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wit-bindgen-rust-macro",
+        "searched_names": [
+          "wit_bindgen_rust_macro"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-0.51.0/src/lib.rs",
+            "line_number": 868,
+            "line_content": "pub use wit_bindgen_rust_macro::generate;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "generate"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "macros"
+          ],
+          "recommended_defaults": [
+            "realloc",
+            "async",
+            "std",
+            "bitflags"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "wasi-mcp-example",
+        "wasi",
+        "wasip2",
+        "wit-bindgen",
+        "wit-bindgen-rust-macro"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 553,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "quinn-udp",
+        "version": "0.5.14"
+      },
+      "fat_dependency": {
+        "name": "windows-sys",
+        "version": "0.60.2"
+      },
+      "w_transitive": 11,
+      "w_unique": 10,
+      "c_ref": 2,
+      "hurrs": 5.5,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "windows-sys",
+        "searched_names": [
+          "windows_sys"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quinn-udp-0.5.14/src/cmsg/windows.rs",
+            "line_number": 6,
+            "line_content": "use windows_sys::Win32::Networking::WinSock;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quinn-udp-0.5.14/src/windows.rs",
+            "line_number": 13,
+            "line_content": "use windows_sys::Win32::Networking::WinSock;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Win32"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "reqwest",
+        "quinn",
+        "quinn-udp",
+        "windows-sys"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 334264,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rmcp",
+        "version": "1.2.0"
+      },
+      "fat_dependency": {
+        "name": "process-wrap",
+        "version": "9.1.0"
+      },
+      "w_transitive": 60,
+      "w_unique": 7,
+      "c_ref": 1,
+      "hurrs": 60.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "process-wrap",
+        "searched_names": [
+          "process_wrap"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/child_process.rs",
+            "line_number": 4,
+            "line_content": "use process_wrap::tokio::{ChildWrapper, CommandWrap};",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "tokio"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "transport-child-process"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "rmcp",
+        "process-wrap"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 3276,
+      "fat_dep_own_deps": 6,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "mcp-server-examples",
+        "version": "0.1.5"
+      },
+      "fat_dependency": {
+        "name": "askama",
+        "version": "0.15.6"
+      },
+      "w_transitive": 19,
+      "w_unique": 5,
+      "c_ref": 1,
+      "hurrs": 19.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "askama",
+        "searched_names": [
+          "askama"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/rmcp/examples/servers/src/complex_auth_streamhttp.rs",
+            "line_number": 4,
+            "line_content": "use askama::Template;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Template"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "askama"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 3940,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "simple-chat-client",
+        "version": "0.1.0"
+      },
+      "fat_dependency": {
+        "name": "toml",
+        "version": "1.1.0+spec-1.1.0"
+      },
+      "w_transitive": 17,
+      "w_unique": 5,
+      "c_ref": 1,
+      "hurrs": 17.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "toml",
+        "searched_names": [
+          "toml"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/rmcp/examples/simple-chat-client/src/config.rs",
+            "line_number": 75,
+            "line_content": "let config: Self = toml::from_str(&content)?;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "from_str"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "simple-chat-client",
+        "toml"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 7216,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0"
+      },
+      "fat_dependency": {
+        "name": "wit-bindgen-rust",
+        "version": "0.51.0"
+      },
+      "w_transitive": 32,
+      "w_unique": 5,
+      "c_ref": 3,
+      "hurrs": 10.666666666666666,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wit-bindgen-rust",
+        "searched_names": [
+          "wit_bindgen_rust"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 13,
+            "line_content": "use wit_bindgen_rust::{Opts, Ownership, WithOption};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 33,
+            "line_content": "if let Some(e) = err.downcast_ref::<wit_bindgen_rust::MissingWith>() {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 340,
+            "line_content": "impl From<ExportKey> for wit_bindgen_rust::ExportKey {",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ExportKey",
+          "MissingWith",
+          "Opts",
+          "Ownership",
+          "WithOption"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "wasi-mcp-example",
+        "wasi",
+        "wasip2",
+        "wit-bindgen",
+        "wit-bindgen-rust-macro",
+        "wit-bindgen-rust"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 5141,
+      "fat_dep_own_deps": 8,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "aws-lc-rs",
+        "version": "1.16.2"
+      },
+      "fat_dependency": {
+        "name": "aws-lc-sys",
+        "version": "0.39.0"
+      },
+      "w_transitive": 55,
+      "w_unique": 4,
+      "c_ref": 1,
+      "hurrs": 55.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "aws-lc-sys",
+        "searched_names": [
+          "aws_lc_sys"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-rs-1.16.2/src/lib.rs",
+            "line_number": 194,
+            "line_content": "extern crate aws_lc_sys as aws_lc;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "aws-lc-sys",
+            "non-fips"
+          ],
+          "recommended_defaults": [
+            "alloc",
+            "ring-io",
+            "ring-sig-verify"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "reqwest",
+        "rustls",
+        "aws-lc-rs",
+        "aws-lc-sys"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 415642,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "transport",
+        "version": "1.2.0"
+      },
+      "fat_dependency": {
+        "name": "tokio-tungstenite",
+        "version": "0.29.0"
+      },
+      "w_transitive": 96,
+      "w_unique": 4,
+      "c_ref": 3,
+      "hurrs": 32.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "tokio-tungstenite",
+        "searched_names": [
+          "tokio_tungstenite"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/rmcp/examples/transport/src/websocket.rs",
+            "line_number": 9,
+            "line_content": "use tokio_tungstenite::tungstenite;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/examples/transport/src/websocket.rs",
+            "line_number": 26,
+            "line_content": "let (stream, response) = tokio_tungstenite::connect_async(uri).await?;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/examples/transport/src/websocket.rs",
+            "line_number": 41,
+            "line_content": "let ws_stream = tokio_tungstenite::accept_async(stream).await?;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "accept_async",
+          "connect_async",
+          "tungstenite"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "transport",
+        "tokio-tungstenite"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 1406,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "askama",
+        "version": "0.15.6"
+      },
+      "fat_dependency": {
+        "name": "askama_macros",
+        "version": "0.15.6"
+      },
+      "w_transitive": 14,
+      "w_unique": 4,
+      "c_ref": 2,
+      "hurrs": 7.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "askama_macros",
+        "searched_names": [
+          "askama_macros"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/askama-0.15.6/src/lib.rs",
+            "line_number": 84,
+            "line_content": "pub use askama_macros::Template;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/askama-0.15.6/src/lib.rs",
+            "line_number": 86,
+            "line_content": "pub use askama_macros::filter_fn;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Template",
+          "filter_fn"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "derive",
+            "nightly-spans"
+          ],
+          "recommended_defaults": [
+            "config",
+            "std",
+            "urlencode"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "askama",
+        "askama_macros"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 16,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "chrono",
+        "version": "0.4.44"
+      },
+      "fat_dependency": {
+        "name": "iana-time-zone",
+        "version": "0.1.65"
+      },
+      "w_transitive": 61,
+      "w_unique": 3,
+      "c_ref": 1,
+      "hurrs": 61.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "iana-time-zone",
+        "searched_names": [
+          "iana_time_zone"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.44/src/offset/local/unix.rs",
+            "line_number": 81,
+            "line_content": "let tz_name = iana_time_zone::get_timezone().ok()?;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "get_timezone"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "optional + platform-conditional",
+          "enabling_features": [
+            "clock",
+            "iana-time-zone"
+          ],
+          "recommended_defaults": [
+            "std",
+            "oldtime",
+            "wasmbind"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "chrono",
+        "iana-time-zone"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 2843,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rustls-platform-verifier",
+        "version": "0.6.2"
+      },
+      "fat_dependency": {
+        "name": "rustls-native-certs",
+        "version": "0.8.3"
+      },
+      "w_transitive": 27,
+      "w_unique": 3,
+      "c_ref": 1,
+      "hurrs": 27.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "rustls-native-certs",
+        "searched_names": [
+          "rustls_native_certs"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.6.2/src/verification/others.rs",
+            "line_number": 94,
+            "line_content": "let result = rustls_native_certs::load_native_certs();",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "load_native_certs"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "reqwest",
+        "rustls-platform-verifier",
+        "rustls-native-certs"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 838,
+      "fat_dep_own_deps": 4,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rmcp",
+        "version": "1.2.0"
+      },
+      "fat_dependency": {
+        "name": "oauth2",
+        "version": "5.0.0"
+      },
+      "w_transitive": 118,
+      "w_unique": 3,
+      "c_ref": 18,
+      "hurrs": 6.555555555555555,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "oauth2",
+        "searched_names": [
+          "oauth2"
+        ],
+        "ref_count": 18,
+        "file_matches": [
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 8,
+            "line_content": "use oauth2::{",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 44,
+            "line_content": "let mut builder = oauth2::http::Response::builder()",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 405,
+            "line_content": "type OAuthErrorResponse = oauth2::StandardErrorResponse<oauth2::basic::BasicErrorResponseType>;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 419,
+            "line_content": "oauth2::StandardTokenIntrospectionResponse<EmptyExtraTokenFields, BasicTokenType>;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 420,
+            "line_content": "type OAuthRevocableToken = oauth2::StandardRevocableToken;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 421,
+            "line_content": "type OAuthRevocationError = oauth2::StandardErrorResponse<oauth2::RevocationErrorResponseType>;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 422,
+            "line_content": "type OAuthClient = oauth2::Client<",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 428,
+            "line_content": "oauth2::EndpointSet,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 429,
+            "line_content": "oauth2::EndpointNotSet,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 430,
+            "line_content": "oauth2::EndpointNotSet,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 431,
+            "line_content": "oauth2::EndpointNotSet,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 432,
+            "line_content": "oauth2::EndpointSet,",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 754,
+            "line_content": "let mut client_builder: OAuthClient = oauth2::Client::new(client_id.clone())",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 1753,
+            "line_content": "let mut client_builder: OAuthClient = oauth2::Client::new(client_id)",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 2506,
+            "line_content": "use oauth2::{AuthType, CsrfToken, PkceCodeVerifier};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 2851,
+            "line_content": "use oauth2::{AccessToken, basic::BasicTokenType};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 3497,
+            "line_content": "use oauth2::{AccessToken, basic::BasicTokenType};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/tmp/rust-projects/rmcp/crates/rmcp/src/transport/auth.rs",
+            "line_number": 3824,
+            "line_content": "use oauth2::RefreshToken;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "AccessToken",
+          "AuthType",
+          "Client",
+          "CsrfToken",
+          "EndpointNotSet",
+          "EndpointSet",
+          "PkceCodeVerifier",
+          "RefreshToken",
+          "RevocationErrorResponseType",
+          "StandardErrorResponse",
+          "StandardRevocableToken",
+          "StandardTokenIntrospectionResponse",
+          "basic",
+          "http"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": [
+            "auth"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "rmcp",
+        "oauth2"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 7320,
+      "fat_dep_own_deps": 11,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "askama_macros",
+        "version": "0.15.6"
+      },
+      "fat_dependency": {
+        "name": "askama_derive",
+        "version": "0.15.6"
+      },
+      "w_transitive": 13,
+      "w_unique": 3,
+      "c_ref": 2,
+      "hurrs": 6.5,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "askama_derive",
+        "searched_names": [
+          "askama_derive"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/askama_macros-0.15.6/src/lib.rs",
+            "line_number": 6,
+            "line_content": "askama_derive::make_derive_template! {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/askama_macros-0.15.6/src/lib.rs",
+            "line_number": 13,
+            "line_content": "askama_derive::make_filter_fn! {",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "make_derive_template",
+          "make_filter_fn"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "askama",
+        "askama_macros",
+        "askama_derive"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 10566,
+      "fat_dep_own_deps": 9,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "transport",
+        "version": "1.2.0"
+      },
+      "fat_dependency": {
+        "name": "reqwest",
+        "version": "0.13.2"
+      },
+      "w_transitive": 223,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "reqwest",
+        "searched_names": [
+          "reqwest"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "transport",
+        "reqwest"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 35,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "mcp-server-examples",
+        "version": "0.1.5"
+      },
+      "fat_dependency": {
+        "name": "hyper",
+        "version": "1.8.1"
+      },
+      "w_transitive": 53,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "hyper",
+        "searched_names": [
+          "hyper"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-server-examples",
+        "hyper"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 15,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "transport",
+        "version": "1.2.0"
+      },
+      "fat_dependency": {
+        "name": "rand",
+        "version": "0.10.0"
+      },
+      "w_transitive": 44,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "rand",
+        "searched_names": [
+          "rand"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "transport",
+        "rand"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "mcp-client-examples",
+        "version": "0.1.5"
+      },
+      "fat_dependency": {
+        "name": "rand",
+        "version": "0.10.0"
+      },
+      "w_transitive": 44,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "rand",
+        "searched_names": [
+          "rand"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-client-examples",
+        "rand"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rmcp",
+        "version": "1.2.0"
+      },
+      "fat_dependency": {
+        "name": "rand",
+        "version": "0.10.0"
+      },
+      "w_transitive": 44,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "rand",
+        "searched_names": [
+          "rand"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "rmcp",
+        "rand"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "mcp-client-examples",
+        "version": "0.1.5"
+      },
+      "fat_dependency": {
+        "name": "tower",
+        "version": "0.5.3"
+      },
+      "w_transitive": 43,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "tower",
+        "searched_names": [
+          "tower"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-client-examples",
+        "tower"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 8,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "mcp-client-examples",
+        "version": "0.1.5"
+      },
+      "fat_dependency": {
+        "name": "url",
+        "version": "2.5.8"
+      },
+      "w_transitive": 35,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "url",
+        "searched_names": [
+          "url"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-client-examples",
+        "url"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "mcp-conformance",
+        "version": "0.1.0"
+      },
+      "fat_dependency": {
+        "name": "tokio-util",
+        "version": "0.7.18"
+      },
+      "w_transitive": 27,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "tokio-util",
+        "searched_names": [
+          "tokio_util"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-conformance",
+        "tokio-util"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "mcp-client-examples",
+        "version": "0.1.5"
+      },
+      "fat_dependency": {
+        "name": "futures",
+        "version": "0.3.32"
+      },
+      "w_transitive": 16,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "futures",
+        "searched_names": [
+          "futures"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "mcp-client-examples",
+        "futures"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "simple-chat-client",
+        "version": "0.1.0"
+      },
+      "fat_dependency": {
+        "name": "futures",
+        "version": "0.3.32"
+      },
+      "w_transitive": 16,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "futures",
+        "searched_names": [
+          "futures"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "simple-chat-client",
+        "futures"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 7,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "simple-chat-client",
+        "version": "0.1.0"
+      },
+      "fat_dependency": {
+        "name": "thiserror",
+        "version": "2.0.18"
+      },
+      "w_transitive": 6,
+      "w_unique": 0,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "Low",
+      "scan_result": {
+        "fat_crate_name": "thiserror",
+        "searched_names": [
+          "thiserror"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "simple-chat-client",
+        "thiserror"
+      ],
+      "required_by_sibling": null,
+      "phantom": false,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    }
+  ],
+  "dep_tree": {
+    "nodes": [
+      {
+        "name": "windows-numerics",
+        "version": "0.3.1",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          189,
+          187
+        ]
+      },
+      {
+        "name": "block-buffer",
+        "version": "0.10.4",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          119
+        ]
+      },
+      {
+        "name": "quinn-proto",
+        "version": "0.11.14",
+        "transitive_weight": 96,
+        "is_workspace": false,
+        "children": [
+          329,
+          8,
+          246,
+          331,
+          251,
+          154,
+          94,
+          174,
+          202,
+          212,
+          221,
+          7,
+          124,
+          183
+        ]
+      },
+      {
+        "name": "wasi",
+        "version": "0.14.7+wasi-0.2.4",
+        "transitive_weight": 36,
+        "is_workspace": false,
+        "children": [
+          11
+        ]
+      },
+      {
+        "name": "form_urlencoded",
+        "version": "1.2.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          134
+        ]
+      },
+      {
+        "name": "p256",
+        "version": "0.13.2",
+        "transitive_weight": 45,
+        "is_workspace": false,
+        "children": [
+          269,
+          76,
+          327,
+          263
+        ]
+      },
+      {
+        "name": "web-sys",
+        "version": "0.3.91",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          225,
+          339
+        ]
+      },
+      {
+        "name": "lru-slab",
+        "version": "0.1.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ring",
+        "version": "0.17.14",
+        "transitive_weight": 65,
+        "is_workspace": false,
+        "children": [
+          267,
+          309,
+          186,
+          99,
+          337,
+          299
+        ]
+      },
+      {
+        "name": "schemars",
+        "version": "1.2.1",
+        "transitive_weight": 70,
+        "is_workspace": false,
+        "children": [
+          302,
+          51,
+          103,
+          266,
+          347,
+          47
+        ]
+      },
+      {
+        "name": "yoke-derive",
+        "version": "0.8.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          30,
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "wasip2",
+        "version": "1.0.2+wasi-0.2.9",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          165
+        ]
+      },
+      {
+        "name": "windows_x86_64_gnullvm",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap",
+        "version": "4.6.0",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          188,
+          27
+        ]
+      },
+      {
+        "name": "pin-utils",
+        "version": "0.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerotrie",
+        "version": "0.2.3",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          146,
+          91,
+          343
+        ]
+      },
+      {
+        "name": "spki",
+        "version": "0.7.3",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          322,
+          220
+        ]
+      },
+      {
+        "name": "ipnet",
+        "version": "2.12.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "pastey",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0",
+        "transitive_weight": 33,
+        "is_workspace": false,
+        "children": [
+          281,
+          116,
+          122,
+          240,
+          52,
+          210,
+          250
+        ]
+      },
+      {
+        "name": "core-foundation",
+        "version": "0.10.1",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          156,
+          337
+        ]
+      },
+      {
+        "name": "rand_chacha",
+        "version": "0.3.1",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          123,
+          271
+        ]
+      },
+      {
+        "name": "iana-time-zone-haiku",
+        "version": "0.1.2",
+        "transitive_weight": 52,
+        "is_workspace": false,
+        "children": [
+          267
+        ]
+      },
+      {
+        "name": "serde_derive_internals",
+        "version": "0.29.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "http-body-util",
+        "version": "0.1.3",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          67,
+          278,
+          221,
+          33,
+          243
+        ]
+      },
+      {
+        "name": "sse-stream",
+        "version": "0.2.1",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [
+          279,
+          24,
+          67,
+          221,
+          243
+        ]
+      },
+      {
+        "name": "toml_writer",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap_derive",
+        "version": "4.6.0",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210,
+          143
+        ]
+      },
+      {
+        "name": "askama",
+        "version": "0.15.6",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          229,
+          51,
+          103,
+          323,
+          134
+        ]
+      },
+      {
+        "name": "windows-strings",
+        "version": "0.5.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          187
+        ]
+      },
+      {
+        "name": "synstructure",
+        "version": "0.13.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "cpufeatures",
+        "version": "0.3.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          337
+        ]
+      },
+      {
+        "name": "utf8parse",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "futures-core",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "encoding_rs",
+        "version": "0.8.35",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          99
+        ]
+      },
+      {
+        "name": "once_cell_polyfill",
+        "version": "1.70.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_gnu",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "foldhash",
+        "version": "0.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "system-configuration",
+        "version": "0.7.0",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          230,
+          96,
+          151
+        ]
+      },
+      {
+        "name": "process-wrap",
+        "version": "9.1.0",
+        "transitive_weight": 60,
+        "is_workspace": false,
+        "children": [
+          104,
+          258,
+          335,
+          174,
+          207,
+          133
+        ]
+      },
+      {
+        "name": "toml_datetime",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          216
+        ]
+      },
+      {
+        "name": "wasmparser",
+        "version": "0.244.0",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          207,
+          284,
+          151,
+          296
+        ]
+      },
+      {
+        "name": "windows-result",
+        "version": "0.4.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          187
+        ]
+      },
+      {
+        "name": "cfg_aliases",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "writeable",
+        "version": "0.6.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerovec-derive",
+        "version": "0.11.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "winnow",
+        "version": "1.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          61
+        ]
+      },
+      {
+        "name": "dyn-clone",
+        "version": "1.0.20",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "once_cell",
+        "version": "1.21.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "quinn-udp",
+        "version": "0.5.14",
+        "transitive_weight": 27,
+        "is_workspace": false,
+        "children": [
+          174,
+          288,
+          97,
+          43,
+          337,
+          48
+        ]
+      },
+      {
+        "name": "ryu",
+        "version": "1.0.23",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_json",
+        "version": "1.0.149",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          103,
+          216,
+          323,
+          61,
+          118
+        ]
+      },
+      {
+        "name": "quote",
+        "version": "1.0.45",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          210
+        ]
+      },
+      {
+        "name": "thiserror-impl",
+        "version": "2.0.18",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "typenum",
+        "version": "1.19.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "lock_api",
+        "version": "0.4.14",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          264
+        ]
+      },
+      {
+        "name": "h2",
+        "version": "0.4.13",
+        "transitive_weight": 45,
+        "is_workspace": false,
+        "children": [
+          102,
+          104,
+          174,
+          207,
+          278,
+          330,
+          221,
+          106,
+          33,
+          132,
+          183
+        ]
+      },
+      {
+        "name": "anstyle-query",
+        "version": "1.1.5",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          222
+        ]
+      },
+      {
+        "name": "version_check",
+        "version": "0.9.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "equivalent",
+        "version": "1.0.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "fs_extra",
+        "version": "1.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "memchr",
+        "version": "2.8.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rfc6979",
+        "version": "0.4.0",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          203,
+          345
+        ]
+      },
+      {
+        "name": "chacha20",
+        "version": "0.10.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          31,
+          99,
+          108
+        ]
+      },
+      {
+        "name": "tokio-rustls",
+        "version": "0.26.4",
+        "transitive_weight": 93,
+        "is_workspace": false,
+        "children": [
+          329,
+          104
+        ]
+      },
+      {
+        "name": "windows_aarch64_gnullvm",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "darling_macro",
+        "version": "0.23.0",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          161,
+          240,
+          52
+        ]
+      },
+      {
+        "name": "http-body",
+        "version": "1.0.1",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          278,
+          221
+        ]
+      },
+      {
+        "name": "toml",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          207,
+          82,
+          40,
+          216,
+          117,
+          46,
+          26
+        ]
+      },
+      {
+        "name": "utf8_iter",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "icu_properties",
+        "version": "2.1.2",
+        "transitive_weight": 23,
+        "is_workspace": false,
+        "children": [
+          166,
+          242,
+          80,
+          15,
+          238,
+          315
+        ]
+      },
+      {
+        "name": "android_system_properties",
+        "version": "0.1.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          337
+        ]
+      },
+      {
+        "name": "is_terminal_polyfill",
+        "version": "1.70.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_i686_gnullvm",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerofrom-derive",
+        "version": "0.1.6",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          30,
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "askama_derive",
+        "version": "0.15.6",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          157,
+          300,
+          103,
+          128,
+          240,
+          52,
+          210,
+          61,
+          124
+        ]
+      },
+      {
+        "name": "primeorder",
+        "version": "0.13.6",
+        "transitive_weight": 38,
+        "is_workspace": false,
+        "children": [
+          327
+        ]
+      },
+      {
+        "name": "windows-future",
+        "version": "0.3.2",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          189,
+          164,
+          187
+        ]
+      },
+      {
+        "name": "thiserror-impl",
+        "version": "1.0.69",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "wasip3",
+        "version": "0.4.0+wasi-0.3.0-rc-2026-01-06",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          165
+        ]
+      },
+      {
+        "name": "icu_collections",
+        "version": "2.1.1",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          348,
+          238,
+          146,
+          91,
+          343
+        ]
+      },
+      {
+        "name": "idna_adapter",
+        "version": "1.2.1",
+        "transitive_weight": 27,
+        "is_workspace": false,
+        "children": [
+          86,
+          70
+        ]
+      },
+      {
+        "name": "serde_spanned",
+        "version": "1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          216
+        ]
+      },
+      {
+        "name": "windows-targets",
+        "version": "0.52.6",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          237,
+          208,
+          319,
+          73,
+          311,
+          195,
+          12,
+          232
+        ]
+      },
+      {
+        "name": "windows_i686_gnu",
+        "version": "0.42.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wit-component",
+        "version": "0.244.0",
+        "transitive_weight": 28,
+        "is_workspace": false,
+        "children": [
+          87,
+          136,
+          257,
+          41,
+          51,
+          207,
+          103,
+          128,
+          250,
+          151,
+          173
+        ]
+      },
+      {
+        "name": "icu_normalizer",
+        "version": "2.1.1",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          70,
+          166,
+          80,
+          238,
+          152,
+          340
+        ]
+      },
+      {
+        "name": "wit-parser",
+        "version": "0.244.0",
+        "transitive_weight": 24,
+        "is_workspace": false,
+        "children": [
+          41,
+          51,
+          207,
+          103,
+          128,
+          250,
+          320,
+          173,
+          296,
+          235
+        ]
+      },
+      {
+        "name": "find-msvc-tools",
+        "version": "0.1.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_i686_msvc",
+        "version": "0.42.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-macro",
+        "version": "0.2.114",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          256,
+          52
+        ]
+      },
+      {
+        "name": "zerofrom",
+        "version": "0.1.6",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          74
+        ]
+      },
+      {
+        "name": "tracing-attributes",
+        "version": "0.1.31",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "thiserror",
+        "version": "1.0.69",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          78
+        ]
+      },
+      {
+        "name": "web-time",
+        "version": "1.1.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          225,
+          339
+        ]
+      },
+      {
+        "name": "crypto-common",
+        "version": "0.1.6",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          119,
+          54
+        ]
+      },
+      {
+        "name": "system-configuration-sys",
+        "version": "0.6.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          156,
+          337
+        ]
+      },
+      {
+        "name": "socket2",
+        "version": "0.6.3",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          222,
+          337
+        ]
+      },
+      {
+        "name": "litemap",
+        "version": "0.8.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "cfg-if",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "jni-sys",
+        "version": "0.4.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          179
+        ]
+      },
+      {
+        "name": "nu-ansi-term",
+        "version": "0.50.3",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          222
+        ]
+      },
+      {
+        "name": "tokio-util",
+        "version": "0.7.18",
+        "transitive_weight": 27,
+        "is_workspace": false,
+        "children": [
+          104,
+          221,
+          33,
+          132,
+          243
+        ]
+      },
+      {
+        "name": "serde",
+        "version": "1.0.228",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          216,
+          128
+        ]
+      },
+      {
+        "name": "tokio",
+        "version": "1.50.0",
+        "transitive_weight": 24,
+        "is_workspace": false,
+        "children": [
+          126,
+          286,
+          217,
+          163,
+          97,
+          222,
+          221,
+          337,
+          243
+        ]
+      },
+      {
+        "name": "crypto-bigint",
+        "version": "0.5.5",
+        "transitive_weight": 23,
+        "is_workspace": false,
+        "children": [
+          123,
+          119,
+          345,
+          346
+        ]
+      },
+      {
+        "name": "fnv",
+        "version": "1.0.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "iana-time-zone",
+        "version": "0.1.65",
+        "transitive_weight": 61,
+        "is_workspace": false,
+        "children": [
+          22,
+          225,
+          339,
+          189,
+          71,
+          156,
+          173
+        ]
+      },
+      {
+        "name": "rand_core",
+        "version": "0.10.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "r-efi",
+        "version": "6.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "oauth2",
+        "version": "5.0.0",
+        "transitive_weight": 118,
+        "is_workspace": false,
+        "children": [
+          302,
+          290,
+          125,
+          309,
+          263,
+          51,
+          140,
+          103,
+          93,
+          278,
+          158
+        ]
+      },
+      {
+        "name": "tokio-stream",
+        "version": "0.1.18",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          104,
+          33,
+          243
+        ]
+      },
+      {
+        "name": "zerocopy",
+        "version": "0.8.47",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          181
+        ]
+      },
+      {
+        "name": "axum",
+        "version": "0.8.8",
+        "transitive_weight": 85,
+        "is_workspace": false,
+        "children": [
+          190,
+          215,
+          249,
+          104,
+          191,
+          279,
+          245,
+          51,
+          174,
+          140,
+          24,
+          216,
+          282,
+          67,
+          278,
+          4,
+          167,
+          221,
+          323,
+          285,
+          61,
+          200,
+          134,
+          243,
+          304,
+          297
+        ]
+      },
+      {
+        "name": "windows_i686_msvc",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "jobserver",
+        "version": "0.1.34",
+        "transitive_weight": 48,
+        "is_workspace": false,
+        "children": [
+          251,
+          337
+        ]
+      },
+      {
+        "name": "wit-bindgen-core",
+        "version": "0.51.0",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          87,
+          250,
+          143
+        ]
+      },
+      {
+        "name": "toml_parser",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          46
+        ]
+      },
+      {
+        "name": "zmij",
+        "version": "1.0.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "generic-array",
+        "version": "0.14.9",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          54,
+          58,
+          346
+        ]
+      },
+      {
+        "name": "mcp-server-examples",
+        "version": "0.1.5",
+        "transitive_weight": 303,
+        "is_workspace": true,
+        "children": [
+          252,
+          214,
+          113,
+          190,
+          9,
+          302,
+          215,
+          180,
+          223,
+          275,
+          290,
+          102,
+          147,
+          104,
+          28,
+          258,
+          245,
+          51,
+          174,
+          103,
+          250
+        ]
+      },
+      {
+        "name": "schannel",
+        "version": "0.1.29",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          222
+        ]
+      },
+      {
+        "name": "prettyplease",
+        "version": "0.2.37",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          210
+        ]
+      },
+      {
+        "name": "rand_core",
+        "version": "0.6.4",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          309
+        ]
+      },
+      {
+        "name": "rustc-hash",
+        "version": "2.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rand",
+        "version": "0.8.5",
+        "transitive_weight": 22,
+        "is_workspace": false,
+        "children": [
+          21,
+          123,
+          337
+        ]
+      },
+      {
+        "name": "parking_lot",
+        "version": "0.12.5",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          204,
+          55
+        ]
+      },
+      {
+        "name": "sec1",
+        "version": "0.7.3",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          160,
+          322,
+          119,
+          260,
+          345,
+          346
+        ]
+      },
+      {
+        "name": "serde_derive",
+        "version": "1.0.228",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "strsim",
+        "version": "0.11.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "anstyle-wincon",
+        "version": "3.0.11",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          222,
+          205,
+          35
+        ]
+      },
+      {
+        "name": "anstyle-parse",
+        "version": "1.0.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          32
+        ]
+      },
+      {
+        "name": "futures-sink",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "nix",
+        "version": "0.31.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          151,
+          99,
+          43,
+          337
+        ]
+      },
+      {
+        "name": "percent-encoding",
+        "version": "2.3.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "urlencoding",
+        "version": "2.1.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-metadata",
+        "version": "0.244.0",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          257,
+          41,
+          207,
+          250
+        ]
+      },
+      {
+        "name": "regex-automata",
+        "version": "0.4.14",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          289,
+          61,
+          277
+        ]
+      },
+      {
+        "name": "futures-task",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "cesu8",
+        "version": "1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_path_to_error",
+        "version": "0.1.20",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          103,
+          216,
+          323
+        ]
+      },
+      {
+        "name": "winapi-util",
+        "version": "0.1.11",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          222
+        ]
+      },
+      {
+        "name": "windows_i686_gnu",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "heck",
+        "version": "0.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_msvc",
+        "version": "0.42.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_msvc",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "yoke",
+        "version": "0.8.1",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          91,
+          10,
+          206
+        ]
+      },
+      {
+        "name": "tracing-subscriber",
+        "version": "0.3.23",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          174,
+          293,
+          306,
+          137,
+          101,
+          298,
+          162,
+          287,
+          48,
+          340
+        ]
+      },
+      {
+        "name": "sha1",
+        "version": "0.10.6",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          336,
+          310,
+          99
+        ]
+      },
+      {
+        "name": "mcp-conformance",
+        "version": "0.1.0",
+        "transitive_weight": 315,
+        "is_workspace": true,
+        "children": [
+          252,
+          214,
+          113,
+          5,
+          290,
+          102,
+          147,
+          104,
+          51,
+          174,
+          103,
+          250,
+          158,
+          135
+        ]
+      },
+      {
+        "name": "same-file",
+        "version": "1.0.6",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          141
+        ]
+      },
+      {
+        "name": "bitflags",
+        "version": "2.11.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "icu_normalizer_data",
+        "version": "2.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tokio-tungstenite",
+        "version": "0.29.0",
+        "transitive_weight": 96,
+        "is_workspace": false,
+        "children": [
+          228,
+          104,
+          279,
+          173
+        ]
+      },
+      {
+        "name": "rustls-pki-types",
+        "version": "1.14.0",
+        "transitive_weight": 16,
+        "is_workspace": false,
+        "children": [
+          94,
+          346
+        ]
+      },
+      {
+        "name": "colorchoice",
+        "version": "1.0.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "core-foundation-sys",
+        "version": "0.8.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "askama_parser",
+        "version": "0.15.6",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          103,
+          128,
+          46,
+          124,
+          344
+        ]
+      },
+      {
+        "name": "base64",
+        "version": "0.22.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "futures-channel",
+        "version": "0.3.32",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          33,
+          132
+        ]
+      },
+      {
+        "name": "pkcs8",
+        "version": "0.10.2",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          16,
+          322
+        ]
+      },
+      {
+        "name": "darling_core",
+        "version": "0.23.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210,
+          255,
+          129
+        ]
+      },
+      {
+        "name": "sharded-slab",
+        "version": "0.1.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          317
+        ]
+      },
+      {
+        "name": "tokio-macros",
+        "version": "2.6.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "windows-threading",
+        "version": "0.2.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          187
+        ]
+      },
+      {
+        "name": "wit-bindgen",
+        "version": "0.51.0",
+        "transitive_weight": 34,
+        "is_workspace": false,
+        "children": [
+          19,
+          151
+        ]
+      },
+      {
+        "name": "icu_provider",
+        "version": "2.1.1",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          242,
+          15,
+          238,
+          146,
+          91,
+          343,
+          44
+        ]
+      },
+      {
+        "name": "sync_wrapper",
+        "version": "1.0.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          33
+        ]
+      },
+      {
+        "name": "openssl-probe",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rand_chacha",
+        "version": "0.9.0",
+        "transitive_weight": 52,
+        "is_workspace": false,
+        "children": [
+          177,
+          271
+        ]
+      },
+      {
+        "name": "valuable",
+        "version": "0.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "mcp-client-examples",
+        "version": "0.1.5",
+        "transitive_weight": 310,
+        "is_workspace": true,
+        "children": [
+          252,
+          214,
+          113,
+          275,
+          249,
+          290,
+          147,
+          104,
+          13,
+          258,
+          51,
+          174,
+          103,
+          250
+        ]
+      },
+      {
+        "name": "tinyvec_macros",
+        "version": "0.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "log",
+        "version": "0.4.29",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tracing",
+        "version": "0.1.44",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          92,
+          298,
+          173,
+          243
+        ]
+      },
+      {
+        "name": "webpki-root-certs",
+        "version": "1.0.6",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          154
+        ]
+      },
+      {
+        "name": "windows-registry",
+        "version": "0.6.1",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          42,
+          29,
+          187
+        ]
+      },
+      {
+        "name": "rand_core",
+        "version": "0.9.5",
+        "transitive_weight": 48,
+        "is_workspace": false,
+        "children": [
+          251
+        ]
+      },
+      {
+        "name": "security-framework-sys",
+        "version": "2.17.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          156,
+          337
+        ]
+      },
+      {
+        "name": "jni-sys-macros",
+        "version": "0.4.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52
+        ]
+      },
+      {
+        "name": "tower-http",
+        "version": "0.6.8",
+        "transitive_weight": 51,
+        "is_workspace": false,
+        "children": [
+          249,
+          279,
+          316,
+          67,
+          278,
+          151,
+          221,
+          243,
+          304,
+          297
+        ]
+      },
+      {
+        "name": "zerocopy-derive",
+        "version": "0.8.47",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "windows-collections",
+        "version": "0.3.2",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          189
+        ]
+      },
+      {
+        "name": "slab",
+        "version": "0.4.12",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-interface",
+        "version": "0.59.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "shlex",
+        "version": "1.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.52.0",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          83
+        ]
+      },
+      {
+        "name": "windows-link",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap_builder",
+        "version": "4.6.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          312,
+          205,
+          326,
+          129
+        ]
+      },
+      {
+        "name": "windows-core",
+        "version": "0.62.2",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          325,
+          184,
+          42,
+          29,
+          187
+        ]
+      },
+      {
+        "name": "hyper-util",
+        "version": "0.1.20",
+        "transitive_weight": 70,
+        "is_workspace": false,
+        "children": [
+          215,
+          104,
+          279,
+          174,
+          38,
+          67,
+          97,
+          176,
+          159,
+          278,
+          158,
+          221,
+          17,
+          337,
+          134,
+          243,
+          297
+        ]
+      },
+      {
+        "name": "axum-core",
+        "version": "0.5.6",
+        "transitive_weight": 22,
+        "is_workspace": false,
+        "children": [
+          174,
+          24,
+          67,
+          278,
+          167,
+          221,
+          33,
+          200,
+          243,
+          304,
+          297
+        ]
+      },
+      {
+        "name": "jni",
+        "version": "0.21.1",
+        "transitive_weight": 30,
+        "is_workspace": false,
+        "children": [
+          194,
+          292,
+          93,
+          198,
+          201,
+          139,
+          99,
+          173
+        ]
+      },
+      {
+        "name": "redox_syscall",
+        "version": "0.5.18",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          151
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.45.0",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          307
+        ]
+      },
+      {
+        "name": "windows_x86_64_gnu",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_gnullvm",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "autocfg",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "walkdir",
+        "version": "2.5.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          150,
+          141
+        ]
+      },
+      {
+        "name": "idna",
+        "version": "1.1.0",
+        "transitive_weight": 29,
+        "is_workspace": false,
+        "children": [
+          81,
+          340,
+          69
+        ]
+      },
+      {
+        "name": "mime",
+        "version": "0.3.17",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "combine",
+        "version": "4.6.7",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          221,
+          61
+        ]
+      },
+      {
+        "name": "thiserror",
+        "version": "2.0.18",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          53
+        ]
+      },
+      {
+        "name": "hmac",
+        "version": "0.12.1",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          336
+        ]
+      },
+      {
+        "name": "parking_lot_core",
+        "version": "0.9.12",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          193,
+          99,
+          337,
+          340,
+          187
+        ]
+      },
+      {
+        "name": "anstyle",
+        "version": "1.0.14",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "stable_deref_trait",
+        "version": "1.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "indexmap",
+        "version": "2.13.0",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          103,
+          216,
+          59,
+          262
+        ]
+      },
+      {
+        "name": "windows_aarch64_msvc",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "try-lock",
+        "version": "0.2.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "proc-macro2",
+        "version": "1.0.106",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          344
+        ]
+      },
+      {
+        "name": "pem-rfc7468",
+        "version": "0.7.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          220
+        ]
+      },
+      {
+        "name": "tinyvec",
+        "version": "1.11.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          172
+        ]
+      },
+      {
+        "name": "ref-cast-impl",
+        "version": "1.0.25",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "reqwest",
+        "version": "0.13.2",
+        "transitive_weight": 223,
+        "is_workspace": false,
+        "children": [
+          233,
+          259,
+          295,
+          64,
+          329,
+          190,
+          215,
+          180,
+          56,
+          249,
+          290,
+          102,
+          301,
+          236,
+          104,
+          154,
+          279,
+          6,
+          225,
+          339,
+          51,
+          24,
+          103,
+          67,
+          278,
+          34,
+          167,
+          158,
+          221,
+          33,
+          173,
+          200,
+          134,
+          243,
+          297
+        ]
+      },
+      {
+        "name": "hyper",
+        "version": "1.8.1",
+        "transitive_weight": 53,
+        "is_workspace": false,
+        "children": [
+          56,
+          104,
+          67,
+          159,
+          278,
+          265,
+          330,
+          221,
+          33,
+          248,
+          227,
+          323,
+          243,
+          14,
+          340
+        ]
+      },
+      {
+        "name": "serde_core",
+        "version": "1.0.228",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          128
+        ]
+      },
+      {
+        "name": "signal-hook-registry",
+        "version": "1.4.8",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          280,
+          337
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.4.2",
+        "transitive_weight": 41,
+        "is_workspace": false,
+        "children": [
+          11,
+          79,
+          99,
+          337,
+          109,
+          108
+        ]
+      },
+      {
+        "name": "rustls-platform-verifier-android",
+        "version": "0.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "base64ct",
+        "version": "1.8.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "bytes",
+        "version": "1.11.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.61.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          187
+        ]
+      },
+      {
+        "name": "uuid",
+        "version": "1.22.0",
+        "transitive_weight": 50,
+        "is_workspace": false,
+        "children": [
+          218,
+          225,
+          339,
+          216
+        ]
+      },
+      {
+        "name": "leb128fmt",
+        "version": "0.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "js-sys",
+        "version": "0.3.91",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          339,
+          48
+        ]
+      },
+      {
+        "name": "windows_i686_gnullvm",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "httpdate",
+        "version": "1.0.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tungstenite",
+        "version": "0.29.0",
+        "transitive_weight": 71,
+        "is_workspace": false,
+        "children": [
+          331,
+          148,
+          202,
+          278,
+          221,
+          276,
+          248,
+          173
+        ]
+      },
+      {
+        "name": "askama_macros",
+        "version": "0.15.6",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          75
+        ]
+      },
+      {
+        "name": "core-foundation",
+        "version": "0.9.4",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          156,
+          337
+        ]
+      },
+      {
+        "name": "transport",
+        "version": "1.2.0",
+        "transitive_weight": 295,
+        "is_workspace": true,
+        "children": [
+          252,
+          214,
+          153,
+          190,
+          215,
+          275,
+          147,
+          104,
+          258,
+          51,
+          174,
+          103,
+          250,
+          243
+        ]
+      },
+      {
+        "name": "windows_x86_64_msvc",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "hyper-rustls",
+        "version": "0.27.7",
+        "transitive_weight": 130,
+        "is_workspace": false,
+        "children": [
+          64,
+          329,
+          190,
+          215,
+          104,
+          154,
+          278,
+          297
+        ]
+      },
+      {
+        "name": "r-efi",
+        "version": "5.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-xid",
+        "version": "0.2.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-futures",
+        "version": "0.4.64",
+        "transitive_weight": 25,
+        "is_workspace": false,
+        "children": [
+          279,
+          6,
+          225,
+          339,
+          99,
+          48
+        ]
+      },
+      {
+        "name": "windows_aarch64_gnullvm",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerovec",
+        "version": "0.11.5",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          146,
+          91,
+          45
+        ]
+      },
+      {
+        "name": "aws-lc-sys",
+        "version": "0.39.0",
+        "transitive_weight": 55,
+        "is_workspace": false,
+        "children": [
+          321,
+          267,
+          244,
+          60
+        ]
+      },
+      {
+        "name": "syn",
+        "version": "2.0.117",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          52,
+          210,
+          344
+        ]
+      },
+      {
+        "name": "const-oid",
+        "version": "0.9.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "icu_locale_core",
+        "version": "2.1.1",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          333,
+          238,
+          343,
+          98,
+          44
+        ]
+      },
+      {
+        "name": "pin-project-lite",
+        "version": "0.2.17",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "dunce",
+        "version": "1.0.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_urlencoded",
+        "version": "0.7.1",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          103,
+          4,
+          323,
+          50
+        ]
+      },
+      {
+        "name": "aws-lc-rs",
+        "version": "1.16.2",
+        "transitive_weight": 57,
+        "is_workspace": false,
+        "children": [
+          239,
+          346
+        ]
+      },
+      {
+        "name": "rustls-webpki",
+        "version": "0.103.10",
+        "transitive_weight": 74,
+        "is_workspace": false,
+        "children": [
+          8,
+          246,
+          154,
+          299
+        ]
+      },
+      {
+        "name": "httparse",
+        "version": "1.10.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tower",
+        "version": "0.5.3",
+        "transitive_weight": 43,
+        "is_workspace": false,
+        "children": [
+          104,
+          279,
+          174,
+          167,
+          33,
+          243,
+          304,
+          297
+        ]
+      },
+      {
+        "name": "anyhow",
+        "version": "1.0.102",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "getrandom",
+        "version": "0.3.4",
+        "transitive_weight": 47,
+        "is_workspace": false,
+        "children": [
+          11,
+          225,
+          339,
+          99,
+          337,
+          234
+        ]
+      },
+      {
+        "name": "rmcp",
+        "version": "1.2.0",
+        "transitive_weight": 280,
+        "is_workspace": true,
+        "children": [
+          214,
+          110,
+          9,
+          302,
+          39,
+          223,
+          275,
+          290,
+          102,
+          111,
+          104,
+          25,
+          303,
+          258,
+          51,
+          174,
+          24,
+          103,
+          202,
+          342,
+          67,
+          278,
+          158,
+          221,
+          18,
+          243,
+          297
+        ]
+      },
+      {
+        "name": "num-traits",
+        "version": "0.2.19",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          197
+        ]
+      },
+      {
+        "name": "wasi-mcp-example",
+        "version": "1.2.0",
+        "transitive_weight": 292,
+        "is_workspace": true,
+        "children": [
+          252,
+          3,
+          147,
+          104,
+          174,
+          103
+        ]
+      },
+      {
+        "name": "ident_case",
+        "version": "1.0.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-macro-support",
+        "version": "0.2.114",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210,
+          334,
+          338
+        ]
+      },
+      {
+        "name": "wasm-encoder",
+        "version": "0.244.0",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          41,
+          224
+        ]
+      },
+      {
+        "name": "futures",
+        "version": "0.3.32",
+        "transitive_weight": 16,
+        "is_workspace": false,
+        "children": [
+          283,
+          279,
+          159,
+          33,
+          261,
+          132,
+          138
+        ]
+      },
+      {
+        "name": "quinn",
+        "version": "0.11.9",
+        "transitive_weight": 123,
+        "is_workspace": false,
+        "children": [
+          2,
+          329,
+          49,
+          104,
+          94,
+          174,
+          202,
+          97,
+          221,
+          43,
+          243,
+          124
+        ]
+      },
+      {
+        "name": "base16ct",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "futures-io",
+        "version": "0.3.32",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.16.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "sha2",
+        "version": "0.10.9",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          336,
+          310,
+          99
+        ]
+      },
+      {
+        "name": "scopeguard",
+        "version": "1.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "want",
+        "version": "0.3.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          209
+        ]
+      },
+      {
+        "name": "ref-cast",
+        "version": "1.0.25",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          213
+        ]
+      },
+      {
+        "name": "cc",
+        "version": "1.2.57",
+        "transitive_weight": 51,
+        "is_workspace": false,
+        "children": [
+          115,
+          88,
+          337,
+          185
+        ]
+      },
+      {
+        "name": "windows_aarch64_msvc",
+        "version": "0.42.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ecdsa",
+        "version": "0.16.9",
+        "transitive_weight": 41,
+        "is_workspace": false,
+        "children": [
+          327,
+          324,
+          62,
+          336,
+          16,
+          322
+        ]
+      },
+      {
+        "name": "windows_aarch64_msvc",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ppv-lite86",
+        "version": "0.2.21",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          112
+        ]
+      },
+      {
+        "name": "windows_x86_64_gnullvm",
+        "version": "0.42.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_gnu",
+        "version": "0.42.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ff",
+        "version": "0.13.1",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          123,
+          345
+        ]
+      },
+      {
+        "name": "rand",
+        "version": "0.10.0",
+        "transitive_weight": 44,
+        "is_workspace": false,
+        "children": [
+          218,
+          63,
+          108
+        ]
+      },
+      {
+        "name": "data-encoding",
+        "version": "2.10.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "regex-syntax",
+        "version": "0.8.10",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "http",
+        "version": "1.4.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          221,
+          323
+        ]
+      },
+      {
+        "name": "futures-util",
+        "version": "0.3.32",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          313,
+          159,
+          33,
+          261,
+          132,
+          138,
+          61,
+          243,
+          183
+        ]
+      },
+      {
+        "name": "errno",
+        "version": "0.3.14",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          222,
+          337
+        ]
+      },
+      {
+        "name": "wit-bindgen-rust",
+        "version": "0.51.0",
+        "transitive_weight": 32,
+        "is_workspace": false,
+        "children": [
+          85,
+          116,
+          136,
+          207,
+          122,
+          240,
+          250,
+          143
+        ]
+      },
+      {
+        "name": "axum-macros",
+        "version": "0.5.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "futures-executor",
+        "version": "0.3.32",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          279,
+          33,
+          138
+        ]
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.15.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          37
+        ]
+      },
+      {
+        "name": "matchit",
+        "version": "0.8.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "mio",
+        "version": "1.1.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          222,
+          337,
+          318
+        ]
+      },
+      {
+        "name": "thread_local",
+        "version": "1.1.9",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          99
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.60.2",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          328
+        ]
+      },
+      {
+        "name": "aho-corasick",
+        "version": "1.1.4",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          61
+        ]
+      },
+      {
+        "name": "url",
+        "version": "2.5.8",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          199,
+          103,
+          128,
+          4,
+          134
+        ]
+      },
+      {
+        "name": "security-framework",
+        "version": "3.7.0",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          20,
+          178,
+          151,
+          156,
+          337
+        ]
+      },
+      {
+        "name": "jni-sys",
+        "version": "0.3.1",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          100
+        ]
+      },
+      {
+        "name": "matchers",
+        "version": "0.2.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          137
+        ]
+      },
+      {
+        "name": "simple-chat-client",
+        "version": "0.1.0",
+        "transitive_weight": 300,
+        "is_workspace": true,
+        "children": [
+          252,
+          214,
+          104,
+          13,
+          68,
+          258,
+          51,
+          103,
+          202,
+          342,
+          250
+        ]
+      },
+      {
+        "name": "rustls-platform-verifier",
+        "version": "0.6.2",
+        "transitive_weight": 109,
+        "is_workspace": false,
+        "children": [
+          329,
+          247,
+          192,
+          332,
+          175,
+          291,
+          20,
+          178,
+          222,
+          156,
+          173,
+          48,
+          219
+        ]
+      },
+      {
+        "name": "semver",
+        "version": "1.0.27",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tower-service",
+        "version": "0.3.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tracing-core",
+        "version": "0.1.36",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          48,
+          170
+        ]
+      },
+      {
+        "name": "untrusted",
+        "version": "0.9.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "basic-toml",
+        "version": "0.1.10",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          103
+        ]
+      },
+      {
+        "name": "wasm-streams",
+        "version": "0.5.0",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          236,
+          279,
+          6,
+          225,
+          339
+        ]
+      },
+      {
+        "name": "chrono",
+        "version": "0.4.44",
+        "transitive_weight": 64,
+        "is_workspace": false,
+        "children": [
+          107,
+          225,
+          339,
+          103,
+          253,
+          187
+        ]
+      },
+      {
+        "name": "rmcp-macros",
+        "version": "1.2.0",
+        "transitive_weight": 17,
+        "is_workspace": true,
+        "children": [
+          51,
+          341,
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "tower-layer",
+        "version": "0.3.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rustversion",
+        "version": "1.0.22",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tracing-log",
+        "version": "0.2.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          298,
+          173,
+          48
+        ]
+      },
+      {
+        "name": "windows-targets",
+        "version": "0.42.2",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          308,
+          268,
+          84,
+          89,
+          273,
+          272,
+          144
+        ]
+      },
+      {
+        "name": "windows_aarch64_gnullvm",
+        "version": "0.42.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "getrandom",
+        "version": "0.2.17",
+        "transitive_weight": 16,
+        "is_workspace": false,
+        "children": [
+          225,
+          339,
+          99,
+          337,
+          318
+        ]
+      },
+      {
+        "name": "cpufeatures",
+        "version": "0.2.17",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          337
+        ]
+      },
+      {
+        "name": "windows_i686_msvc",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "anstream",
+        "version": "1.0.0",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          130,
+          57,
+          131,
+          205,
+          155,
+          72,
+          32
+        ]
+      },
+      {
+        "name": "futures-macro",
+        "version": "0.3.32",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "group",
+        "version": "0.13.0",
+        "transitive_weight": 20,
+        "is_workspace": false,
+        "children": [
+          274,
+          123,
+          345
+        ]
+      },
+      {
+        "name": "icu_properties_data",
+        "version": "2.1.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "iri-string",
+        "version": "0.7.11",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          103,
+          61
+        ]
+      },
+      {
+        "name": "lazy_static",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasi",
+        "version": "0.11.1+wasi-snapshot-preview1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_i686_gnu",
+        "version": "0.52.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "id-arena",
+        "version": "2.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "cmake",
+        "version": "0.1.57",
+        "transitive_weight": 52,
+        "is_workspace": false,
+        "children": [
+          267
+        ]
+      },
+      {
+        "name": "der",
+        "version": "0.7.10",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          211,
+          241,
+          346
+        ]
+      },
+      {
+        "name": "itoa",
+        "version": "1.0.18",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "signature",
+        "version": "2.2.0",
+        "transitive_weight": 27,
+        "is_workspace": false,
+        "children": [
+          123,
+          336
+        ]
+      },
+      {
+        "name": "windows-implement",
+        "version": "0.60.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "clap_lex",
+        "version": "1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "elliptic-curve",
+        "version": "0.13.8",
+        "transitive_weight": 37,
+        "is_workspace": false,
+        "children": [
+          105,
+          314,
+          274,
+          123,
+          127,
+          336,
+          160,
+          119,
+          211,
+          260,
+          345,
+          346
+        ]
+      },
+      {
+        "name": "windows-targets",
+        "version": "0.53.5",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          187,
+          65,
+          270,
+          142,
+          226,
+          114,
+          36,
+          196,
+          145
+        ]
+      },
+      {
+        "name": "rustls",
+        "version": "0.23.37",
+        "transitive_weight": 76,
+        "is_workspace": false,
+        "children": [
+          247,
+          246,
+          154,
+          48,
+          345,
+          346
+        ]
+      },
+      {
+        "name": "atomic-waker",
+        "version": "1.1.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rand",
+        "version": "0.9.2",
+        "transitive_weight": 53,
+        "is_workspace": false,
+        "children": [
+          169,
+          177
+        ]
+      },
+      {
+        "name": "rustls-native-certs",
+        "version": "0.8.3",
+        "transitive_weight": 27,
+        "is_workspace": false,
+        "children": [
+          154,
+          291,
+          121,
+          168
+        ]
+      },
+      {
+        "name": "tinystr",
+        "version": "0.8.2",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          238,
+          343
+        ]
+      },
+      {
+        "name": "wasm-bindgen-shared",
+        "version": "0.2.114",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          344
+        ]
+      },
+      {
+        "name": "windows",
+        "version": "0.62.2",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          77,
+          182,
+          0,
+          189
+        ]
+      },
+      {
+        "name": "digest",
+        "version": "0.10.7",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          1,
+          95,
+          241,
+          345
+        ]
+      },
+      {
+        "name": "libc",
+        "version": "0.2.183",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "bumpalo",
+        "version": "3.20.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen",
+        "version": "0.2.114",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          90,
+          334,
+          99,
+          48,
+          305
+        ]
+      },
+      {
+        "name": "smallvec",
+        "version": "1.15.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "darling",
+        "version": "0.23.0",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          66,
+          161
+        ]
+      },
+      {
+        "name": "async-trait",
+        "version": "0.1.89",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "displaydoc",
+        "version": "0.2.5",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "unicode-ident",
+        "version": "1.0.24",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "subtle",
+        "version": "2.6.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zeroize",
+        "version": "1.8.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "schemars_derive",
+        "version": "1.2.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          23,
+          240,
+          52,
+          210
+        ]
+      },
+      {
+        "name": "potential_utf",
+        "version": "0.1.4",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          238
+        ]
+      }
+    ],
+    "root_indices": [
+      149,
+      171,
+      120,
+      294,
+      231,
+      254,
+      252,
+      303
+    ]
+  },
+  "unused_edges": [
+    [
+      "transport",
+      "reqwest"
+    ],
+    [
+      "mcp-server-examples",
+      "hyper"
+    ],
+    [
+      "transport",
+      "rand"
+    ],
+    [
+      "mcp-client-examples",
+      "rand"
+    ],
+    [
+      "rmcp",
+      "rand"
+    ],
+    [
+      "mcp-client-examples",
+      "tower"
+    ],
+    [
+      "mcp-client-examples",
+      "url"
+    ],
+    [
+      "mcp-conformance",
+      "tokio-util"
+    ],
+    [
+      "mcp-client-examples",
+      "futures"
+    ],
+    [
+      "simple-chat-client",
+      "futures"
+    ],
+    [
+      "simple-chat-client",
+      "thiserror"
+    ]
+  ]
+}

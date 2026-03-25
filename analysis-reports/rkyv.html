@@ -1,0 +1,3457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>depflame — Dependency Analysis Report</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  background: #f5f5f5; color: #333; line-height: 1.5;
+}
+.header {
+  background: #fff; border-bottom: 1px solid #ddd; padding: 16px 24px;
+}
+.header h1 { font-size: 20px; margin-bottom: 4px; }
+.header .stats { font-size: 13px; color: #666; }
+.header .stats span { margin-right: 16px; }
+.header .stats span[title] { cursor: help; border-bottom: 1px dashed #aaa; }
+.tabs {
+  display: flex; background: #fff; border-bottom: 2px solid #ddd;
+  padding: 0 24px; gap: 0;
+}
+.tab-btn {
+  padding: 10px 20px; border: none; background: none; cursor: pointer;
+  font-size: 14px; font-weight: 500; color: #666;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn:hover { color: #333; }
+.tab-btn.active { color: #0066cc; border-bottom-color: #0066cc; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Flamegraph tab */
+#tab-flamegraph { background: #fff; }
+#tab-flamegraph svg { display: block; width: 100%; height: auto; }
+
+/* Targets tab */
+#tab-targets { padding: 24px; }
+.action-summary {
+  background: #fff; border: 1px solid #ddd; border-radius: 6px;
+  padding: 16px 20px; margin-bottom: 20px;
+}
+.action-summary h3 { font-size: 14px; margin-bottom: 8px; color: #444; }
+.action-summary ul { list-style: none; padding: 0; }
+.action-summary li { font-size: 13px; padding: 3px 0; }
+.cargo-diff {
+  background: #1e1e1e; border-radius: 4px; padding: 8px 12px;
+  margin: 6px 0 10px 20px; font-family: "Consolas", "Fira Code", monospace;
+  font-size: 12px; line-height: 1.6; overflow-x: auto;
+  display: none;
+}
+.show-diff-btn {
+  display: inline-block; font-size: 11px; color: #0066cc;
+  border: 1px solid #0066cc; border-radius: 3px; padding: 1px 6px;
+  margin-left: 6px; cursor: pointer; vertical-align: middle;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.cargo-diff .diff-file { color: #888; }
+.cargo-diff .diff-rm { color: #f44; }
+.cargo-diff .diff-add { color: #4c4; }
+.cargo-diff .diff-comment { color: #888; font-style: italic; }
+.targets-table {
+  width: 100%; border-collapse: collapse; background: #fff;
+  border: 1px solid #ddd; border-radius: 6px; overflow: hidden;
+  font-size: 13px;
+}
+.targets-table th {
+  background: #f8f8f8; text-align: left; padding: 10px 12px;
+  border-bottom: 2px solid #ddd; font-weight: 600; font-size: 12px;
+  text-transform: uppercase; color: #555; white-space: nowrap;
+}
+.targets-table th[title] {
+  cursor: help; border-bottom: 1px dashed #999;
+}
+.targets-table td {
+  padding: 8px 12px; border-bottom: 1px solid #eee;
+  vertical-align: top;
+}
+.targets-table tr:hover { background: #f9f9f9; }
+.targets-table tr.expandable { cursor: pointer; }
+.detail-row { display: none; }
+.detail-row.open { display: table-row; }
+.detail-row td {
+  background: #fafafa; padding: 12px 20px;
+  border-bottom: 1px solid #ddd;
+}
+.detail-box {
+  font-family: "Consolas", monospace; font-size: 12px; line-height: 1.6;
+}
+.detail-box .label { color: #888; }
+.badge {
+  display: inline-block; padding: 1px 6px; border-radius: 3px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-high { background: #e8f5e9; color: #2e7d32; }
+.badge-medium { background: #fff3e0; color: #e65100; }
+.badge-low { background: #fce4ec; color: #c62828; }
+.badge-noise { background: #f3e5f5; color: #6a1b9a; }
+.badge-flag {
+  background: #e3f2fd; color: #1565c0; margin-right: 4px;
+}
+.ref-file { color: #0066cc; }
+.ref-line { color: #888; margin-left: 16px; }
+
+/* JSON tab */
+#tab-json { padding: 24px; }
+.json-container {
+  position: relative; background: #1e1e1e; border-radius: 6px;
+  overflow: hidden;
+}
+.json-container pre {
+  padding: 20px; overflow-x: auto; color: #d4d4d4;
+  font-family: "Consolas", "Fira Code", monospace; font-size: 12px;
+  line-height: 1.5; margin: 0;
+}
+.copy-btn {
+  position: absolute; top: 8px; right: 8px; padding: 6px 14px;
+  background: #333; color: #ccc; border: 1px solid #555;
+  border-radius: 4px; cursor: pointer; font-size: 12px;
+}
+.copy-btn:hover { background: #444; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>depflame — Dependency Analysis Report</h1>
+  <div class="stats">
+    <span title="Total number of crate dependencies in the full cross-platform resolve graph (includes all targets/platforms).">69 total deps</span>
+    <span title="Dependencies actually compiled for your current platform/target. This is the number that matters for your build times.">16 platform deps</span>
+    <span title="Dependencies that appear in metadata but are not compiled on your current platform (e.g. windows-only crates on linux). These are typically not actionable.">53 phantom deps</span>
+    <span title="Crates with a high transitive dependency count (above the --fat-threshold). These are the heavy hitters that the tool analyzes for removal opportunities.">9 heavy crates analyzed</span>
+    <span title="Number of upstream edges identified as potential optimization targets, ranked by impact.">6 targets found</span>
+    <span style="color:#aaa">v0.1.0 &middot; 2026-03-25T21:28:09.860162022+00:00</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('flamegraph')">Flamegraph</button>
+  <button class="tab-btn" onclick="showTab('targets')">Suggestions (6)</button>
+  <button class="tab-btn" onclick="showTab('json')">Raw JSON</button>
+</div>
+
+<div id="tab-flamegraph" class="tab-content active">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 260"
+     width="100%" font-family="Consolas,monospace" font-size="11">
+<style>
+  .frame { cursor: pointer; }
+  .frame:hover rect { stroke: #222; stroke-width: 1.5; }
+  .frame:hover rect.shared { stroke: #fff; stroke-width: 1.5; }
+  .frame text { pointer-events: none; }
+  rect.shared { stroke-dasharray: 4,2; stroke: rgba(100,70,130,0.5); stroke-width: 0.5; }
+  rect.normal { stroke: rgba(0,0,0,0.12); stroke-width: 0.5; }
+  rect.unused { stroke: rgba(220,20,80,0.8); stroke-width: 1.5; }
+  rect.workspace { stroke: rgba(0,0,0,0.3); stroke-width: 1; }
+  text.title { font-size: 15px; font-weight: bold; fill: #333; }
+  text.subtitle { font-size: 11px; fill: #888; }
+  text.legend { font-size: 10px; fill: #666; }
+  .legend-rect { stroke: #999; stroke-width: 0.5; }
+  /* Highlight all instances of the same dep on hover via JS */
+  .highlight rect { stroke: #000 !important; stroke-width: 2 !important; }
+</style>
+<script type="text/ecmascript"><![CDATA[
+  // --- Click-to-zoom (flamegraph style) ---
+  var zoomStack = [];
+  var origView = [0, 1200];
+
+  function zoom(evt) {
+    var g = evt.currentTarget;
+    var ox = parseFloat(g.getAttribute('data-x'));
+    var ow = parseFloat(g.getAttribute('data-w'));
+    if (ow >= 1200 * 0.99) {
+      if (zoomStack.length > 0) {
+        var prev = zoomStack.pop();
+        applyZoom(prev[0], prev[1]);
+      }
+      return;
+    }
+    zoomStack.push(origView.slice());
+    origView = [ox, ow];
+    applyZoom(ox, ow);
+  }
+
+  function applyZoom(ox, ow) {
+    var frames = document.querySelectorAll('.frame');
+    var scale = 1200 / ow;
+    for (var i = 0; i < frames.length; i++) {
+      var f = frames[i];
+      var fx = parseFloat(f.getAttribute('data-x'));
+      var fw = parseFloat(f.getAttribute('data-w'));
+      var rect = f.querySelector('rect');
+      var text = f.querySelector('text');
+      var newX = (fx - ox) * scale;
+      var newW = fw * scale;
+      // Hide frames fully outside viewport.
+      if (newX + newW < -1 || newX > 1200 + 1 || newW < 0.5) {
+        f.style.display = 'none';
+      } else {
+        f.style.display = '';
+        rect.setAttribute('x', newX);
+        rect.setAttribute('width', Math.max(newW, 0.5));
+        text.setAttribute('x', newX + 3);
+        var name = f.getAttribute('data-name');
+        var weight = f.getAttribute('data-weight');
+        text.textContent = fitLabel(name, weight, newW);
+      }
+    }
+  }
+
+  function fitLabel(name, weight, w) {
+    var full = name + ' (' + weight + ')';
+    if (full.length * 6.5 + 8 <= w) return full;
+    if (name.length * 6.5 + 8 <= w) return name;
+    var max = Math.floor((w - 8) / 6.5);
+    if (max > 2) return name.substr(0, max - 2) + '..';
+    return '';
+  }
+
+  function resetZoom() {
+    zoomStack = [];
+    origView = [0, 1200];
+    applyZoom(0, 1200);
+  }
+
+  // --- Hover: highlight all instances of the same crate ---
+  function hlOn(evt) {
+    var name = evt.currentTarget.getAttribute('data-name');
+    var all = document.querySelectorAll('.frame[data-name="' + name + '"]');
+    for (var i = 0; i < all.length; i++) all[i].classList.add('highlight');
+  }
+  function hlOff(evt) {
+    var name = evt.currentTarget.getAttribute('data-name');
+    var all = document.querySelectorAll('.frame[data-name="' + name + '"]');
+    for (var i = 0; i < all.length; i++) all[i].classList.remove('highlight');
+  }
+
+  // --- Search: highlight matching crates ---
+  function search() {
+    var q = prompt('Search for crate name (regex):');
+    if (!q) return;
+    var re = new RegExp(q, 'i');
+    var frames = document.querySelectorAll('.frame');
+    var count = 0;
+    for (var i = 0; i < frames.length; i++) {
+      var name = frames[i].getAttribute('data-name');
+      if (re.test(name)) {
+        frames[i].classList.add('highlight');
+        count++;
+      } else {
+        frames[i].classList.remove('highlight');
+      }
+    }
+    document.getElementById('search-status').textContent = count + ' matches';
+  }
+  function clearSearch() {
+    var frames = document.querySelectorAll('.frame');
+    for (var i = 0; i < frames.length; i++) frames[i].classList.remove('highlight');
+    document.getElementById('search-status').textContent = '';
+  }
+]]></script>
+<text x="6" y="18" class="title">depflame — Dependency Tree</text>
+<text x="6" y="33" class="subtitle">69 deps total, 44 unique crates shown, 205 shared (dashed border = multiple parents) | click to zoom</text>
+<rect x="762" y="4" width="12" height="10" rx="2" fill="rgb(70,130,180)" class="legend-rect"/>
+<text x="777" y="13" class="legend">workspace</text>
+<rect x="837" y="4" width="12" height="10" rx="2" fill="hsl(120,55%,58%)" class="legend-rect"/>
+<text x="852" y="13" class="legend">leaf (0 deps)</text>
+<rect x="936" y="4" width="12" height="10" rx="2" fill="hsl(75,65%,54%)" class="legend-rect"/>
+<text x="951" y="13" class="legend">some deps</text>
+<rect x="1011" y="4" width="12" height="10" rx="2" fill="hsl(30,75%,50%)" class="legend-rect"/>
+<text x="1026" y="13" class="legend">many deps</text>
+<rect x="1086" y="4" width="12" height="10" rx="2" fill="hsl(270,50%,65%)" class="legend-rect" stroke-dasharray="4,2"/>
+<text x="1101" y="13" class="legend">shared</text>
+<rect x="1143" y="4" width="12" height="10" rx="2" fill="rgb(220,20,80)" class="legend-rect"/>
+<text x="1158" y="13" class="legend">unused</text>
+<text x="1020" y="33" class="legend" style="cursor:pointer;text-decoration:underline" onclick="search()">[search]</text>
+<text x="1074" y="33" class="legend" style="cursor:pointer;text-decoration:underline" onclick="clearSearch()">[clear]</text>
+<text x="1122" y="33" class="legend" style="cursor:pointer;text-decoration:underline" onclick="resetZoom()">[reset zoom]</text>
+<text id="search-status" x="940" y="33" class="legend" fill="rgb(204,68,68)"></text>
+<g id="frames">
+<g class="frame" data-x="0" data-w="688.8888888888889" data-d="0" data-name="rkyv" data-weight="31" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rkyv v0.8.15
+31 transitive deps
+depth 0</title>
+<rect x="0" y="40" width="688.8888888888889" height="18" rx="2" fill="rgb(70,130,180)" class="workspace"/>
+<text x="4" y="53" fill="#fff">rkyv (31)</text>
+</g>
+<g class="frame" data-x="0" data-w="146.12794612794613" data-d="1" data-name="uuid" data-weight="14" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>uuid v1.22.0
+14 transitive deps
+depth 1</title>
+<rect x="0" y="59" width="146.12794612794613" height="18" rx="2" fill="hsl(48,71%,52%)" class="normal"/>
+<text x="4" y="72" fill="#000">uuid (14)</text>
+</g>
+<g class="frame" data-x="0" data-w="75.98653198653199" data-d="2" data-name="js-sys" data-weight="13" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>js-sys v0.3.91
+13 transitive deps
+depth 2</title>
+<rect x="0" y="78" width="75.98653198653199" height="18" rx="2" fill="hsl(50,71%,52%)" class="normal"/>
+<text x="4" y="91" fill="#000">js-sys</text>
+</g>
+<g class="frame" data-x="0" data-w="70.14141414141415" data-d="3" data-name="wasm-bindgen" data-weight="12" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen v0.2.114
+12 transitive deps
+depth 3
+[shared: 2 parents in dep graph]</title>
+<rect x="0" y="97" width="70.14141414141415" height="18" rx="2" fill="hsl(250,60%,57%)" class="shared"/>
+<text x="4" y="110" fill="#000">wasm-bi..</text>
+</g>
+<g class="frame" data-x="0" data-w="43.16394716394717" data-d="4" data-name="wasm-bindgen-macro" data-weight="8" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen-macro v0.2.114
+8 transitive deps
+depth 4</title>
+<rect x="0" y="116" width="43.16394716394717" height="18" rx="2" fill="hsl(63,68%,53%)" class="normal"/>
+<text x="4" y="129" fill="#000">was..</text>
+</g>
+<g class="frame" data-x="0" data-w="30.21476301476302" data-d="5" data-name="wasm-bindgen-macro-support" data-weight="7" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen-macro-support v0.2.114
+7 transitive deps
+depth 5</title>
+<rect x="0" y="135" width="30.21476301476302" height="18" rx="2" fill="hsl(67,67%,53%)" class="normal"/>
+<text x="4" y="148" fill="#000">w..</text>
+</g>
+<g class="frame" data-x="0" data-w="10.071587671587672" data-d="6" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 6
+[shared: 8 parents in dep graph]
+[1 children too small to show]</title>
+<rect x="0" y="154" width="10.071587671587672" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="4" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="0" data-w="5.035793835793836" data-d="7" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="0" y="173" width="5.035793835793836" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="4" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="0" data-w="5.035793835793836" data-d="8" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 8
+[shared: 10 parents in dep graph]</title>
+<rect x="0" y="192" width="5.035793835793836" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="4" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="0" data-w="5.035793835793836" data-d="9" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 9
+[shared: 3 parents in dep graph]</title>
+<rect x="0" y="211" width="5.035793835793836" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="4" y="224" fill="#000"></text>
+</g>
+<g class="frame" data-x="5.035793835793836" data-w="3.3571958905292236" data-d="7" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="5.035793835793836" y="173" width="3.3571958905292236" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="9.035793835793836" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="5.035793835793836" data-w="3.3571958905292236" data-d="8" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 8
+[shared: 3 parents in dep graph]</title>
+<rect x="5.035793835793836" y="192" width="3.3571958905292236" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="9.035793835793836" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="10.071587671587672" data-w="7.553690753690755" data-d="6" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="10.071587671587672" y="154" width="7.553690753690755" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="14.071587671587672" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="10.071587671587672" data-w="7.553690753690755" data-d="7" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="10.071587671587672" y="173" width="7.553690753690755" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="14.071587671587672" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="10.071587671587672" data-w="7.553690753690755" data-d="8" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 8
+[shared: 3 parents in dep graph]</title>
+<rect x="10.071587671587672" y="192" width="7.553690753690755" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="14.071587671587672" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="17.625278425278427" data-w="5.035793835793836" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="17.625278425278427" y="154" width="5.035793835793836" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="21.625278425278427" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="17.625278425278427" data-w="5.035793835793836" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="17.625278425278427" y="173" width="5.035793835793836" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="21.625278425278427" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="22.661072261072263" data-w="5.035793835793836" data-d="6" data-name="wasm-bindgen-shared" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen-shared v0.2.114
+2 transitive deps
+depth 6
+[shared: 2 parents in dep graph]</title>
+<rect x="22.661072261072263" y="154" width="5.035793835793836" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="26.661072261072263" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="22.661072261072263" data-w="5.035793835793836" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="22.661072261072263" y="173" width="5.035793835793836" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="26.661072261072263" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="27.6968660968661" data-w="2.517896917896918" data-d="6" data-name="bumpalo" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>bumpalo v3.20.2
+1 transitive dep
+depth 6</title>
+<rect x="27.6968660968661" y="154" width="2.517896917896918" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="31.6968660968661" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="30.21476301476302" data-w="12.94918414918415" data-d="5" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="30.21476301476302" y="135" width="12.94918414918415" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="34.21476301476302" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="30.21476301476302" data-w="12.94918414918415" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="30.21476301476302" y="154" width="12.94918414918415" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="34.21476301476302" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="30.21476301476302" data-w="12.94918414918415" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="30.21476301476302" y="173" width="12.94918414918415" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="34.21476301476302" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="43.16394716394717" data-w="10.790986790986793" data-d="4" data-name="wasm-bindgen-shared" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen-shared v0.2.114
+2 transitive deps
+depth 4
+[shared: 2 parents in dep graph]</title>
+<rect x="43.16394716394717" y="116" width="10.790986790986793" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="47.16394716394717" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="43.16394716394717" data-w="10.790986790986793" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="43.16394716394717" y="135" width="10.790986790986793" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="47.16394716394717" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="53.95493395493396" data-w="5.395493395493396" data-d="4" data-name="cfg-if" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>cfg-if v1.0.4
+1 transitive dep
+depth 4
+[shared: 4 parents in dep graph]</title>
+<rect x="53.95493395493396" y="116" width="5.395493395493396" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="57.95493395493396" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="59.35042735042736" data-w="5.395493395493396" data-d="4" data-name="once_cell" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>once_cell v1.21.4
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="59.35042735042736" y="116" width="5.395493395493396" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="63.35042735042736" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="64.74592074592076" data-w="5.395493395493396" data-d="4" data-name="rustversion" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rustversion v1.0.22
+1 transitive dep
+depth 4</title>
+<rect x="64.74592074592076" y="116" width="5.395493395493396" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="68.74592074592076" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="70.14141414141415" data-w="5.845117845117845" data-d="3" data-name="once_cell" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>once_cell v1.21.4
+1 transitive dep
+depth 3
+[shared: 3 parents in dep graph]</title>
+<rect x="70.14141414141415" y="97" width="5.845117845117845" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="74.14141414141415" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="75.98653198653199" data-w="70.14141414141415" data-d="2" data-name="wasm-bindgen" data-weight="12" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen v0.2.114
+12 transitive deps
+depth 2
+[shared: 2 parents in dep graph]</title>
+<rect x="75.98653198653199" y="78" width="70.14141414141415" height="18" rx="2" fill="hsl(250,60%,57%)" class="shared"/>
+<text x="79.98653198653199" y="91" fill="#000">wasm-bi..</text>
+</g>
+<g class="frame" data-x="75.98653198653199" data-w="43.16394716394717" data-d="3" data-name="wasm-bindgen-macro" data-weight="8" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen-macro v0.2.114
+8 transitive deps
+depth 3</title>
+<rect x="75.98653198653199" y="97" width="43.16394716394717" height="18" rx="2" fill="hsl(63,68%,53%)" class="normal"/>
+<text x="79.98653198653199" y="110" fill="#000">was..</text>
+</g>
+<g class="frame" data-x="75.98653198653199" data-w="30.21476301476302" data-d="4" data-name="wasm-bindgen-macro-support" data-weight="7" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen-macro-support v0.2.114
+7 transitive deps
+depth 4</title>
+<rect x="75.98653198653199" y="116" width="30.21476301476302" height="18" rx="2" fill="hsl(67,67%,53%)" class="normal"/>
+<text x="79.98653198653199" y="129" fill="#000">w..</text>
+</g>
+<g class="frame" data-x="75.98653198653199" data-w="10.071587671587672" data-d="5" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 5
+[shared: 8 parents in dep graph]
+[1 children too small to show]</title>
+<rect x="75.98653198653199" y="135" width="10.071587671587672" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="79.98653198653199" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="75.98653198653199" data-w="5.035793835793836" data-d="6" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="75.98653198653199" y="154" width="5.035793835793836" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="79.98653198653199" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="75.98653198653199" data-w="5.035793835793836" data-d="7" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="75.98653198653199" y="173" width="5.035793835793836" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="79.98653198653199" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="75.98653198653199" data-w="5.035793835793836" data-d="8" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 8
+[shared: 3 parents in dep graph]</title>
+<rect x="75.98653198653199" y="192" width="5.035793835793836" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="79.98653198653199" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="81.02232582232583" data-w="3.3571958905292236" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="81.02232582232583" y="154" width="3.3571958905292236" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="85.02232582232583" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="81.02232582232583" data-w="3.3571958905292236" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="81.02232582232583" y="173" width="3.3571958905292236" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="85.02232582232583" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="86.05811965811967" data-w="7.553690753690755" data-d="5" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="86.05811965811967" y="135" width="7.553690753690755" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="90.05811965811967" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="86.05811965811967" data-w="7.553690753690755" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="86.05811965811967" y="154" width="7.553690753690755" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="90.05811965811967" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="86.05811965811967" data-w="7.553690753690755" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="86.05811965811967" y="173" width="7.553690753690755" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="90.05811965811967" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="93.61181041181042" data-w="5.035793835793836" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="93.61181041181042" y="135" width="5.035793835793836" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="97.61181041181042" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="93.61181041181042" data-w="5.035793835793836" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="93.61181041181042" y="154" width="5.035793835793836" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="97.61181041181042" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="98.64760424760426" data-w="5.035793835793836" data-d="5" data-name="wasm-bindgen-shared" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen-shared v0.2.114
+2 transitive deps
+depth 5
+[shared: 2 parents in dep graph]</title>
+<rect x="98.64760424760426" y="135" width="5.035793835793836" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="102.64760424760426" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="98.64760424760426" data-w="5.035793835793836" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="98.64760424760426" y="154" width="5.035793835793836" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="102.64760424760426" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="103.6833980833981" data-w="2.517896917896918" data-d="5" data-name="bumpalo" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>bumpalo v3.20.2
+1 transitive dep
+depth 5</title>
+<rect x="103.6833980833981" y="135" width="2.517896917896918" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="107.6833980833981" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="106.20129500129501" data-w="12.94918414918415" data-d="4" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="106.20129500129501" y="116" width="12.94918414918415" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="110.20129500129501" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="106.20129500129501" data-w="12.94918414918415" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="106.20129500129501" y="135" width="12.94918414918415" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="110.20129500129501" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="106.20129500129501" data-w="12.94918414918415" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="106.20129500129501" y="154" width="12.94918414918415" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="110.20129500129501" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="119.15047915047916" data-w="10.790986790986793" data-d="3" data-name="wasm-bindgen-shared" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>wasm-bindgen-shared v0.2.114
+2 transitive deps
+depth 3
+[shared: 2 parents in dep graph]</title>
+<rect x="119.15047915047916" y="97" width="10.790986790986793" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="123.15047915047916" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="119.15047915047916" data-w="10.790986790986793" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="119.15047915047916" y="116" width="10.790986790986793" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="123.15047915047916" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="129.94146594146594" data-w="5.395493395493396" data-d="3" data-name="cfg-if" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>cfg-if v1.0.4
+1 transitive dep
+depth 3
+[shared: 4 parents in dep graph]</title>
+<rect x="129.94146594146594" y="97" width="5.395493395493396" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="133.94146594146594" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="135.33695933695932" data-w="5.395493395493396" data-d="3" data-name="once_cell" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>once_cell v1.21.4
+1 transitive dep
+depth 3
+[shared: 3 parents in dep graph]</title>
+<rect x="135.33695933695932" y="97" width="5.395493395493396" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="139.33695933695932" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="140.7324527324527" data-w="5.395493395493396" data-d="3" data-name="rustversion" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rustversion v1.0.22
+1 transitive dep
+depth 3</title>
+<rect x="140.7324527324527" y="97" width="5.395493395493396" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="144.7324527324527" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="114.81481481481481" data-d="1" data-name="rend" data-weight="11" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rend v0.5.3
+11 transitive deps
+depth 1</title>
+<rect x="146.12794612794613" y="59" width="114.81481481481481" height="18" rx="2" fill="hsl(55,70%,52%)" class="normal"/>
+<text x="150.12794612794613" y="72" fill="#000">rend (11)</text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="114.81481481481481" data-d="2" data-name="bytecheck" data-weight="10" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>bytecheck v0.8.2
+10 transitive deps
+depth 2
+[shared: 2 parents in dep graph]</title>
+<rect x="146.12794612794613" y="78" width="114.81481481481481" height="18" rx="2" fill="hsl(252,59%,58%)" class="shared"/>
+<text x="150.12794612794613" y="91" fill="#000">bytecheck (10)</text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="42.30019493177387" data-d="3" data-name="rancor" data-weight="7" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rancor v0.1.1
+7 transitive deps
+depth 3
+[shared: 2 parents in dep graph]</title>
+<rect x="146.12794612794613" y="97" width="42.30019493177387" height="18" rx="2" fill="hsl(256,57%,59%)" class="shared"/>
+<text x="150.12794612794613" y="110" fill="#000">ran..</text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="42.30019493177387" data-d="4" data-name="ptr_meta" data-weight="6" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta v0.3.1
+6 transitive deps
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="146.12794612794613" y="116" width="42.30019493177387" height="18" rx="2" fill="hsl(258,56%,60%)" class="shared"/>
+<text x="150.12794612794613" y="129" fill="#000">ptr..</text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="42.30019493177387" data-d="5" data-name="ptr_meta_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta_derive v0.3.1
+5 transitive deps
+depth 5</title>
+<rect x="146.12794612794613" y="135" width="42.30019493177387" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="150.12794612794613" y="148" fill="#000">ptr..</text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="18.80008663634394" data-d="6" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 6
+[shared: 8 parents in dep graph]</title>
+<rect x="146.12794612794613" y="154" width="18.80008663634394" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="150.12794612794613" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="9.40004331817197" data-d="7" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="146.12794612794613" y="173" width="9.40004331817197" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="150.12794612794613" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="9.40004331817197" data-d="8" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 8
+[shared: 10 parents in dep graph]</title>
+<rect x="146.12794612794613" y="192" width="9.40004331817197" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="150.12794612794613" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="146.12794612794613" data-w="9.40004331817197" data-d="9" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 9
+[shared: 3 parents in dep graph]</title>
+<rect x="146.12794612794613" y="211" width="9.40004331817197" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="150.12794612794613" y="224" fill="#000"></text>
+</g>
+<g class="frame" data-x="155.5279894461181" data-w="6.2666955454479805" data-d="7" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="155.5279894461181" y="173" width="6.2666955454479805" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="159.5279894461181" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="155.5279894461181" data-w="6.2666955454479805" data-d="8" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 8
+[shared: 3 parents in dep graph]</title>
+<rect x="155.5279894461181" y="192" width="6.2666955454479805" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="159.5279894461181" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="161.7946849915661" data-w="3.1333477727239902" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="161.7946849915661" y="173" width="3.1333477727239902" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="165.7946849915661" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="164.92803276429007" data-w="14.100064977257958" data-d="6" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="164.92803276429007" y="154" width="14.100064977257958" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="168.92803276429007" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="164.92803276429007" data-w="14.100064977257958" data-d="7" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="164.92803276429007" y="173" width="14.100064977257958" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="168.92803276429007" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="164.92803276429007" data-w="14.100064977257958" data-d="8" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 8
+[shared: 3 parents in dep graph]</title>
+<rect x="164.92803276429007" y="192" width="14.100064977257958" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="168.92803276429007" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="179.02809774154804" data-w="9.40004331817197" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="179.02809774154804" y="154" width="9.40004331817197" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="183.02809774154804" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="179.02809774154804" data-w="9.40004331817197" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="179.02809774154804" y="173" width="9.40004331817197" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="183.02809774154804" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="188.42814105972002" data-w="36.25730994152046" data-d="3" data-name="ptr_meta" data-weight="6" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta v0.3.1
+6 transitive deps
+depth 3
+[shared: 3 parents in dep graph]</title>
+<rect x="188.42814105972002" y="97" width="36.25730994152046" height="18" rx="2" fill="hsl(258,56%,60%)" class="shared"/>
+<text x="192.42814105972002" y="110" fill="#000">pt..</text>
+</g>
+<g class="frame" data-x="188.42814105972002" data-w="36.25730994152046" data-d="4" data-name="ptr_meta_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta_derive v0.3.1
+5 transitive deps
+depth 4</title>
+<rect x="188.42814105972002" y="116" width="36.25730994152046" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="192.42814105972002" y="129" fill="#000">pt..</text>
+</g>
+<g class="frame" data-x="188.42814105972002" data-w="16.114359974009094" data-d="5" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 5
+[shared: 8 parents in dep graph]</title>
+<rect x="188.42814105972002" y="135" width="16.114359974009094" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="192.42814105972002" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="188.42814105972002" data-w="8.057179987004547" data-d="6" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="188.42814105972002" y="154" width="8.057179987004547" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="192.42814105972002" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="188.42814105972002" data-w="8.057179987004547" data-d="7" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="188.42814105972002" y="173" width="8.057179987004547" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="192.42814105972002" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="188.42814105972002" data-w="8.057179987004547" data-d="8" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 8
+[shared: 3 parents in dep graph]</title>
+<rect x="188.42814105972002" y="192" width="8.057179987004547" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="192.42814105972002" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="196.48532104672458" data-w="5.371453324669698" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="196.48532104672458" y="154" width="5.371453324669698" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="200.48532104672458" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="196.48532104672458" data-w="5.371453324669698" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="196.48532104672458" y="173" width="5.371453324669698" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="200.48532104672458" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="201.85677437139427" data-w="2.685726662334849" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="201.85677437139427" y="154" width="2.685726662334849" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="205.85677437139427" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="204.5425010337291" data-w="12.08576998050682" data-d="5" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="204.5425010337291" y="135" width="12.08576998050682" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="208.5425010337291" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="204.5425010337291" data-w="12.08576998050682" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="204.5425010337291" y="154" width="12.08576998050682" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="208.5425010337291" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="204.5425010337291" data-w="12.08576998050682" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="204.5425010337291" y="173" width="12.08576998050682" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="208.5425010337291" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="216.62827101423593" data-w="8.057179987004547" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="216.62827101423593" y="135" width="8.057179987004547" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="220.62827101423593" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="216.62827101423593" data-w="8.057179987004547" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="216.62827101423593" y="154" width="8.057179987004547" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="220.62827101423593" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="224.6854510012405" data-w="30.214424951267052" data-d="3" data-name="bytecheck_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>bytecheck_derive v0.8.2
+5 transitive deps
+depth 3</title>
+<rect x="224.6854510012405" y="97" width="30.214424951267052" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="228.6854510012405" y="110" fill="#000">b..</text>
+</g>
+<g class="frame" data-x="224.6854510012405" data-w="13.428633311674245" data-d="4" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 4
+[shared: 8 parents in dep graph]</title>
+<rect x="224.6854510012405" y="116" width="13.428633311674245" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="228.6854510012405" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="224.6854510012405" data-w="6.714316655837123" data-d="5" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="224.6854510012405" y="135" width="6.714316655837123" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="228.6854510012405" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="224.6854510012405" data-w="6.714316655837123" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="224.6854510012405" y="154" width="6.714316655837123" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="228.6854510012405" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="224.6854510012405" data-w="6.714316655837123" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="224.6854510012405" y="173" width="6.714316655837123" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="228.6854510012405" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="231.3997676570776" data-w="4.476211103891415" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="231.3997676570776" y="135" width="4.476211103891415" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="235.3997676570776" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="231.3997676570776" data-w="4.476211103891415" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="231.3997676570776" y="154" width="4.476211103891415" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="235.3997676570776" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="235.87597876096902" data-w="2.2381055519457074" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="235.87597876096902" y="135" width="2.2381055519457074" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="239.87597876096902" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="238.11408431291474" data-w="10.071474983755683" data-d="4" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="238.11408431291474" y="116" width="10.071474983755683" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="242.11408431291474" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="238.11408431291474" data-w="10.071474983755683" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="238.11408431291474" y="135" width="10.071474983755683" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="242.11408431291474" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="238.11408431291474" data-w="10.071474983755683" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="238.11408431291474" y="154" width="10.071474983755683" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="242.11408431291474" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="248.18555929667042" data-w="6.714316655837123" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="248.18555929667042" y="116" width="6.714316655837123" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="252.18555929667042" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="248.18555929667042" data-w="6.714316655837123" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="248.18555929667042" y="135" width="6.714316655837123" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="252.18555929667042" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="254.89987595250756" data-w="6.042884990253411" data-d="3" data-name="simdutf8" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>simdutf8 v0.1.5
+1 transitive dep
+depth 3</title>
+<rect x="254.89987595250756" y="97" width="6.042884990253411" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="258.89987595250756" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="260.94276094276097" data-w="104.37710437710439" data-d="1" data-name="bytecheck" data-weight="10" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>bytecheck v0.8.2
+10 transitive deps
+depth 1
+[shared: 2 parents in dep graph]</title>
+<rect x="260.94276094276097" y="59" width="104.37710437710439" height="18" rx="2" fill="hsl(252,59%,58%)" class="shared"/>
+<text x="264.94276094276097" y="72" fill="#000">bytecheck (10)</text>
+</g>
+<g class="frame" data-x="260.94276094276097" data-w="38.45472266524898" data-d="2" data-name="rancor" data-weight="7" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rancor v0.1.1
+7 transitive deps
+depth 2
+[shared: 2 parents in dep graph]</title>
+<rect x="260.94276094276097" y="78" width="38.45472266524898" height="18" rx="2" fill="hsl(256,57%,59%)" class="shared"/>
+<text x="264.94276094276097" y="91" fill="#000">ra..</text>
+</g>
+<g class="frame" data-x="260.94276094276097" data-w="38.45472266524898" data-d="3" data-name="ptr_meta" data-weight="6" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta v0.3.1
+6 transitive deps
+depth 3
+[shared: 3 parents in dep graph]</title>
+<rect x="260.94276094276097" y="97" width="38.45472266524898" height="18" rx="2" fill="hsl(258,56%,60%)" class="shared"/>
+<text x="264.94276094276097" y="110" fill="#000">pt..</text>
+</g>
+<g class="frame" data-x="260.94276094276097" data-w="38.45472266524898" data-d="4" data-name="ptr_meta_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta_derive v0.3.1
+5 transitive deps
+depth 4</title>
+<rect x="260.94276094276097" y="116" width="38.45472266524898" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="264.94276094276097" y="129" fill="#000">pt..</text>
+</g>
+<g class="frame" data-x="260.94276094276097" data-w="17.09098785122177" data-d="5" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 5
+[shared: 8 parents in dep graph]</title>
+<rect x="260.94276094276097" y="135" width="17.09098785122177" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="264.94276094276097" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="260.94276094276097" data-w="8.545493925610884" data-d="6" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="260.94276094276097" y="154" width="8.545493925610884" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="264.94276094276097" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="260.94276094276097" data-w="8.545493925610884" data-d="7" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 7
+[shared: 10 parents in dep graph]</title>
+<rect x="260.94276094276097" y="173" width="8.545493925610884" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="264.94276094276097" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="260.94276094276097" data-w="8.545493925610884" data-d="8" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 8
+[shared: 3 parents in dep graph]</title>
+<rect x="260.94276094276097" y="192" width="8.545493925610884" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="264.94276094276097" y="205" fill="#000"></text>
+</g>
+<g class="frame" data-x="269.4882548683719" data-w="5.696995950407256" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="269.4882548683719" y="154" width="5.696995950407256" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="273.4882548683719" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="269.4882548683719" data-w="5.696995950407256" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="269.4882548683719" y="173" width="5.696995950407256" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="273.4882548683719" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="275.18525081877914" data-w="2.848497975203628" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="275.18525081877914" y="154" width="2.848497975203628" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="279.18525081877914" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="278.03374879398274" data-w="12.818240888416327" data-d="5" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="278.03374879398274" y="135" width="12.818240888416327" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="282.03374879398274" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="278.03374879398274" data-w="12.818240888416327" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="278.03374879398274" y="154" width="12.818240888416327" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="282.03374879398274" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="278.03374879398274" data-w="12.818240888416327" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="278.03374879398274" y="173" width="12.818240888416327" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="282.03374879398274" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="290.85198968239905" data-w="8.545493925610884" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="290.85198968239905" y="135" width="8.545493925610884" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="294.85198968239905" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="290.85198968239905" data-w="8.545493925610884" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="290.85198968239905" y="154" width="8.545493925610884" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="294.85198968239905" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="299.39748360800996" data-w="32.9611908559277" data-d="2" data-name="ptr_meta" data-weight="6" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta v0.3.1
+6 transitive deps
+depth 2
+[shared: 3 parents in dep graph]</title>
+<rect x="299.39748360800996" y="78" width="32.9611908559277" height="18" rx="2" fill="hsl(258,56%,60%)" class="shared"/>
+<text x="303.39748360800996" y="91" fill="#000">p..</text>
+</g>
+<g class="frame" data-x="299.39748360800996" data-w="32.9611908559277" data-d="3" data-name="ptr_meta_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta_derive v0.3.1
+5 transitive deps
+depth 3</title>
+<rect x="299.39748360800996" y="97" width="32.9611908559277" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="303.39748360800996" y="110" fill="#000">p..</text>
+</g>
+<g class="frame" data-x="299.39748360800996" data-w="14.649418158190088" data-d="4" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 4
+[shared: 8 parents in dep graph]</title>
+<rect x="299.39748360800996" y="116" width="14.649418158190088" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="303.39748360800996" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="299.39748360800996" data-w="7.324709079095044" data-d="5" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="299.39748360800996" y="135" width="7.324709079095044" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="303.39748360800996" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="299.39748360800996" data-w="7.324709079095044" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="299.39748360800996" y="154" width="7.324709079095044" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="303.39748360800996" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="299.39748360800996" data-w="7.324709079095044" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="299.39748360800996" y="173" width="7.324709079095044" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="303.39748360800996" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="306.722192687105" data-w="4.8831393860633625" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="306.722192687105" y="135" width="4.8831393860633625" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="310.722192687105" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="306.722192687105" data-w="4.8831393860633625" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="306.722192687105" y="154" width="4.8831393860633625" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="310.722192687105" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="311.60533207316837" data-w="2.4415696930316813" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="311.60533207316837" y="135" width="2.4415696930316813" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="315.60533207316837" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="314.04690176620005" data-w="10.987063618642566" data-d="4" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="314.04690176620005" y="116" width="10.987063618642566" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="318.04690176620005" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="314.04690176620005" data-w="10.987063618642566" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="314.04690176620005" y="135" width="10.987063618642566" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="318.04690176620005" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="314.04690176620005" data-w="10.987063618642566" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="314.04690176620005" y="154" width="10.987063618642566" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="318.04690176620005" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="325.03396538484265" data-w="7.324709079095044" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="325.03396538484265" y="116" width="7.324709079095044" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="329.03396538484265" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="325.03396538484265" data-w="7.324709079095044" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="325.03396538484265" y="135" width="7.324709079095044" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="329.03396538484265" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="332.35867446393763" data-w="27.467659046606418" data-d="2" data-name="bytecheck_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>bytecheck_derive v0.8.2
+5 transitive deps
+depth 2</title>
+<rect x="332.35867446393763" y="78" width="27.467659046606418" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="336.35867446393763" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="332.35867446393763" data-w="12.207848465158408" data-d="3" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 3
+[shared: 8 parents in dep graph]</title>
+<rect x="332.35867446393763" y="97" width="12.207848465158408" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="336.35867446393763" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="332.35867446393763" data-w="6.103924232579204" data-d="4" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="332.35867446393763" y="116" width="6.103924232579204" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="336.35867446393763" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="332.35867446393763" data-w="6.103924232579204" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="332.35867446393763" y="135" width="6.103924232579204" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="336.35867446393763" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="332.35867446393763" data-w="6.103924232579204" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="332.35867446393763" y="154" width="6.103924232579204" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="336.35867446393763" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="338.46259869651686" data-w="4.069282821719469" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="338.46259869651686" y="116" width="4.069282821719469" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="342.46259869651686" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="338.46259869651686" data-w="4.069282821719469" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="338.46259869651686" y="135" width="4.069282821719469" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="342.46259869651686" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="342.53188151823633" data-w="2.0346414108597344" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="342.53188151823633" y="116" width="2.0346414108597344" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="346.53188151823633" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="344.56652292909604" data-w="9.155886348868805" data-d="3" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="344.56652292909604" y="97" width="9.155886348868805" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="348.56652292909604" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="344.56652292909604" data-w="9.155886348868805" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="344.56652292909604" y="116" width="9.155886348868805" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="348.56652292909604" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="344.56652292909604" data-w="9.155886348868805" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="344.56652292909604" y="135" width="9.155886348868805" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="348.56652292909604" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="353.72240927796486" data-w="6.103924232579204" data-d="3" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="353.72240927796486" y="97" width="6.103924232579204" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="357.72240927796486" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="353.72240927796486" data-w="6.103924232579204" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="353.72240927796486" y="116" width="6.103924232579204" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="357.72240927796486" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="359.82633351054403" data-w="5.493531809321283" data-d="2" data-name="simdutf8" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>simdutf8 v0.1.5
+1 transitive dep
+depth 2</title>
+<rect x="359.82633351054403" y="78" width="5.493531809321283" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="363.82633351054403" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="365.31986531986536" data-w="73.06397306397307" data-d="1" data-name="rancor" data-weight="7" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rancor v0.1.1
+7 transitive deps
+depth 1
+[shared: 2 parents in dep graph]</title>
+<rect x="365.31986531986536" y="59" width="73.06397306397307" height="18" rx="2" fill="hsl(256,57%,59%)" class="shared"/>
+<text x="369.31986531986536" y="72" fill="#000">rancor (7)</text>
+</g>
+<g class="frame" data-x="365.31986531986536" data-w="73.06397306397307" data-d="2" data-name="ptr_meta" data-weight="6" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta v0.3.1
+6 transitive deps
+depth 2
+[shared: 3 parents in dep graph]</title>
+<rect x="365.31986531986536" y="78" width="73.06397306397307" height="18" rx="2" fill="hsl(258,56%,60%)" class="shared"/>
+<text x="369.31986531986536" y="91" fill="#000">ptr_meta</text>
+</g>
+<g class="frame" data-x="365.31986531986536" data-w="73.06397306397307" data-d="3" data-name="ptr_meta_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta_derive v0.3.1
+5 transitive deps
+depth 3</title>
+<rect x="365.31986531986536" y="97" width="73.06397306397307" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="369.31986531986536" y="110" fill="#000">ptr_meta..</text>
+</g>
+<g class="frame" data-x="365.31986531986536" data-w="32.47287691732136" data-d="4" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 4
+[shared: 8 parents in dep graph]</title>
+<rect x="365.31986531986536" y="116" width="32.47287691732136" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="369.31986531986536" y="129" fill="#000">syn</text>
+</g>
+<g class="frame" data-x="365.31986531986536" data-w="16.23643845866068" data-d="5" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="365.31986531986536" y="135" width="16.23643845866068" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="369.31986531986536" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="365.31986531986536" data-w="16.23643845866068" data-d="6" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 6
+[shared: 10 parents in dep graph]</title>
+<rect x="365.31986531986536" y="154" width="16.23643845866068" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="369.31986531986536" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="365.31986531986536" data-w="16.23643845866068" data-d="7" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 7
+[shared: 3 parents in dep graph]</title>
+<rect x="365.31986531986536" y="173" width="16.23643845866068" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="369.31986531986536" y="186" fill="#000"></text>
+</g>
+<g class="frame" data-x="381.55630377852606" data-w="10.824292305773785" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="381.55630377852606" y="135" width="10.824292305773785" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="385.55630377852606" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="381.55630377852606" data-w="10.824292305773785" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="381.55630377852606" y="154" width="10.824292305773785" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="385.55630377852606" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="392.38059608429984" data-w="5.412146152886892" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="392.38059608429984" y="135" width="5.412146152886892" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="396.38059608429984" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="397.7927422371867" data-w="24.354657687991022" data-d="4" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="397.7927422371867" y="116" width="24.354657687991022" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="401.7927422371867" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="397.7927422371867" data-w="24.354657687991022" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="397.7927422371867" y="135" width="24.354657687991022" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="401.7927422371867" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="397.7927422371867" data-w="24.354657687991022" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="397.7927422371867" y="154" width="24.354657687991022" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="401.7927422371867" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="422.14739992517775" data-w="16.23643845866068" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="422.14739992517775" y="116" width="16.23643845866068" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="426.14739992517775" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="422.14739992517775" data-w="16.23643845866068" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="422.14739992517775" y="135" width="16.23643845866068" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="426.14739992517775" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="438.38383838383845" data-w="62.62626262626263" data-d="1" data-name="munge" data-weight="6" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>munge v0.4.7
+6 transitive deps
+depth 1</title>
+<rect x="438.38383838383845" y="59" width="62.62626262626263" height="18" rx="2" fill="hsl(71,66%,54%)" class="normal"/>
+<text x="442.38383838383845" y="72" fill="#000">munge</text>
+</g>
+<g class="frame" data-x="438.38383838383845" data-w="62.62626262626263" data-d="2" data-name="munge_macro" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>munge_macro v0.4.7
+5 transitive deps
+depth 2</title>
+<rect x="438.38383838383845" y="78" width="62.62626262626263" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="442.38383838383845" y="91" fill="#000">munge_..</text>
+</g>
+<g class="frame" data-x="438.38383838383845" data-w="27.83389450056117" data-d="3" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 3
+[shared: 8 parents in dep graph]</title>
+<rect x="438.38383838383845" y="97" width="27.83389450056117" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="442.38383838383845" y="110" fill="#000">syn</text>
+</g>
+<g class="frame" data-x="438.38383838383845" data-w="13.916947250280584" data-d="4" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="438.38383838383845" y="116" width="13.916947250280584" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="442.38383838383845" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="438.38383838383845" data-w="13.916947250280584" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="438.38383838383845" y="135" width="13.916947250280584" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="442.38383838383845" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="438.38383838383845" data-w="13.916947250280584" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="438.38383838383845" y="154" width="13.916947250280584" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="442.38383838383845" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="452.30078563411905" data-w="9.27796483352039" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="452.30078563411905" y="116" width="9.27796483352039" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="456.30078563411905" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="452.30078563411905" data-w="9.27796483352039" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="452.30078563411905" y="135" width="9.27796483352039" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="456.30078563411905" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="461.57875046763945" data-w="4.638982416760195" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="461.57875046763945" y="116" width="4.638982416760195" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="465.57875046763945" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="466.2177328843996" data-w="20.875420875420875" data-d="3" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="466.2177328843996" y="97" width="20.875420875420875" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="470.2177328843996" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="466.2177328843996" data-w="20.875420875420875" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="466.2177328843996" y="116" width="20.875420875420875" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="470.2177328843996" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="466.2177328843996" data-w="20.875420875420875" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="466.2177328843996" y="135" width="20.875420875420875" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="470.2177328843996" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="487.0931537598205" data-w="13.916947250280584" data-d="3" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="487.0931537598205" y="97" width="13.916947250280584" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="491.0931537598205" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="487.0931537598205" data-w="13.916947250280584" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="487.0931537598205" y="116" width="13.916947250280584" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="491.0931537598205" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="501.0101010101011" data-w="62.62626262626263" data-d="1" data-name="ptr_meta" data-weight="6" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta v0.3.1
+6 transitive deps
+depth 1
+[shared: 3 parents in dep graph]</title>
+<rect x="501.0101010101011" y="59" width="62.62626262626263" height="18" rx="2" fill="hsl(258,56%,60%)" class="shared"/>
+<text x="505.0101010101011" y="72" fill="#000">ptr_meta</text>
+</g>
+<g class="frame" data-x="501.0101010101011" data-w="62.62626262626263" data-d="2" data-name="ptr_meta_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>ptr_meta_derive v0.3.1
+5 transitive deps
+depth 2</title>
+<rect x="501.0101010101011" y="78" width="62.62626262626263" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="505.0101010101011" y="91" fill="#000">ptr_me..</text>
+</g>
+<g class="frame" data-x="501.0101010101011" data-w="27.83389450056117" data-d="3" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 3
+[shared: 8 parents in dep graph]</title>
+<rect x="501.0101010101011" y="97" width="27.83389450056117" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="505.0101010101011" y="110" fill="#000">syn</text>
+</g>
+<g class="frame" data-x="501.0101010101011" data-w="13.916947250280584" data-d="4" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="501.0101010101011" y="116" width="13.916947250280584" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="505.0101010101011" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="501.0101010101011" data-w="13.916947250280584" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="501.0101010101011" y="135" width="13.916947250280584" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="505.0101010101011" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="501.0101010101011" data-w="13.916947250280584" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="501.0101010101011" y="154" width="13.916947250280584" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="505.0101010101011" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="514.9270482603816" data-w="9.27796483352039" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="514.9270482603816" y="116" width="9.27796483352039" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="518.9270482603816" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="514.9270482603816" data-w="9.27796483352039" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="514.9270482603816" y="135" width="9.27796483352039" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="518.9270482603816" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="524.205013093902" data-w="4.638982416760195" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="524.205013093902" y="116" width="4.638982416760195" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="528.205013093902" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="528.8439955106622" data-w="20.875420875420875" data-d="3" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="528.8439955106622" y="97" width="20.875420875420875" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="532.8439955106622" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="528.8439955106622" data-w="20.875420875420875" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="528.8439955106622" y="116" width="20.875420875420875" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="532.8439955106622" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="528.8439955106622" data-w="20.875420875420875" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="528.8439955106622" y="135" width="20.875420875420875" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="532.8439955106622" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="549.7194163860831" data-w="13.916947250280584" data-d="3" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="549.7194163860831" y="97" width="13.916947250280584" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="553.7194163860831" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="549.7194163860831" data-w="13.916947250280584" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="549.7194163860831" y="116" width="13.916947250280584" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="553.7194163860831" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="563.6363636363637" data-w="52.188552188552194" data-d="1" data-name="rkyv_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rkyv_derive v0.8.15
+5 transitive deps
+depth 1</title>
+<rect x="563.6363636363637" y="59" width="52.188552188552194" height="18" rx="2" fill="rgb(70,130,180)" class="workspace"/>
+<text x="567.6363636363637" y="72" fill="#fff">rkyv..</text>
+</g>
+<g class="frame" data-x="563.6363636363637" data-w="23.194912083800975" data-d="2" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 2
+[shared: 8 parents in dep graph]</title>
+<rect x="563.6363636363637" y="78" width="23.194912083800975" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="567.6363636363637" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="563.6363636363637" data-w="11.597456041900488" data-d="3" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="563.6363636363637" y="97" width="11.597456041900488" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="567.6363636363637" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="563.6363636363637" data-w="11.597456041900488" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="563.6363636363637" y="116" width="11.597456041900488" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="567.6363636363637" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="563.6363636363637" data-w="11.597456041900488" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="563.6363636363637" y="135" width="11.597456041900488" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="567.6363636363637" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="575.2338196782642" data-w="7.7316373612669915" data-d="3" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="575.2338196782642" y="97" width="7.7316373612669915" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="579.2338196782642" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="575.2338196782642" data-w="7.7316373612669915" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="575.2338196782642" y="116" width="7.7316373612669915" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="579.2338196782642" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="582.9654570395312" data-w="3.8658186806334958" data-d="3" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 3
+[shared: 3 parents in dep graph]</title>
+<rect x="582.9654570395312" y="97" width="3.8658186806334958" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="586.9654570395312" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="586.8312757201647" data-w="17.39618406285073" data-d="2" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 2
+[shared: 10 parents in dep graph]</title>
+<rect x="586.8312757201647" y="78" width="17.39618406285073" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="590.8312757201647" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="586.8312757201647" data-w="17.39618406285073" data-d="3" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="586.8312757201647" y="97" width="17.39618406285073" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="590.8312757201647" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="586.8312757201647" data-w="17.39618406285073" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="586.8312757201647" y="116" width="17.39618406285073" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="590.8312757201647" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="604.2274597830154" data-w="11.597456041900488" data-d="2" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 2
+[shared: 10 parents in dep graph]</title>
+<rect x="604.2274597830154" y="78" width="11.597456041900488" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="608.2274597830154" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="604.2274597830154" data-w="11.597456041900488" data-d="3" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 3
+[shared: 3 parents in dep graph]</title>
+<rect x="604.2274597830154" y="97" width="11.597456041900488" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="608.2274597830154" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="615.8249158249159" data-w="31.313131313131315" data-d="1" data-name="indexmap" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>indexmap v2.13.0
+3 transitive deps
+depth 1
+[shared: 2 parents in dep graph]</title>
+<rect x="615.8249158249159" y="59" width="31.313131313131315" height="18" rx="2" fill="rgb(220,20,80)" class="unused"/>
+<text x="619.8249158249159" y="72" fill="#fff">i..</text>
+</g>
+<g class="frame" data-x="615.8249158249159" data-w="15.656565656565657" data-d="2" data-name="equivalent" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>equivalent v1.0.2
+1 transitive dep
+depth 2</title>
+<rect x="615.8249158249159" y="78" width="15.656565656565657" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="619.8249158249159" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="631.4814814814816" data-w="15.656565656565657" data-d="2" data-name="hashbrown" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>hashbrown v0.16.1
+1 transitive dep
+depth 2
+[shared: 2 parents in dep graph]</title>
+<rect x="631.4814814814816" y="78" width="15.656565656565657" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="635.4814814814816" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="647.1380471380472" data-w="20.875420875420875" data-d="1" data-name="tinyvec" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>tinyvec v1.11.0
+2 transitive deps
+depth 1</title>
+<rect x="647.1380471380472" y="59" width="20.875420875420875" height="18" rx="2" fill="rgb(220,20,80)" class="unused"/>
+<text x="651.1380471380472" y="72" fill="#fff"></text>
+</g>
+<g class="frame" data-x="647.1380471380472" data-w="20.875420875420875" data-d="2" data-name="tinyvec_macros" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>tinyvec_macros v0.1.1
+1 transitive dep
+depth 2</title>
+<rect x="647.1380471380472" y="78" width="20.875420875420875" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="651.1380471380472" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="668.0134680134681" data-w="10.437710437710438" data-d="1" data-name="bytes" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>bytes v1.11.1
+1 transitive dep
+depth 1</title>
+<rect x="668.0134680134681" y="59" width="10.437710437710438" height="18" rx="2" fill="rgb(220,20,80)" class="unused"/>
+<text x="672.0134680134681" y="72" fill="#fff"></text>
+</g>
+<g class="frame" data-x="678.4511784511785" data-w="10.437710437710438" data-d="1" data-name="hashbrown" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>hashbrown v0.16.1
+1 transitive dep
+depth 1
+[shared: 2 parents in dep graph]</title>
+<rect x="678.4511784511785" y="59" width="10.437710437710438" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="682.4511784511785" y="72" fill="#000"></text>
+</g>
+<g class="frame" data-x="688.8888888888889" data-w="400" data-d="0" data-name="benchlib" data-weight="18" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>benchlib v0.8.15
+18 transitive deps
+depth 0</title>
+<rect x="688.8888888888889" y="40" width="400" height="18" rx="2" fill="rgb(70,130,180)" class="workspace"/>
+<text x="692.8888888888889" y="53" fill="#fff">benchlib (18)</text>
+</g>
+<g class="frame" data-x="688.8888888888889" data-w="311.11111111111114" data-d="1" data-name="divan" data-weight="14" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>divan v0.1.21
+14 transitive deps
+depth 1</title>
+<rect x="688.8888888888889" y="59" width="311.11111111111114" height="18" rx="2" fill="hsl(48,71%,52%)" class="normal"/>
+<text x="692.8888888888889" y="72" fill="#000">divan (14)</text>
+</g>
+<g class="frame" data-x="688.8888888888889" data-w="119.65811965811967" data-d="2" data-name="divan-macros" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>divan-macros v0.1.21
+5 transitive deps
+depth 2</title>
+<rect x="688.8888888888889" y="78" width="119.65811965811967" height="18" rx="2" fill="hsl(76,65%,54%)" class="normal"/>
+<text x="692.8888888888889" y="91" fill="#000">divan-macros (5)</text>
+</g>
+<g class="frame" data-x="688.8888888888889" data-w="53.181386514719854" data-d="3" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 3
+[shared: 8 parents in dep graph]</title>
+<rect x="688.8888888888889" y="97" width="53.181386514719854" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="692.8888888888889" y="110" fill="#000">syn</text>
+</g>
+<g class="frame" data-x="688.8888888888889" data-w="26.590693257359927" data-d="4" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="688.8888888888889" y="116" width="26.590693257359927" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="692.8888888888889" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="688.8888888888889" data-w="26.590693257359927" data-d="5" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 5
+[shared: 10 parents in dep graph]</title>
+<rect x="688.8888888888889" y="135" width="26.590693257359927" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="692.8888888888889" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="688.8888888888889" data-w="26.590693257359927" data-d="6" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 6
+[shared: 3 parents in dep graph]</title>
+<rect x="688.8888888888889" y="154" width="26.590693257359927" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="692.8888888888889" y="167" fill="#000"></text>
+</g>
+<g class="frame" data-x="715.4795821462488" data-w="17.72712883823995" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="715.4795821462488" y="116" width="17.72712883823995" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="719.4795821462488" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="715.4795821462488" data-w="17.72712883823995" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="715.4795821462488" y="135" width="17.72712883823995" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="719.4795821462488" y="148" fill="#000"></text>
+</g>
+<g class="frame" data-x="733.2067109844888" data-w="8.863564419119975" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="733.2067109844888" y="116" width="8.863564419119975" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="737.2067109844888" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="742.0702754036088" data-w="39.88603988603989" data-d="3" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="742.0702754036088" y="97" width="39.88603988603989" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="746.0702754036088" y="110" fill="#000">qu..</text>
+</g>
+<g class="frame" data-x="742.0702754036088" data-w="39.88603988603989" data-d="4" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 4
+[shared: 10 parents in dep graph]</title>
+<rect x="742.0702754036088" y="116" width="39.88603988603989" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="746.0702754036088" y="129" fill="#000">pr..</text>
+</g>
+<g class="frame" data-x="742.0702754036088" data-w="39.88603988603989" data-d="5" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 5
+[shared: 3 parents in dep graph]</title>
+<rect x="742.0702754036088" y="135" width="39.88603988603989" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="746.0702754036088" y="148" fill="#000">un..</text>
+</g>
+<g class="frame" data-x="781.9563152896486" data-w="26.590693257359927" data-d="3" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="781.9563152896486" y="97" width="26.590693257359927" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="785.9563152896486" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="781.9563152896486" data-w="26.590693257359927" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="781.9563152896486" y="116" width="26.590693257359927" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="785.9563152896486" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="808.5470085470085" data-w="95.72649572649574" data-d="2" data-name="clap" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>clap v4.6.0
+4 transitive deps
+depth 2</title>
+<rect x="808.5470085470085" y="78" width="95.72649572649574" height="18" rx="2" fill="hsl(82,63%,55%)" class="normal"/>
+<text x="812.5470085470085" y="91" fill="#000">clap (4)</text>
+</g>
+<g class="frame" data-x="808.5470085470085" data-w="95.72649572649574" data-d="3" data-name="clap_builder" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>clap_builder v4.6.0
+3 transitive deps
+depth 3</title>
+<rect x="808.5470085470085" y="97" width="95.72649572649574" height="18" rx="2" fill="hsl(90,62%,55%)" class="normal"/>
+<text x="812.5470085470085" y="110" fill="#000">clap_builder</text>
+</g>
+<g class="frame" data-x="808.5470085470085" data-w="47.86324786324787" data-d="4" data-name="anstyle" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>anstyle v1.0.14
+1 transitive dep
+depth 4</title>
+<rect x="808.5470085470085" y="116" width="47.86324786324787" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="812.5470085470085" y="129" fill="#000">anst..</text>
+</g>
+<g class="frame" data-x="856.4102564102565" data-w="47.86324786324787" data-d="4" data-name="clap_lex" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>clap_lex v1.1.0
+1 transitive dep
+depth 4</title>
+<rect x="856.4102564102565" y="116" width="47.86324786324787" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="860.4102564102565" y="129" fill="#000">clap..</text>
+</g>
+<g class="frame" data-x="904.2735042735043" data-w="23.931623931623935" data-d="2" data-name="cfg-if" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>cfg-if v1.0.4
+1 transitive dep
+depth 2
+[shared: 4 parents in dep graph]</title>
+<rect x="904.2735042735043" y="78" width="23.931623931623935" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="908.2735042735043" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="928.2051282051282" data-w="23.931623931623935" data-d="2" data-name="condtype" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>condtype v1.3.0
+1 transitive dep
+depth 2</title>
+<rect x="928.2051282051282" y="78" width="23.931623931623935" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="932.2051282051282" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="952.1367521367521" data-w="23.931623931623935" data-d="2" data-name="libc" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>libc v0.2.183
+1 transitive dep
+depth 2
+[shared: 2 parents in dep graph]</title>
+<rect x="952.1367521367521" y="78" width="23.931623931623935" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="956.1367521367521" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="976.068376068376" data-w="23.931623931623935" data-d="2" data-name="regex-lite" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>regex-lite v0.1.9
+1 transitive dep
+depth 2</title>
+<rect x="976.068376068376" y="78" width="23.931623931623935" height="18" rx="2" fill="hsl(120,55%,58%)" class="normal"/>
+<text x="980.068376068376" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="1000" data-w="44.44444444444444" data-d="1" data-name="rand" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rand v0.8.5
+2 transitive deps
+depth 1</title>
+<rect x="1000" y="59" width="44.44444444444444" height="18" rx="2" fill="hsl(101,59%,56%)" class="normal"/>
+<text x="1004" y="72" fill="#000">rand</text>
+</g>
+<g class="frame" data-x="1000" data-w="44.44444444444444" data-d="2" data-name="rand_core" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rand_core v0.6.4
+1 transitive dep
+depth 2
+[shared: 2 parents in dep graph]</title>
+<rect x="1000" y="78" width="44.44444444444444" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="1004" y="91" fill="#000">ran..</text>
+</g>
+<g class="frame" data-x="1044.4444444444443" data-w="44.44444444444444" data-d="1" data-name="rand_pcg" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rand_pcg v0.3.1
+2 transitive deps
+depth 1</title>
+<rect x="1044.4444444444443" y="59" width="44.44444444444444" height="18" rx="2" fill="hsl(101,59%,56%)" class="normal"/>
+<text x="1048.4444444444443" y="72" fill="#000">ran..</text>
+</g>
+<g class="frame" data-x="1044.4444444444443" data-w="44.44444444444444" data-d="2" data-name="rand_core" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rand_core v0.6.4
+1 transitive dep
+depth 2
+[shared: 2 parents in dep graph]</title>
+<rect x="1044.4444444444443" y="78" width="44.44444444444444" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="1048.4444444444443" y="91" fill="#000">ran..</text>
+</g>
+<g class="frame" data-x="1088.888888888889" data-w="111.1111111111111" data-d="0" data-name="rkyv_derive" data-weight="5" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>rkyv_derive v0.8.15
+5 transitive deps
+depth 0</title>
+<rect x="1088.888888888889" y="40" width="111.1111111111111" height="18" rx="2" fill="rgb(70,130,180)" class="workspace"/>
+<text x="1092.888888888889" y="53" fill="#fff">rkyv_derive (5)</text>
+</g>
+<g class="frame" data-x="1088.888888888889" data-w="49.38271604938271" data-d="1" data-name="syn" data-weight="4" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>syn v2.0.117
+4 transitive deps
+depth 1
+[shared: 8 parents in dep graph]</title>
+<rect x="1088.888888888889" y="59" width="49.38271604938271" height="18" rx="2" fill="hsl(263,53%,61%)" class="shared"/>
+<text x="1092.888888888889" y="72" fill="#000">syn</text>
+</g>
+<g class="frame" data-x="1088.888888888889" data-w="24.691358024691354" data-d="2" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 2
+[shared: 10 parents in dep graph]</title>
+<rect x="1088.888888888889" y="78" width="24.691358024691354" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="1092.888888888889" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="1088.888888888889" data-w="24.691358024691354" data-d="3" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 3
+[shared: 10 parents in dep graph]</title>
+<rect x="1088.888888888889" y="97" width="24.691358024691354" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="1092.888888888889" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="1088.888888888889" data-w="24.691358024691354" data-d="4" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 4
+[shared: 3 parents in dep graph]</title>
+<rect x="1088.888888888889" y="116" width="24.691358024691354" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="1092.888888888889" y="129" fill="#000"></text>
+</g>
+<g class="frame" data-x="1113.5802469135804" data-w="16.460905349794235" data-d="2" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 2
+[shared: 10 parents in dep graph]</title>
+<rect x="1113.5802469135804" y="78" width="16.460905349794235" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="1117.5802469135804" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="1113.5802469135804" data-w="16.460905349794235" data-d="3" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 3
+[shared: 3 parents in dep graph]</title>
+<rect x="1113.5802469135804" y="97" width="16.460905349794235" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="1117.5802469135804" y="110" fill="#000"></text>
+</g>
+<g class="frame" data-x="1130.0411522633747" data-w="8.230452674897117" data-d="2" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 2
+[shared: 3 parents in dep graph]</title>
+<rect x="1130.0411522633747" y="78" width="8.230452674897117" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="1134.0411522633747" y="91" fill="#000"></text>
+</g>
+<g class="frame" data-x="1138.2716049382716" data-w="37.03703703703703" data-d="1" data-name="quote" data-weight="3" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>quote v1.0.45
+3 transitive deps
+depth 1
+[shared: 10 parents in dep graph]</title>
+<rect x="1138.2716049382716" y="59" width="37.03703703703703" height="18" rx="2" fill="hsl(267,52%,62%)" class="shared"/>
+<text x="1142.2716049382716" y="72" fill="#000">qu..</text>
+</g>
+<g class="frame" data-x="1138.2716049382716" data-w="37.03703703703703" data-d="2" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 2
+[shared: 10 parents in dep graph]</title>
+<rect x="1138.2716049382716" y="78" width="37.03703703703703" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="1142.2716049382716" y="91" fill="#000">pr..</text>
+</g>
+<g class="frame" data-x="1138.2716049382716" data-w="37.03703703703703" data-d="3" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 3
+[shared: 3 parents in dep graph]</title>
+<rect x="1138.2716049382716" y="97" width="37.03703703703703" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="1142.2716049382716" y="110" fill="#000">un..</text>
+</g>
+<g class="frame" data-x="1175.3086419753085" data-w="24.691358024691354" data-d="1" data-name="proc-macro2" data-weight="2" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>proc-macro2 v1.0.106
+2 transitive deps
+depth 1
+[shared: 10 parents in dep graph]</title>
+<rect x="1175.3086419753085" y="59" width="24.691358024691354" height="18" rx="2" fill="hsl(272,49%,63%)" class="shared"/>
+<text x="1179.3086419753085" y="72" fill="#000"></text>
+</g>
+<g class="frame" data-x="1175.3086419753085" data-w="24.691358024691354" data-d="2" data-name="unicode-ident" data-weight="1" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
+<title>unicode-ident v1.0.24
+1 transitive dep
+depth 2
+[shared: 3 parents in dep graph]</title>
+<rect x="1175.3086419753085" y="78" width="24.691358024691354" height="18" rx="2" fill="hsl(280,45%,65%)" class="shared"/>
+<text x="1179.3086419753085" y="91" fill="#000"></text>
+</g>
+</g>
+</svg>
+
+</div>
+
+<div id="tab-targets" class="tab-content">
+<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#664d03"><strong>⚠ Use your judgement.</strong> These suggestions are based on automated analysis of dependency metadata and source references. They may be wrong or impractical. Before acting on any suggestion, make sure you understand why the dependency exists, what features it provides, and whether removing it would break functionality or degrade the library for other users.</div>
+<div class="action-summary">
+<h3>Remove unused dependencies</h3>
+<p style="font-size:13px;color:#666;margin-bottom:8px">These dependencies are in your <code>Cargo.toml</code> but no references were found in your source code. You can remove them by deleting the line from <code>[dependencies]</code>. If a dependency has 0 deps saved, it's also pulled in transitively by something else, so removing it only cleans up your manifest without shrinking the build.</p>
+<ul>
+<li>(-2 deps) Remove <a href="https://crates.io/crates/indexmap" target="_blank" style="color:inherit;text-decoration:underline dotted">indexmap</a> from <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &mdash; it appears unused <span class="show-diff-btn" onclick="toggleDiff(this.parentElement)">show diff</span>
+<div class="cargo-diff"><div class="diff-file"># Cargo.toml</div><div class="diff-rm">- indexmap = "2.13.0"</div></div></li>
+<li>(-2 deps) Remove <a href="https://crates.io/crates/tinyvec" target="_blank" style="color:inherit;text-decoration:underline dotted">tinyvec</a> from <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &mdash; it appears unused <span class="show-diff-btn" onclick="toggleDiff(this.parentElement)">show diff</span>
+<div class="cargo-diff"><div class="diff-file"># Cargo.toml</div><div class="diff-rm">- tinyvec = "1.11.0"</div></div></li>
+<li>(-1 deps) Remove <a href="https://crates.io/crates/bytes" target="_blank" style="color:inherit;text-decoration:underline dotted">bytes</a> from <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &mdash; it appears unused <span class="show-diff-btn" onclick="toggleDiff(this.parentElement)">show diff</span>
+<div class="cargo-diff"><div class="diff-file"># Cargo.toml</div><div class="diff-rm">- bytes = "1.11.1"</div></div></li>
+</ul>
+</div>
+
+<div class="action-summary">
+<h3>Disable unnecessary features</h3>
+<p style="font-size:13px;color:#666;margin-bottom:8px">These dependencies are already <em>optional</em> in their upstream crate, but are being pulled in by a feature you have enabled (often the <code>default</code> features). You can reduce your dependency count by changing the feature flags in your <code>Cargo.toml</code> &mdash; for example, adding <code>default-features = false</code> and listing only the features you actually need.</p>
+<ul>
+<li>(-9 deps) <a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a> is already optional in <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> (already optional) <span class="show-diff-btn" onclick="toggleDiff(this.parentElement)">show diff</span>
+<div class="cargo-diff"><div class="diff-file"># Cargo.toml</div><div class="diff-comment"># check your [rkyv] dependency — a feature is pulling in uuid</div><div class="diff-rm">- rkyv = { version = "...", features = ["..."] }</div><div class="diff-add">+ rkyv = { version = "..." }  # try removing features that pull in uuid</div></div></li>
+<li>(-1 deps) <a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a> is already optional in <a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a> (optional + platform-conditional) &mdash; enabled by feature(s) <code>js</code> <span class="show-diff-btn" onclick="toggleDiff(this.parentElement)">show diff</span>
+<div class="cargo-diff"><div class="diff-file"># Cargo.toml</div><div class="diff-comment"># feature(s) "js" of uuid pull in js-sys</div><div class="diff-rm">- uuid = { version = "...", features = ["js"] }</div><div class="diff-add">+ uuid = { version = "..." }  # without "js"</div></div></li>
+</ul>
+</div>
+
+<div class="action-summary">
+<h3>Proposals for upstream libraries</h3>
+<p style="font-size:13px;color:#666;margin-bottom:8px">These changes would need to happen in an external library's repository, not your own code. You would need to open an issue or submit a pull request to the upstream maintainer. The impact listed is the savings <em>you</em> would see if the change were accepted.</p>
+<ul>
+<li>(-0 deps) <a href="https://crates.io/crates/wasm-bindgen" target="_blank" style="color:inherit;text-decoration:underline dotted">wasm-bindgen</a> can't be removed &mdash; it's also required by sibling dep <a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a></li>
+</ul>
+</div>
+
+<div style="margin-bottom:12px">
+<p style="font-size:14px;color:#444;margin-bottom:4px"><strong>Detailed breakdown</strong></p>
+<p style="font-size:13px;color:#666">Each row below is a dependency edge you could optimize. <em>Upstream Crate</em> is where the change would happen; <em>Heavy Dep</em> is the dependency to reduce. Rows marked \u{1f4e4} require contributing a PR upstream. Click any row to see exactly where the dependency is used in the source code.</p>
+</div>
+<table class="targets-table">
+<thead><tr>
+  <th>#</th>
+  <th title="The crate that directly depends on the heavy dependency. This is the crate where a change (feature-gate, removal, etc.) would need to happen.">Upstream Crate</th>
+  <th title="The heavy dependency being pulled in. Removing or gating this dep is the goal.">Heavy Dep</th>
+  <th title="Deps Saved: how many transitive dependencies would be removed from your build if this edge were cut. Higher = more impact.">Deps Saved</th>
+  <th title="Total Deps: the total number of transitive dependencies this heavy dep brings (including shared ones that may still be needed by other crates).">Total Deps</th>
+  <th title="Code Refs: number of source-level references to this dependency found in the upstream crate. Fewer refs = easier to remove or inline.">Code Refs</th>
+  <th title="Score: W_transitive / C_ref. Higher score = heavier dependency relative to how much it's used. Measures ROI of removal.">Score</th>
+  <th title="How confident we are in this suggestion. HIGH = clear signal, NOISE = already gated or platform-specific.">Confidence</th>
+  <th title="The recommended action: FEATURE GATE (make optional), REMOVE (appears unused), INLINE (small enough to copy), ALREADY GATED (check if you need it enabled), etc.">Suggested Action</th>
+</tr></thead>
+<tbody>
+<tr class="expandable" onclick="toggleDetail(1)">
+  <td>1</td>
+  <td><code><a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a></code></td>
+  <td><code><a href="https://crates.io/crates/indexmap" target="_blank" style="color:inherit;text-decoration:underline dotted">indexmap</a></code></td>
+  <td>2</td><td>3</td><td>0</td><td>∞</td>
+  <td><span class="badge badge-high">HIGH</span></td>
+  <td>REMOVE (appears unused)</td>
+</tr>
+<tr class="detail-row" id="detail-1">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> v0.8.15 &rarr; <a href="https://crates.io/crates/indexmap" target="_blank" style="color:inherit;text-decoration:underline dotted">indexmap</a> v2.13.0</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">YOUR-CRATE</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &rarr; <a href="https://crates.io/crates/indexmap" target="_blank" style="color:inherit;text-decoration:underline dotted">indexmap</a></div>
+  <div style="margin-top:8px"><span class="label">References (0):</span></div>
+  <div style="margin-left:8px"><span style="color:#aaa">no references found</span></div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(2)">
+  <td>2</td>
+  <td><code><a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a></code></td>
+  <td><code><a href="https://crates.io/crates/tinyvec" target="_blank" style="color:inherit;text-decoration:underline dotted">tinyvec</a></code></td>
+  <td>2</td><td>2</td><td>0</td><td>∞</td>
+  <td><span class="badge badge-high">HIGH</span></td>
+  <td>REMOVE (appears unused)</td>
+</tr>
+<tr class="detail-row" id="detail-2">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> v0.8.15 &rarr; <a href="https://crates.io/crates/tinyvec" target="_blank" style="color:inherit;text-decoration:underline dotted">tinyvec</a> v1.11.0</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">YOUR-CRATE</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &rarr; <a href="https://crates.io/crates/tinyvec" target="_blank" style="color:inherit;text-decoration:underline dotted">tinyvec</a></div>
+  <div style="margin-top:8px"><span class="label">References (0):</span></div>
+  <div style="margin-left:8px"><span style="color:#aaa">no references found</span></div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(3)">
+  <td>3</td>
+  <td><code><a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a></code></td>
+  <td><code><a href="https://crates.io/crates/bytes" target="_blank" style="color:inherit;text-decoration:underline dotted">bytes</a></code></td>
+  <td>1</td><td>1</td><td>0</td><td>∞</td>
+  <td><span class="badge badge-high">HIGH</span></td>
+  <td>REMOVE (appears unused)</td>
+</tr>
+<tr class="detail-row" id="detail-3">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> v0.8.15 &rarr; <a href="https://crates.io/crates/bytes" target="_blank" style="color:inherit;text-decoration:underline dotted">bytes</a> v1.11.1</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">YOUR-CRATE</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &rarr; <a href="https://crates.io/crates/bytes" target="_blank" style="color:inherit;text-decoration:underline dotted">bytes</a></div>
+  <div style="margin-top:8px"><span class="label">References (0):</span></div>
+  <div style="margin-left:8px"><span style="color:#aaa">no references found</span></div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(4)">
+  <td>4</td>
+  <td><code><a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a></code></td>
+  <td><code><a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a></code></td>
+  <td>9</td><td>14</td><td>2</td><td>7.0</td>
+  <td><span class="badge badge-noise">NOISE</span></td>
+  <td>ALREADY GATED (already optional)</td>
+</tr>
+<tr class="detail-row" id="detail-4">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> v0.8.15 &rarr; <a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a> v1.22.0</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">YOUR-CRATE</span> <span class="badge badge-flag">ALREADY-OPTIONAL</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &rarr; <a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a></div>
+  <div style="margin-top:8px"><span class="label">References (2):</span></div>
+  <div style="margin-left:8px"><div class="ref-file">/root/.cargo/registry/src/.../rkyv-0.8.15/src/impls/ext/uuid_1.rs:2</div>
+<div class="ref-line"><code>use uuid_1::Uuid;</code></div>
+<div class="ref-file">/root/.cargo/registry/src/.../rkyv-0.8.15/src/impls/ext/uuid_1.rs:10</div>
+<div class="ref-line"><code>unsafe impl Portable for Uuid where uuid_1::Bytes: Portable {}</code></div>
+</div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(5)">
+  <td>5</td>
+  <td><code><a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a></code></td>
+  <td><code><a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a></code></td>
+  <td>1</td><td>13</td><td>2</td><td>6.5</td>
+  <td><span class="badge badge-noise">NOISE</span></td>
+  <td>ALREADY GATED (optional + platform-conditional, enabled by: js)</td>
+</tr>
+<tr class="detail-row" id="detail-5">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a> v1.22.0 &rarr; <a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a> v0.3.91</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">ALREADY-OPTIONAL</span> <span class="badge badge-flag">PLATFORM-CONDITIONAL</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &rarr; <a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a> &rarr; <a href="https://crates.io/crates/js-sys" target="_blank" style="color:inherit;text-decoration:underline dotted">js-sys</a></div>
+  <div style="margin-top:8px"><span class="label">References (2):</span></div>
+  <div style="margin-left:8px"><div class="ref-file">/root/.cargo/registry/src/.../uuid-1.22.0/src/rng.rs:273</div>
+<div class="ref-line"><code>let buf = js_sys::Uint8Array::new_with_length(buf_len_u32);</code></div>
+<div class="ref-file">/root/.cargo/registry/src/.../uuid-1.22.0/src/rng.rs:305</div>
+<div class="ref-line"><code>fn get_random_values(buf: &amp;js_sys::Uint8Array) -&gt; Result&lt;(), JsValue&gt;;</code></div>
+</div>
+</div></td>
+</tr>
+<tr class="expandable" onclick="toggleDetail(6)">
+  <td>6</td>
+  <td><code><a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a></code></td>
+  <td><code><a href="https://crates.io/crates/wasm-bindgen" target="_blank" style="color:inherit;text-decoration:underline dotted">wasm-bindgen</a></code></td>
+  <td>0</td><td>12</td><td>2</td><td>6.0</td>
+  <td><span class="badge badge-noise">NOISE</span></td>
+  <td>REQUIRED BY js-sys</td>
+</tr>
+<tr class="detail-row" id="detail-6">
+<td colspan="9"><div class="detail-box">
+  <div><span class="label">Edge:</span> <a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a> v1.22.0 &rarr; <a href="https://crates.io/crates/wasm-bindgen" target="_blank" style="color:inherit;text-decoration:underline dotted">wasm-bindgen</a> v0.2.114</div>
+  <div><span class="label">Flags:</span> <span class="badge badge-flag">PHANTOM</span> <span class="badge badge-flag">ALREADY-OPTIONAL</span> <span class="badge badge-flag">PLATFORM-CONDITIONAL</span></div>
+  <div><span class="label">Chain:</span> <a href="https://crates.io/crates/rkyv" target="_blank" style="color:inherit;text-decoration:underline dotted">rkyv</a> &rarr; <a href="https://crates.io/crates/uuid" target="_blank" style="color:inherit;text-decoration:underline dotted">uuid</a> &rarr; <a href="https://crates.io/crates/wasm-bindgen" target="_blank" style="color:inherit;text-decoration:underline dotted">wasm-bindgen</a></div>
+  <div style="margin-top:8px"><span class="label">References (2):</span></div>
+  <div style="margin-left:8px"><div class="ref-file">/root/.cargo/registry/src/.../uuid-1.22.0/src/rng.rs:247</div>
+<div class="ref-line"><code>use wasm_bindgen::{prelude::wasm_bindgen, JsValue};</code></div>
+<div class="ref-file">/root/.cargo/registry/src/.../uuid-1.22.0/src/timestamp.rs:347</div>
+<div class="ref-line"><code>use wasm_bindgen::prelude::*;</code></div>
+</div>
+</div></td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+<div id="tab-json" class="tab-content">
+<div class="json-container">
+  <button class="copy-btn" onclick="copyJson()">Copy</button>
+  <pre><code>{
+  &quot;tool_version&quot;: &quot;0.1.0&quot;,
+  &quot;timestamp&quot;: &quot;2026-03-25T21:28:09.860162022+00:00&quot;,
+  &quot;workspace_root&quot;: &quot;/tmp/rust-projects/rkyv&quot;,
+  &quot;threshold&quot;: 3.0,
+  &quot;total_dependencies&quot;: 69,
+  &quot;platform_dependencies&quot;: 16,
+  &quot;phantom_dependencies&quot;: 53,
+  &quot;fat_nodes_found&quot;: 9,
+  &quot;targets&quot;: [
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;rkyv&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;indexmap&quot;,
+        &quot;version&quot;: &quot;2.13.0&quot;
+      },
+      &quot;w_transitive&quot;: 3,
+      &quot;w_unique&quot;: 2,
+      &quot;c_ref&quot;: 0,
+      &quot;hurrs&quot;: null,
+      &quot;confidence&quot;: &quot;High&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;indexmap&quot;,
+        &quot;searched_names&quot;: [
+          &quot;indexmap&quot;
+        ],
+        &quot;ref_count&quot;: 0,
+        &quot;file_matches&quot;: [],
+        &quot;files_with_matches&quot;: 0,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: &quot;Remove&quot;,
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: false,
+        &quot;platform_conditional&quot;: false
+      },
+      &quot;dep_chain&quot;: [
+        &quot;rkyv&quot;,
+        &quot;indexmap&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: true,
+      &quot;fat_dep_loc&quot;: 0,
+      &quot;fat_dep_own_deps&quot;: 2,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;rkyv&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;tinyvec&quot;,
+        &quot;version&quot;: &quot;1.11.0&quot;
+      },
+      &quot;w_transitive&quot;: 2,
+      &quot;w_unique&quot;: 2,
+      &quot;c_ref&quot;: 0,
+      &quot;hurrs&quot;: null,
+      &quot;confidence&quot;: &quot;High&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;tinyvec&quot;,
+        &quot;searched_names&quot;: [
+          &quot;tinyvec&quot;
+        ],
+        &quot;ref_count&quot;: 0,
+        &quot;file_matches&quot;: [],
+        &quot;files_with_matches&quot;: 0,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: &quot;Remove&quot;,
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: false,
+        &quot;platform_conditional&quot;: false
+      },
+      &quot;dep_chain&quot;: [
+        &quot;rkyv&quot;,
+        &quot;tinyvec&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: true,
+      &quot;fat_dep_loc&quot;: 0,
+      &quot;fat_dep_own_deps&quot;: 1,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;rkyv&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;bytes&quot;,
+        &quot;version&quot;: &quot;1.11.1&quot;
+      },
+      &quot;w_transitive&quot;: 1,
+      &quot;w_unique&quot;: 1,
+      &quot;c_ref&quot;: 0,
+      &quot;hurrs&quot;: null,
+      &quot;confidence&quot;: &quot;High&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;bytes&quot;,
+        &quot;searched_names&quot;: [
+          &quot;bytes&quot;
+        ],
+        &quot;ref_count&quot;: 0,
+        &quot;file_matches&quot;: [],
+        &quot;files_with_matches&quot;: 0,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: &quot;Remove&quot;,
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: false,
+        &quot;platform_conditional&quot;: false
+      },
+      &quot;dep_chain&quot;: [
+        &quot;rkyv&quot;,
+        &quot;bytes&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: true,
+      &quot;fat_dep_loc&quot;: 0,
+      &quot;fat_dep_own_deps&quot;: 0,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;rkyv&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;uuid&quot;,
+        &quot;version&quot;: &quot;1.22.0&quot;
+      },
+      &quot;w_transitive&quot;: 14,
+      &quot;w_unique&quot;: 9,
+      &quot;c_ref&quot;: 2,
+      &quot;hurrs&quot;: 7.0,
+      &quot;confidence&quot;: &quot;Noise&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;uuid&quot;,
+        &quot;searched_names&quot;: [
+          &quot;uuid&quot;,
+          &quot;uuid_1&quot;
+        ],
+        &quot;ref_count&quot;: 2,
+        &quot;file_matches&quot;: [
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rkyv-0.8.15/src/impls/ext/uuid_1.rs&quot;,
+            &quot;line_number&quot;: 2,
+            &quot;line_content&quot;: &quot;use uuid_1::Uuid;&quot;,
+            &quot;in_generated_file&quot;: false
+          },
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rkyv-0.8.15/src/impls/ext/uuid_1.rs&quot;,
+            &quot;line_number&quot;: 10,
+            &quot;line_content&quot;: &quot;unsafe impl Portable for Uuid where uuid_1::Bytes: Portable {}&quot;,
+            &quot;in_generated_file&quot;: false
+          }
+        ],
+        &quot;files_with_matches&quot;: 1,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [
+          &quot;Bytes&quot;,
+          &quot;Uuid&quot;
+        ],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: {
+        &quot;AlreadyGated&quot;: {
+          &quot;detail&quot;: &quot;already optional&quot;,
+          &quot;enabling_features&quot;: []
+        }
+      },
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: true,
+        &quot;platform_conditional&quot;: false
+      },
+      &quot;dep_chain&quot;: [
+        &quot;rkyv&quot;,
+        &quot;uuid&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: true,
+      &quot;fat_dep_loc&quot;: 4607,
+      &quot;fat_dep_own_deps&quot;: 2,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;uuid&quot;,
+        &quot;version&quot;: &quot;1.22.0&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;js-sys&quot;,
+        &quot;version&quot;: &quot;0.3.91&quot;
+      },
+      &quot;w_transitive&quot;: 13,
+      &quot;w_unique&quot;: 1,
+      &quot;c_ref&quot;: 2,
+      &quot;hurrs&quot;: 6.5,
+      &quot;confidence&quot;: &quot;Noise&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;js-sys&quot;,
+        &quot;searched_names&quot;: [
+          &quot;js_sys&quot;
+        ],
+        &quot;ref_count&quot;: 2,
+        &quot;file_matches&quot;: [
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.22.0/src/rng.rs&quot;,
+            &quot;line_number&quot;: 273,
+            &quot;line_content&quot;: &quot;let buf = js_sys::Uint8Array::new_with_length(buf_len_u32);&quot;,
+            &quot;in_generated_file&quot;: false
+          },
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.22.0/src/rng.rs&quot;,
+            &quot;line_number&quot;: 305,
+            &quot;line_content&quot;: &quot;fn get_random_values(buf: &amp;js_sys::Uint8Array) -&gt; Result&lt;(), JsValue&gt;;&quot;,
+            &quot;in_generated_file&quot;: false
+          }
+        ],
+        &quot;files_with_matches&quot;: 1,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [
+          &quot;Uint8Array&quot;
+        ],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: {
+        &quot;AlreadyGated&quot;: {
+          &quot;detail&quot;: &quot;optional + platform-conditional&quot;,
+          &quot;enabling_features&quot;: [
+            &quot;js&quot;
+          ]
+        }
+      },
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: true,
+        &quot;platform_conditional&quot;: true
+      },
+      &quot;dep_chain&quot;: [
+        &quot;rkyv&quot;,
+        &quot;uuid&quot;,
+        &quot;js-sys&quot;
+      ],
+      &quot;required_by_sibling&quot;: null,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: false,
+      &quot;fat_dep_loc&quot;: 8218,
+      &quot;fat_dep_own_deps&quot;: 2,
+      &quot;has_re_export_all&quot;: false
+    },
+    {
+      &quot;intermediate&quot;: {
+        &quot;name&quot;: &quot;uuid&quot;,
+        &quot;version&quot;: &quot;1.22.0&quot;
+      },
+      &quot;fat_dependency&quot;: {
+        &quot;name&quot;: &quot;wasm-bindgen&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;
+      },
+      &quot;w_transitive&quot;: 12,
+      &quot;w_unique&quot;: 0,
+      &quot;c_ref&quot;: 2,
+      &quot;hurrs&quot;: 6.0,
+      &quot;confidence&quot;: &quot;Noise&quot;,
+      &quot;scan_result&quot;: {
+        &quot;fat_crate_name&quot;: &quot;wasm-bindgen&quot;,
+        &quot;searched_names&quot;: [
+          &quot;wasm_bindgen&quot;
+        ],
+        &quot;ref_count&quot;: 2,
+        &quot;file_matches&quot;: [
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.22.0/src/rng.rs&quot;,
+            &quot;line_number&quot;: 247,
+            &quot;line_content&quot;: &quot;use wasm_bindgen::{prelude::wasm_bindgen, JsValue};&quot;,
+            &quot;in_generated_file&quot;: false
+          },
+          {
+            &quot;path&quot;: &quot;/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.22.0/src/timestamp.rs&quot;,
+            &quot;line_number&quot;: 347,
+            &quot;line_content&quot;: &quot;use wasm_bindgen::prelude::*;&quot;,
+            &quot;in_generated_file&quot;: false
+          }
+        ],
+        &quot;files_with_matches&quot;: 2,
+        &quot;generated_file_refs&quot;: 0,
+        &quot;distinct_items&quot;: [
+          &quot;JsValue&quot;,
+          &quot;prelude&quot;
+        ],
+        &quot;has_re_export_all&quot;: false
+      },
+      &quot;suggestion&quot;: {
+        &quot;RequiredBySibling&quot;: {
+          &quot;sibling&quot;: &quot;js-sys&quot;
+        }
+      },
+      &quot;edge_meta&quot;: {
+        &quot;build_only&quot;: false,
+        &quot;already_optional&quot;: true,
+        &quot;platform_conditional&quot;: true
+      },
+      &quot;dep_chain&quot;: [
+        &quot;rkyv&quot;,
+        &quot;uuid&quot;,
+        &quot;wasm-bindgen&quot;
+      ],
+      &quot;required_by_sibling&quot;: &quot;js-sys&quot;,
+      &quot;phantom&quot;: true,
+      &quot;intermediate_is_workspace_member&quot;: false,
+      &quot;fat_dep_loc&quot;: 4401,
+      &quot;fat_dep_own_deps&quot;: 5,
+      &quot;has_re_export_all&quot;: false
+    }
+  ],
+  &quot;dep_tree&quot;: {
+    &quot;nodes&quot;: [
+      {
+        &quot;name&quot;: &quot;wasip2&quot;,
+        &quot;version&quot;: &quot;1.0.2+wasi-0.2.9&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          44
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;ptr_meta&quot;,
+        &quot;version&quot;: &quot;0.3.1&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          29
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;bumpalo&quot;,
+        &quot;version&quot;: &quot;3.20.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;windows-link&quot;,
+        &quot;version&quot;: &quot;0.2.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;hashbrown&quot;,
+        &quot;version&quot;: &quot;0.16.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;equivalent&quot;,
+        &quot;version&quot;: &quot;1.0.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;munge&quot;,
+        &quot;version&quot;: &quot;0.4.7&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          15
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;clap_builder&quot;,
+        &quot;version&quot;: &quot;4.6.0&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          69,
+          58
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;version_check&quot;,
+        &quot;version&quot;: &quot;0.9.5&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;uuid&quot;,
+        &quot;version&quot;: &quot;1.22.0&quot;,
+        &quot;transitive_weight&quot;: 14,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          49,
+          43
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;windows-sys&quot;,
+        &quot;version&quot;: &quot;0.61.2&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          3
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;termcolor&quot;,
+        &quot;version&quot;: &quot;1.4.1&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          28
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rancor&quot;,
+        &quot;version&quot;: &quot;0.1.1&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          1
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          47
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;bytecheck_derive&quot;,
+        &quot;version&quot;: &quot;0.8.2&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;munge_macro&quot;,
+        &quot;version&quot;: &quot;0.4.7&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;simdutf8&quot;,
+        &quot;version&quot;: &quot;0.1.5&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;rkyv_derive&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: true,
+        &quot;children&quot;: [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde_json&quot;,
+        &quot;version&quot;: &quot;1.0.149&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          13,
+          47,
+          20,
+          52,
+          53
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-shared&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;itoa&quot;,
+        &quot;version&quot;: &quot;1.0.18&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;proc-macro2&quot;,
+        &quot;version&quot;: &quot;1.0.106&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;quote&quot;,
+        &quot;version&quot;: &quot;1.0.45&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;divan-macros&quot;,
+        &quot;version&quot;: &quot;0.1.21&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;bytecheck&quot;,
+        &quot;version&quot;: &quot;0.8.2&quot;,
+        &quot;transitive_weight&quot;: 10,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          12,
+          1,
+          14,
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zerocopy-derive&quot;,
+        &quot;version&quot;: &quot;0.8.47&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;benchlib&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;,
+        &quot;transitive_weight&quot;: 18,
+        &quot;is_workspace&quot;: true,
+        &quot;children&quot;: [
+          41,
+          35,
+          39
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;tinyvec_macros&quot;,
+        &quot;version&quot;: &quot;0.1.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;winapi-util&quot;,
+        &quot;version&quot;: &quot;0.1.11&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          10
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;ptr_meta_derive&quot;,
+        &quot;version&quot;: &quot;0.3.1&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rend&quot;,
+        &quot;version&quot;: &quot;0.5.3&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          24
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;condtype&quot;,
+        &quot;version&quot;: &quot;1.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;libc&quot;,
+        &quot;version&quot;: &quot;0.2.183&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;once_cell&quot;,
+        &quot;version&quot;: &quot;1.21.4&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;serde_spanned&quot;,
+        &quot;version&quot;: &quot;1.1.0&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          47
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rand&quot;,
+        &quot;version&quot;: &quot;0.8.5&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          42
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;toml_datetime&quot;,
+        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          47
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;tinyvec&quot;,
+        &quot;version&quot;: &quot;1.11.0&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          27
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;trybuild&quot;,
+        &quot;version&quot;: &quot;1.0.116&quot;,
+        &quot;transitive_weight&quot;: 27,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          64,
+          18,
+          13,
+          55,
+          11,
+          63,
+          71
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rand_pcg&quot;,
+        &quot;version&quot;: &quot;0.3.1&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          42
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rkyv&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;,
+        &quot;transitive_weight&quot;: 31,
+        &quot;is_workspace&quot;: true,
+        &quot;children&quot;: [
+          9,
+          30,
+          24,
+          12,
+          6,
+          1,
+          17,
+          46,
+          37,
+          66,
+          4
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;divan&quot;,
+        &quot;version&quot;: &quot;0.1.21&quot;,
+        &quot;transitive_weight&quot;: 14,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          23,
+          54,
+          67,
+          31,
+          32,
+          50
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rand_core&quot;,
+        &quot;version&quot;: &quot;0.6.4&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;,
+        &quot;transitive_weight&quot;: 12,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          59,
+          19,
+          67,
+          33,
+          68
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wit-bindgen&quot;,
+        &quot;version&quot;: &quot;0.51.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;ahash&quot;,
+        &quot;version&quot;: &quot;0.8.12&quot;,
+        &quot;transitive_weight&quot;: 15,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          62,
+          61,
+          67,
+          33,
+          8
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;indexmap&quot;,
+        &quot;version&quot;: &quot;2.13.0&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          5,
+          4
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde_core&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          55
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;toml_writer&quot;,
+        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;js-sys&quot;,
+        &quot;version&quot;: &quot;0.3.91&quot;,
+        &quot;transitive_weight&quot;: 13,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          43,
+          33
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;regex-lite&quot;,
+        &quot;version&quot;: &quot;0.1.9&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;syn&quot;,
+        &quot;version&quot;: &quot;2.0.117&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          22,
+          21,
+          70
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;memchr&quot;,
+        &quot;version&quot;: &quot;2.8.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;zmij&quot;,
+        &quot;version&quot;: &quot;1.0.21&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;clap&quot;,
+        &quot;version&quot;: &quot;4.6.0&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          7
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde_derive&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-macro-support&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          51,
+          22,
+          21,
+          19,
+          2
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;r-efi&quot;,
+        &quot;version&quot;: &quot;5.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;clap_lex&quot;,
+        &quot;version&quot;: &quot;1.1.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-macro&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;,
+        &quot;transitive_weight&quot;: 8,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          56,
+          22
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;winnow&quot;,
+        &quot;version&quot;: &quot;1.0.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;zerocopy&quot;,
+        &quot;version&quot;: &quot;0.8.47&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          25
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;getrandom&quot;,
+        &quot;version&quot;: &quot;0.3.4&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          0,
+          67,
+          32,
+          57
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;glob&quot;,
+        &quot;version&quot;: &quot;0.3.3&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;toml&quot;,
+        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 15,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          34,
+          36,
+          47,
+          46,
+          65,
+          48,
+          60
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;toml_parser&quot;,
+        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          60
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;bytes&quot;,
+        &quot;version&quot;: &quot;1.11.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;cfg-if&quot;,
+        &quot;version&quot;: &quot;1.0.4&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;rustversion&quot;,
+        &quot;version&quot;: &quot;1.0.22&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;anstyle&quot;,
+        &quot;version&quot;: &quot;1.0.14&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;unicode-ident&quot;,
+        &quot;version&quot;: &quot;1.0.24&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;target-triple&quot;,
+        &quot;version&quot;: &quot;1.0.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      }
+    ],
+    &quot;root_indices&quot;: [
+      40,
+      26,
+      17
+    ]
+  },
+  &quot;unused_edges&quot;: [
+    [
+      &quot;rkyv&quot;,
+      &quot;indexmap&quot;
+    ],
+    [
+      &quot;rkyv&quot;,
+      &quot;tinyvec&quot;
+    ],
+    [
+      &quot;rkyv&quot;,
+      &quot;bytes&quot;
+    ]
+  ]
+}</code></pre>
+</div>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+  document.getElementById('tab-' + name).classList.add('active');
+  // Find the button whose onclick contains the tab name.
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    if (btn.getAttribute('onclick').indexOf(name) !== -1) {
+      btn.classList.add('active');
+    }
+  });
+}
+function toggleDetail(n) {
+  var row = document.getElementById('detail-' + n);
+  if (row) row.classList.toggle('open');
+}
+function toggleDiff(li) {
+  var diff = li.querySelector('.cargo-diff');
+  var btn = li.querySelector('.show-diff-btn');
+  if (diff) {
+    var show = diff.style.display !== 'block';
+    diff.style.display = show ? 'block' : 'none';
+    if (btn) btn.textContent = show ? 'hide diff' : 'show diff';
+  }
+}
+function copyJson() {
+  var text = document.querySelector('#tab-json pre code').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+  });
+}
+</script>
+
+</body>
+</html>
