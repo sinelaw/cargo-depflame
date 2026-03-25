@@ -1,6 +1,7 @@
 pub mod cargo_toml;
 pub mod cli;
 pub mod error;
+pub mod flamegraph;
 pub mod graph;
 pub mod metrics;
 pub mod platform;

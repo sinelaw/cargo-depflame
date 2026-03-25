@@ -79,4 +79,6 @@ pub struct ReportArgs {
 pub enum OutputFormat {
     Text,
     Json,
+    /// Flamegraph / icicle-chart SVG showing dependency tree breakdown.
+    Svg,
 }
