@@ -246,12 +246,10 @@ enum Section {
 
 /// Extract a field value from an inline TOML table string like `{ version = "1.0", package = "foo" }`.
 fn extract_field(table_str: &str, field: &str) -> Option<String> {
-    let pattern = format!("{field}");
-    // Find "field = value" within the string.
     for part in table_str.split(',') {
         let part = part.trim().trim_matches(|c| c == '{' || c == '}');
         if let Some((k, v)) = part.split_once('=') {
-            if k.trim() == pattern {
+            if k.trim() == field {
                 let v = v.trim().trim_matches('"').trim_matches('\'');
                 return Some(v.to_string());
             }

@@ -1,10 +1,9 @@
 pub mod analyze;
 pub mod cargo_toml;
 pub mod cli;
-pub mod error;
 pub mod flamegraph;
-pub mod html_report;
 pub mod graph;
+pub mod html_report;
 pub mod metrics;
 pub mod platform;
 pub mod registry;

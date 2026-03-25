@@ -3,20 +3,9 @@ use super::layout::{
     HEADER_HEIGHT, FOOTER_HEIGHT,
 };
 use super::DepTreeData;
+use crate::html_report::html_escape;
 use std::collections::HashSet;
 use std::io::Write;
-
-// ---------------------------------------------------------------------------
-// SVG rendering helpers.
-// ---------------------------------------------------------------------------
-
-fn xml_escape(s: &str) -> String {
-    s.replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
-        .replace('\'', "&apos;")
-}
 
 /// Map transitive weight to a fill colour.
 ///   - workspace members -> steel blue
@@ -404,8 +393,8 @@ fn render_frames(
             "normal"
         };
         let label = fit_label(&r.name, r.weight, r.w);
-        let tip = xml_escape(&tooltip(r));
-        let ename = xml_escape(&r.name);
+        let tip = html_escape(&tooltip(r));
+        let ename = html_escape(&r.name);
 
         svg.push_str(&format!(
             r#"<g class="frame" data-x="{x}" data-w="{w}" data-d="{d}" data-name="{ename}" data-weight="{weight}" onclick="zoom(evt)" onmouseover="hlOn(evt)" onmouseout="hlOff(evt)">
@@ -422,7 +411,7 @@ fn render_frames(
             weight = r.weight,
             tx = r.x + TEXT_PAD,
             ty = r.y + 13.0,
-            elabel = xml_escape(&label),
+            elabel = html_escape(&label),
         ));
     }
 }

@@ -113,11 +113,12 @@ pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> an
     Ok(())
 }
 
-pub(crate) fn html_escape(s: &str) -> String {
+pub fn html_escape(s: &str) -> String {
     s.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
         .replace('"', "&quot;")
+        .replace('\'', "&apos;")
 }
 
 /// Render a crate name as a link to crates.io.

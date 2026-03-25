@@ -27,8 +27,9 @@ pub enum Command {
     Flame(FlameArgs),
 }
 
-#[derive(Parser, Debug)]
-pub struct AnalyzeArgs {
+/// Arguments shared between Analyze and Flame commands.
+#[derive(Args, Debug, Clone)]
+pub struct CommonArgs {
     /// Path to the workspace Cargo.toml.
     #[arg(long, default_value = "Cargo.toml")]
     pub manifest_path: PathBuf,
@@ -45,6 +46,28 @@ pub struct AnalyzeArgs {
     #[arg(long, default_value_t = 10)]
     pub fat_threshold: usize,
 
+    /// Show detailed analysis (file matches, dep chains, metrics).
+    #[arg(long, short)]
+    pub verbose: bool,
+}
+
+impl Default for CommonArgs {
+    fn default() -> Self {
+        Self {
+            manifest_path: PathBuf::from("Cargo.toml"),
+            threshold: 3.0,
+            top: 10,
+            fat_threshold: 10,
+            verbose: false,
+        }
+    }
+}
+
+#[derive(Parser, Debug)]
+pub struct AnalyzeArgs {
+    #[command(flatten)]
+    pub common: CommonArgs,
+
     /// Output format.
     #[arg(long, default_value = "text")]
     pub format: OutputFormat,
@@ -52,10 +75,6 @@ pub struct AnalyzeArgs {
     /// Write report to a file instead of stdout.
     #[arg(long)]
     pub output: Option<PathBuf>,
-
-    /// Show detailed analysis (file matches, dep chains, metrics).
-    #[arg(long, short)]
-    pub verbose: bool,
 }
 
 #[derive(Parser, Debug)]
@@ -77,38 +96,16 @@ pub struct ReportArgs {
     pub verbose: bool,
 }
 
-/// Arguments shared between Analyze and Flame commands.
 #[derive(Args, Debug)]
 pub struct FlameArgs {
-    /// Path to the workspace Cargo.toml.
-    #[arg(long, default_value = "Cargo.toml")]
-    pub manifest_path: PathBuf,
-
-    /// Minimum hURRS score to include in the report.
-    #[arg(long, default_value_t = 3.0)]
-    pub threshold: f64,
-
-    /// Show only the top N results.
-    #[arg(long, default_value_t = 10)]
-    pub top: usize,
-
-    /// Minimum transitive weight for a node to be considered "fat".
-    #[arg(long, default_value_t = 10)]
-    pub fat_threshold: usize,
-
-    /// Show detailed analysis (file matches, dep chains, metrics).
-    #[arg(long, short)]
-    pub verbose: bool,
+    #[command(flatten)]
+    pub common: CommonArgs,
 }
 
 impl Default for FlameArgs {
     fn default() -> Self {
         Self {
-            manifest_path: PathBuf::from("Cargo.toml"),
-            threshold: 3.0,
-            top: 10,
-            fat_threshold: 10,
-            verbose: false,
+            common: CommonArgs::default(),
         }
     }
 }

@@ -4,6 +4,7 @@ use cargo_depflame::report::AnalysisReport;
 use cargo_depflame::{analyze, flamegraph, report};
 use clap::Parser;
 use std::io::Write;
+use std::path::Path;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -18,7 +19,7 @@ fn main() -> Result<()> {
 fn run_analyze_command(args: AnalyzeArgs) -> Result<()> {
     let output = args.output.clone();
     let format = args.format.clone();
-    let verbose = args.verbose;
+    let verbose = args.common.verbose;
 
     let analysis = analyze::run_analyze(&args)?;
 
@@ -29,10 +30,7 @@ fn run_analyze_command(args: AnalyzeArgs) -> Result<()> {
     if let Some(path) = &output {
         let json_path = path.with_extension("json");
         if json_path != *path {
-            let file = std::fs::File::create(&json_path)?;
-            let mut json_writer = std::io::BufWriter::new(file);
-            report::render_json(&analysis, &mut json_writer)?;
-            eprintln!("JSON report saved to: {}", json_path.display());
+            save_json(&analysis, &json_path)?;
         }
     }
 
@@ -41,13 +39,9 @@ fn run_analyze_command(args: AnalyzeArgs) -> Result<()> {
 
 fn run_flame(args: FlameArgs) -> Result<()> {
     let analyze_args = AnalyzeArgs {
-        manifest_path: args.manifest_path,
-        threshold: args.threshold,
-        top: args.top,
-        fat_threshold: args.fat_threshold,
+        common: args.common,
         format: OutputFormat::Html,
         output: None,
-        verbose: args.verbose,
     };
 
     // Create a named temp file for the HTML output.
@@ -71,12 +65,7 @@ fn run_flame(args: FlameArgs) -> Result<()> {
     };
     write_output(&analysis, &OutputFormat::Html, false, &mut writer)?;
 
-    // Also save JSON alongside for convenience.
-    let json_path = html_path.with_extension("json");
-    let file = std::fs::File::create(&json_path)?;
-    let mut json_writer = std::io::BufWriter::new(file);
-    report::render_json(&analysis, &mut json_writer)?;
-    eprintln!("JSON report saved to: {}", json_path.display());
+    save_json(&analysis, &html_path.with_extension("json"))?;
 
     // Open the HTML in the user's default browser.
     let uri = format!("file://{}", html_path.display());
@@ -95,6 +84,16 @@ fn run_report(args: ReportArgs) -> Result<()> {
     let mut writer: Box<dyn Write> = open_writer(&args.output)?;
     write_output(&analysis, &args.format, args.verbose, &mut writer)?;
 
+    Ok(())
+}
+
+/// Save analysis as JSON to the given path.
+fn save_json(analysis: &AnalysisReport, path: &Path) -> Result<()> {
+    let file = std::fs::File::create(path)
+        .with_context(|| format!("failed to create JSON file: {}", path.display()))?;
+    let mut writer = std::io::BufWriter::new(file);
+    report::render_json(analysis, &mut writer)?;
+    eprintln!("JSON report saved to: {}", path.display());
     Ok(())
 }
 

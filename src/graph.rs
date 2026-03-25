@@ -1,7 +1,6 @@
+use anyhow::{anyhow, Result};
 use cargo_metadata::{DependencyKind, Metadata, PackageId};
 use std::collections::{HashMap, HashSet, VecDeque};
-
-use crate::error::TriageError;
 
 /// A node in the dependency graph.
 #[derive(Debug, Clone)]
@@ -65,11 +64,11 @@ pub struct DepGraph {
 
 impl DepGraph {
     /// Build the dependency graph from cargo_metadata output.
-    pub fn from_metadata(metadata: &Metadata) -> Result<Self, TriageError> {
+    pub fn from_metadata(metadata: &Metadata) -> Result<Self> {
         let resolve = metadata
             .resolve
             .as_ref()
-            .ok_or(TriageError::NoResolveGraph)?;
+            .ok_or_else(|| anyhow!("no dependency resolution graph found"))?;
 
         let workspace_members: HashSet<PackageId> =
             metadata.workspace_members.iter().cloned().collect();
@@ -154,35 +153,6 @@ impl DepGraph {
         };
         graph.compute_transitive_weights();
         Ok(graph)
-    }
-
-    /// Enrich edge metadata with optional/platform info from Cargo.toml parsing.
-    pub fn enrich_edge_meta(
-        &mut self,
-        from_id: &PackageId,
-        to_package_name: &str,
-        meta: &crate::cargo_toml::CrateDepInfo,
-    ) {
-        if let Some(edge) = self.forward.get(from_id) {
-            for to_id in edge {
-                if let Some(to_node) = self.nodes.get(to_id) {
-                    if to_node.name == to_package_name {
-                        if let Some(em) = self.edge_meta.get_mut(&(from_id.clone(), to_id.clone()))
-                        {
-                            if meta.is_optional(to_package_name) {
-                                em.already_optional = true;
-                            }
-                            if meta.is_platform_conditional(to_package_name) {
-                                em.platform_conditional = true;
-                            }
-                            if meta.is_build_dep(to_package_name) {
-                                em.build_only = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /// Compute W_transitive for every node via BFS, storing the full set.
@@ -354,10 +324,8 @@ impl DepGraph {
     pub fn fat_nodes(&self, threshold: usize) -> Vec<FatNode> {
         self.nodes
             .iter()
-            .filter(|(id, node)| {
-                !node.is_workspace_member
-                    && node.transitive_weight > threshold
-                    && !self.workspace_members.contains(*id)
+            .filter(|(_, node)| {
+                !node.is_workspace_member && node.transitive_weight > threshold
             })
             .map(|(id, node)| FatNode {
                 id: id.clone(),
@@ -368,10 +336,9 @@ impl DepGraph {
             .collect()
     }
 
-    /// For each fat node F, find intermediate crates I such that:
+    /// For each fat node F, find crates I such that:
     /// - I depends on F directly
-    /// - I is not a workspace member
-    /// - I is reachable from a workspace member
+    /// - I is reachable from a workspace member (including workspace members themselves)
     pub fn intermediate_edges(&self, fat_nodes: &[FatNode]) -> Vec<IntermediateEdge> {
         let fat_ids: HashSet<&PackageId> = fat_nodes.iter().map(|f| &f.id).collect();
         let mut edges = Vec::new();
@@ -382,20 +349,14 @@ impl DepGraph {
             platform_conditional: false,
         };
 
-        // For each non-workspace node, check if any of its direct deps is a fat node.
         for (id, deps) in &self.forward {
             let node = match self.nodes.get(id) {
                 Some(n) => n,
                 None => continue,
             };
 
-            // Skip workspace members — we want upstream targets.
-            if node.is_workspace_member {
-                continue;
-            }
-
-            // Check if this node is reachable from any workspace member.
-            if !self.is_reachable_from_workspace(id) {
+            // Workspace members are trivially reachable; others need a check.
+            if !node.is_workspace_member && !self.is_reachable_from_workspace(id) {
                 continue;
             }
 
@@ -418,36 +379,6 @@ impl DepGraph {
                             fat_transitive_weight: fat_node.transitive_weight,
                             edge_meta: meta,
                         });
-                    }
-                }
-            }
-        }
-
-        // Also check workspace members' direct deps on fat nodes.
-        for ws_id in &self.workspace_members {
-            if let Some(deps) = self.forward.get(ws_id) {
-                for dep_id in deps {
-                    if fat_ids.contains(dep_id) {
-                        if let (Some(ws_node), Some(fat_node)) =
-                            (self.nodes.get(ws_id), self.nodes.get(dep_id))
-                        {
-                            let meta = self
-                                .edge_meta
-                                .get(&(ws_id.clone(), dep_id.clone()))
-                                .cloned()
-                                .unwrap_or_else(|| default_meta.clone());
-
-                            edges.push(IntermediateEdge {
-                                intermediate_id: ws_id.clone(),
-                                intermediate_name: ws_node.name.clone(),
-                                intermediate_version: ws_node.version.clone(),
-                                fat_id: dep_id.clone(),
-                                fat_name: fat_node.name.clone(),
-                                fat_version: fat_node.version.clone(),
-                                fat_transitive_weight: fat_node.transitive_weight,
-                                edge_meta: meta,
-                            });
-                        }
                     }
                 }
             }

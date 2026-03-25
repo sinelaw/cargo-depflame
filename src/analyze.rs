@@ -8,7 +8,7 @@ use crate::cargo_toml::CrateDepInfo;
 use crate::cli::AnalyzeArgs;
 use crate::flamegraph;
 use crate::graph::{DepGraph, EdgeMeta, IntermediateEdge};
-use crate::metrics::{self, Confidence, PackageInfo, RemovalStrategy, UpstreamTarget};
+use crate::metrics::{self, ComputeTargetInput, Confidence, PackageInfo, RemovalStrategy, UpstreamTarget};
 use crate::report::AnalysisReport;
 use crate::{platform, registry, scanner};
 
@@ -20,7 +20,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
     // Phase 1: Load metadata.
     eprintln!("Loading workspace metadata...");
     let metadata = cargo_metadata::MetadataCommand::new()
-        .manifest_path(&args.manifest_path)
+        .manifest_path(&args.common.manifest_path)
         .exec()
         .context("failed to run cargo metadata")?;
 
@@ -30,17 +30,17 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
     eprintln!("Building dependency graph...");
     let dep_graph = crate::graph::DepGraph::from_metadata(&metadata)?;
     let total_deps = dep_graph.total_dependency_count();
-    let fat_nodes = dep_graph.fat_nodes(args.fat_threshold);
+    let fat_nodes = dep_graph.fat_nodes(args.common.fat_threshold);
     eprintln!(
         "Found {} fat nodes (W_transitive > {}) out of {} total dependencies",
         fat_nodes.len(),
-        args.fat_threshold,
+        args.common.fat_threshold,
         total_deps
     );
 
     if fat_nodes.is_empty() {
         eprintln!("No fat nodes found. Your dependency tree is lean!");
-        return Ok(empty_report(workspace_root, args.threshold, total_deps));
+        return Ok(empty_report(workspace_root, args.common.threshold, total_deps));
     }
 
     // Phase 2b: Find intermediate edges.
@@ -49,12 +49,12 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
 
     if edges.is_empty() {
         eprintln!("No intermediate dependency edges to analyze.");
-        return Ok(empty_report(workspace_root, args.threshold, total_deps));
+        return Ok(empty_report(workspace_root, args.common.threshold, total_deps));
     }
 
     // Phase 2c: Resolve real platform deps to detect phantom deps.
     eprintln!("Resolving platform-specific dependency tree...");
-    let real_deps = platform::resolve_real_deps(&args.manifest_path);
+    let real_deps = platform::resolve_real_deps(&args.common.manifest_path);
     if real_deps.is_none() {
         eprintln!("  [WARN] Could not resolve platform deps, phantom detection disabled");
     }
@@ -73,7 +73,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         .collect();
 
     // Phase 5b: Rank.
-    let mut ranked = metrics::rank_targets(targets, args.threshold, args.top);
+    let mut ranked = metrics::rank_targets(targets, args.common.threshold, args.common.top);
 
     // Phase 5c: Enrich AlreadyGated suggestions with feature info.
     enrich_features(&mut ranked, &metadata);
@@ -109,7 +109,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         tool_version: env!("CARGO_PKG_VERSION").to_string(),
         timestamp: chrono::Utc::now().to_rfc3339(),
         workspace_root,
-        threshold: args.threshold,
+        threshold: args.common.threshold,
         total_dependencies: total_deps,
         platform_dependencies: platform_deps,
         phantom_dependencies: phantom_deps,
@@ -227,24 +227,24 @@ fn scan_edge(
     let intermediate_is_ws = dep_graph.workspace_members.contains(&edge.intermediate_id);
 
     // Phase 5: Compute metrics.
-    Some(metrics::compute_target(
-        &edge.intermediate_name,
-        &edge.intermediate_version,
-        &edge.fat_name,
-        &edge.fat_version,
-        edge.fat_transitive_weight,
+    Some(metrics::compute_target(ComputeTargetInput {
+        intermediate_name: edge.intermediate_name.clone(),
+        intermediate_version: edge.intermediate_version.clone(),
+        fat_name: edge.fat_name.clone(),
+        fat_version: edge.fat_version.clone(),
+        w_transitive: edge.fat_transitive_weight,
         w_unique,
-        scan,
+        scan_result: scan,
         edge_meta,
         dep_chain,
         was_renamed,
         required_by_sibling,
         phantom,
-        intermediate_is_ws,
+        intermediate_is_workspace_member: intermediate_is_ws,
         fat_dep_loc,
         fat_dep_own_deps,
         has_re_export_all,
-    ))
+    }))
 }
 
 /// Enrich `AlreadyGated` suggestions with enabling-feature information

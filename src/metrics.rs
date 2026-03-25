@@ -198,85 +198,86 @@ const STD_REPLACEMENTS: &[(&str, &str)] = &[
 /// it's deeply integrated and suggesting removal/gating is not useful.
 const DEEPLY_INTEGRATED_THRESHOLD: usize = 15;
 
+/// All inputs needed to compute an `UpstreamTarget`.
+pub struct ComputeTargetInput {
+    pub intermediate_name: String,
+    pub intermediate_version: String,
+    pub fat_name: String,
+    pub fat_version: String,
+    pub w_transitive: usize,
+    pub w_unique: usize,
+    pub scan_result: ScanResult,
+    pub edge_meta: EdgeMeta,
+    pub dep_chain: Vec<String>,
+    pub was_renamed: bool,
+    pub required_by_sibling: Option<String>,
+    pub phantom: bool,
+    pub intermediate_is_workspace_member: bool,
+    pub fat_dep_loc: usize,
+    pub fat_dep_own_deps: usize,
+    pub has_re_export_all: bool,
+}
+
 /// Compute hURRS, confidence, and determine the removal strategy.
-pub fn compute_target(
-    intermediate_name: &str,
-    intermediate_version: &str,
-    fat_name: &str,
-    fat_version: &str,
-    w_transitive: usize,
-    w_unique: usize,
-    scan_result: ScanResult,
-    edge_meta: EdgeMeta,
-    dep_chain: Vec<String>,
-    was_renamed: bool,
-    required_by_sibling: Option<String>,
-    phantom: bool,
-    intermediate_is_workspace_member: bool,
-    fat_dep_loc: usize,
-    fat_dep_own_deps: usize,
-    has_re_export_all: bool,
-) -> UpstreamTarget {
-    let c_ref = scan_result.ref_count;
-    let api_items_used = scan_result.distinct_items.len();
+pub fn compute_target(input: ComputeTargetInput) -> UpstreamTarget {
+    let c_ref = input.scan_result.ref_count;
+    let api_items_used = input.scan_result.distinct_items.len();
 
     let hurrs = if c_ref == 0 {
-        None // infinity — dependency appears unused
+        None
     } else {
-        Some(w_transitive as f64 / c_ref as f64)
+        Some(input.w_transitive as f64 / c_ref as f64)
     };
 
-    // Determine confidence.
     let confidence = compute_confidence(
         c_ref,
-        &scan_result,
-        &edge_meta,
-        fat_name,
-        intermediate_name,
-        was_renamed,
-        &required_by_sibling,
-        phantom,
-        intermediate_is_workspace_member,
-        has_re_export_all,
+        &input.scan_result,
+        &input.edge_meta,
+        &input.fat_name,
+        &input.intermediate_name,
+        input.was_renamed,
+        &input.required_by_sibling,
+        input.phantom,
+        input.intermediate_is_workspace_member,
+        input.has_re_export_all,
     );
 
-    // Determine suggestion.
     let suggestion = compute_suggestion(
         c_ref,
-        fat_name,
-        intermediate_name,
-        &edge_meta,
-        &required_by_sibling,
-        fat_dep_loc,
+        &input.fat_name,
+        &input.intermediate_name,
+        &input.edge_meta,
+        &input.required_by_sibling,
+        input.fat_dep_loc,
         api_items_used,
-        fat_dep_own_deps,
-        has_re_export_all,
+        input.fat_dep_own_deps,
+        input.has_re_export_all,
     );
 
     UpstreamTarget {
         intermediate: PackageInfo {
-            name: intermediate_name.to_string(),
-            version: intermediate_version.to_string(),
+            name: input.intermediate_name,
+            version: input.intermediate_version,
         },
         fat_dependency: PackageInfo {
-            name: fat_name.to_string(),
-            version: fat_version.to_string(),
+            name: input.fat_name,
+            version: input.fat_version,
         },
-        w_transitive,
-        w_unique,
+        w_transitive: input.w_transitive,
+        w_unique: input.w_unique,
         c_ref,
         hurrs,
         confidence,
-        scan_result,
+        scan_result: input.scan_result,
         suggestion,
-        edge_meta,
-        dep_chain,
-        required_by_sibling,
-        phantom,
-        intermediate_is_workspace_member,
-        fat_dep_loc,
-        fat_dep_own_deps,
-        has_re_export_all,
+        edge_meta: input.edge_meta,
+        dep_chain: input.dep_chain,
+        required_by_sibling: input.required_by_sibling,
+        phantom: input.phantom,
+        intermediate_is_workspace_member: input.intermediate_is_workspace_member,
+        fat_dep_loc: input.fat_dep_loc,
+        fat_dep_own_deps: input.fat_dep_own_deps,
+        has_re_export_all: input.has_re_export_all,
     }
 }
 
