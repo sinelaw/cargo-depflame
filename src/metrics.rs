@@ -119,6 +119,13 @@ pub struct UpstreamTarget {
     /// Lines of code in the fat dependency crate (0 if unknown).
     #[serde(default)]
     pub fat_dep_loc: usize,
+    /// Number of direct dependencies the fat dep itself has.
+    /// A fat dep with 0 own deps is a leaf — potentially inlinable.
+    #[serde(default)]
+    pub fat_dep_own_deps: usize,
+    /// True if the intermediate crate has `pub use <fat_dep>::*` (full re-export).
+    #[serde(default)]
+    pub has_re_export_all: bool,
     // TODO: Future — deep usage analysis via reachable LOC
     //
     // Currently we estimate "light usage" by counting distinct API symbols
@@ -184,6 +191,8 @@ pub fn compute_target(
     phantom: bool,
     intermediate_is_workspace_member: bool,
     fat_dep_loc: usize,
+    fat_dep_own_deps: usize,
+    has_re_export_all: bool,
 ) -> UpstreamTarget {
     let c_ref = scan_result.ref_count;
     let api_items_used = scan_result.distinct_items.len();
@@ -200,20 +209,25 @@ pub fn compute_target(
         &scan_result,
         &edge_meta,
         fat_name,
+        intermediate_name,
         was_renamed,
         &required_by_sibling,
         phantom,
         intermediate_is_workspace_member,
+        has_re_export_all,
     );
 
     // Determine suggestion.
     let suggestion = compute_suggestion(
         c_ref,
         fat_name,
+        intermediate_name,
         &edge_meta,
         &required_by_sibling,
         fat_dep_loc,
         api_items_used,
+        fat_dep_own_deps,
+        has_re_export_all,
     );
 
     UpstreamTarget {
@@ -238,20 +252,24 @@ pub fn compute_target(
         phantom,
         intermediate_is_workspace_member,
         fat_dep_loc,
+        fat_dep_own_deps,
+        has_re_export_all,
     }
 }
 
-/// Thresholds for suggesting "inline the code instead of depending on it".
+/// Max LOC for a leaf dep to be considered inlinable.
 const SMALL_CRATE_LOC: usize = 500;
-const LIGHT_USAGE_ITEMS: usize = 3;
 
 fn compute_suggestion(
     c_ref: usize,
     fat_name: &str,
+    intermediate_name: &str,
     edge_meta: &EdgeMeta,
     required_by_sibling: &Option<String>,
     fat_dep_loc: usize,
     api_items_used: usize,
+    fat_dep_own_deps: usize,
+    has_re_export_all: bool,
 ) -> RemovalStrategy {
     // If a sibling dep transitively requires this, it can't be removed.
     if let Some(sibling) = required_by_sibling {
@@ -271,6 +289,12 @@ fn compute_suggestion(
         };
     }
 
+    // Fix I: Detect foo-core -> foo-sys wrapper pattern.
+    // An FFI wrapper always needs its -sys crate — never suggest gating it.
+    if is_ffi_wrapper_pair(intermediate_name, fat_name) || has_re_export_all {
+        return RemovalStrategy::FeatureGate;
+    }
+
     if c_ref == 0 {
         return RemovalStrategy::Remove;
     }
@@ -284,23 +308,40 @@ fn compute_suggestion(
         };
     }
 
-    // Small crate: suggest inlining regardless of usage breadth.
-    // Light usage of a moderate crate: suggest inlining the specific items.
-    // But never suggest inlining large crates (>2000 LOC) — feature-gate instead.
-    let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
-    let is_light = api_items_used > 0
-        && api_items_used <= LIGHT_USAGE_ITEMS
-        && fat_dep_loc > 0
-        && fat_dep_loc <= 2000;
-
-    if is_small || is_light {
-        return RemovalStrategy::InlineUpstream {
-            fat_loc: fat_dep_loc,
-            api_items_used,
-        };
+    // Fix A+D: Only suggest inlining for leaf deps (0 own transitive deps).
+    // Crates with their own dep trees are too complex to inline — they pull
+    // in data, FFI bindings, or other infrastructure.
+    let is_leaf = fat_dep_own_deps == 0;
+    if is_leaf {
+        let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
+        if is_small {
+            return RemovalStrategy::InlineUpstream {
+                fat_loc: fat_dep_loc,
+                api_items_used,
+            };
+        }
     }
 
     RemovalStrategy::FeatureGate
+}
+
+/// Fix I: Detect FFI wrapper pairs like "foo-core" -> "foo-sys" or "foo" -> "foo-sys".
+fn is_ffi_wrapper_pair(intermediate: &str, fat: &str) -> bool {
+    if !fat.ends_with("-sys") {
+        return false;
+    }
+    let fat_base = fat.strip_suffix("-sys").unwrap_or(fat);
+    // foo -> foo-sys
+    if intermediate == fat_base {
+        return true;
+    }
+    // foo-core -> foo-sys
+    if let Some(int_base) = intermediate.strip_suffix("-core") {
+        if int_base == fat_base {
+            return true;
+        }
+    }
+    false
 }
 
 fn compute_confidence(
@@ -308,10 +349,12 @@ fn compute_confidence(
     scan_result: &ScanResult,
     edge_meta: &EdgeMeta,
     fat_name: &str,
+    intermediate_name: &str,
     was_renamed: bool,
     required_by_sibling: &Option<String>,
     phantom: bool,
     intermediate_is_workspace_member: bool,
+    has_re_export_all: bool,
 ) -> Confidence {
     // Phantom deps aren't compiled on this platform — noise.
     if phantom {
@@ -328,14 +371,23 @@ fn compute_confidence(
         return Confidence::Noise;
     }
 
+    // Fix I: FFI wrapper pairs (foo-core -> foo-sys) are structural — noise.
+    if is_ffi_wrapper_pair(intermediate_name, fat_name) {
+        return Confidence::Noise;
+    }
+
+    // Fix J: If the intermediate re-exports the entire fat dep API, they're
+    // structurally coupled — demote to low.
+    if has_re_export_all {
+        return Confidence::Low;
+    }
+
     // Workspace member's own optional dep: the author already knows about this.
-    // Not useful to tell them "your dep is optional" — they declared it.
     if intermediate_is_workspace_member && edge_meta.already_optional {
         return Confidence::Low;
     }
 
-    // Deeply integrated dep in a workspace member: high C_ref means it's core,
-    // not something that can be realistically feature-gated.
+    // Deeply integrated dep in a workspace member: high C_ref means it's core.
     if intermediate_is_workspace_member && c_ref >= DEEPLY_INTEGRATED_THRESHOLD {
         return Confidence::Low;
     }
@@ -346,34 +398,32 @@ fn compute_confidence(
         if scan_result.generated_file_refs == c_ref {
             return Confidence::Medium;
         }
+        // Fix H: If refs are spread across many files relative to the
+        // intermediate crate's total file count, it's deeply integrated.
+        if scan_result.files_with_matches >= 4 {
+            return Confidence::Medium;
+        }
         return Confidence::High;
     }
 
-    // C_ref == 0 from here. Assess why it might be a false positive.
+    // C_ref == 0 from here.
 
-    // Build-only deps won't appear in src — low confidence for "unused".
     if edge_meta.build_only {
         return Confidence::Low;
     }
 
-    // -sys crates are typically FFI link deps, not referenced via `use`.
     if fat_name.ends_with("-sys") {
         return Confidence::Low;
     }
 
-    // Platform-conditional deps may not be used on the current platform.
     if edge_meta.platform_conditional {
         return Confidence::Low;
     }
 
-    // If the dep was renamed in Cargo.toml and we still found 0 refs,
-    // we already searched under the alias, so this is more likely real.
-    // But if we couldn't find the Cargo.toml (no rename info), medium.
     if was_renamed {
         return Confidence::Medium;
     }
 
-    // Default: no refs found, no obvious explanation — high confidence unused.
     Confidence::High
 }
 

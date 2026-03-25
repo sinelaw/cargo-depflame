@@ -28,6 +28,9 @@ pub struct ScanResult {
     /// Distinct API items used (e.g., "Regex::new", "from_u8").
     #[serde(default)]
     pub distinct_items: Vec<String>,
+    /// True if the intermediate crate has `pub use <fat_dep>::*`.
+    #[serde(default)]
+    pub has_re_export_all: bool,
 }
 
 /// Heuristics to detect auto-generated source files.
@@ -97,9 +100,18 @@ pub fn scan_files_with_aliases(
         .join("|");
     let re = Regex::new(&combined).expect("valid regex");
 
+    // Build a pattern to detect `pub use <name>::*` re-exports.
+    let re_export_patterns: Vec<String> = names
+        .iter()
+        .map(|name| format!(r"pub\s+use\s+{}::\*", regex::escape(name)))
+        .collect();
+    let re_export_combined = re_export_patterns.join("|");
+    let re_export_re = Regex::new(&re_export_combined).expect("valid regex");
+
     let mut file_matches = Vec::new();
     let mut files_with_matches = 0;
     let mut generated_file_refs = 0;
+    let mut has_re_export_all = false;
 
     for path in rs_files {
         let content = match std::fs::read_to_string(path) {
@@ -116,6 +128,11 @@ pub fn scan_files_with_aliases(
             // Skip single-line comments.
             if trimmed.starts_with("//") {
                 continue;
+            }
+
+            // Check for `pub use <dep>::*` re-export.
+            if !has_re_export_all && re_export_re.is_match(line) {
+                has_re_export_all = true;
             }
 
             if re.is_match(line) {
@@ -147,6 +164,7 @@ pub fn scan_files_with_aliases(
         files_with_matches,
         generated_file_refs,
         distinct_items,
+        has_re_export_all,
     }
 }
 
