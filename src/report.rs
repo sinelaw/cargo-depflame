@@ -107,6 +107,51 @@ pub fn render_text(
         })
         .collect();
 
+    let inline_candidates: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            matches!(t.confidence, Confidence::High | Confidence::Medium)
+                && matches!(t.suggestion, RemovalStrategy::InlineUpstream { .. })
+                && !t.intermediate_is_workspace_member
+        })
+        .collect();
+
+    // Section 0: Inline candidates (small deps / light usage)
+    if !inline_candidates.is_empty() {
+        writeln!(
+            writer,
+            "{}",
+            "Consider inlining into upstream (small dep or light usage):".bold()
+        )?;
+        writeln!(writer)?;
+        for target in &inline_candidates {
+            let chain = format_short_chain(&target.dep_chain, &target.intermediate.name);
+            let items = &target.scan_result.distinct_items;
+            let items_str = if items.is_empty() {
+                String::new()
+            } else {
+                format!(" [uses: {}]", items.join(", "))
+            };
+            let loc_str = if target.fat_dep_loc > 0 {
+                format!(" ({} LOC)", target.fat_dep_loc)
+            } else {
+                String::new()
+            };
+            writeln!(
+                writer,
+                "  {} Inline `{}`{} into `{}`{}  {}",
+                format!("(-{} deps)", target.w_unique).green(),
+                target.fat_dependency.name.yellow(),
+                loc_str.dimmed(),
+                target.intermediate.name.cyan(),
+                items_str.dimmed(),
+                chain.dimmed(),
+            )?;
+        }
+        writeln!(writer)?;
+    }
+
     // Section 1: Upstream PRs to propose
     if !upstream_feature_gate.is_empty() {
         writeln!(

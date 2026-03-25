@@ -25,6 +25,9 @@ pub struct ScanResult {
     /// Number of matches found in auto-generated files.
     #[serde(default)]
     pub generated_file_refs: usize,
+    /// Distinct API items used (e.g., "Regex::new", "from_u8").
+    #[serde(default)]
+    pub distinct_items: Vec<String>,
 }
 
 /// Heuristics to detect auto-generated source files.
@@ -135,6 +138,7 @@ pub fn scan_files_with_aliases(
     }
 
     let ref_count = file_matches.len();
+    let distinct_items = extract_distinct_items(&file_matches, &names);
     ScanResult {
         fat_crate_name: fat_crate_name.to_string(),
         searched_names: names,
@@ -142,6 +146,7 @@ pub fn scan_files_with_aliases(
         file_matches,
         files_with_matches,
         generated_file_refs,
+        distinct_items,
     }
 }
 
@@ -161,4 +166,48 @@ pub fn display_path(path: &str) -> String {
         }
     }
     path.to_string()
+}
+
+/// Extract distinct API items from matched lines.
+/// e.g., `use idna::domain_to_ascii` -> "domain_to_ascii"
+/// e.g., `cached::UnboundCache` -> "UnboundCache"
+fn extract_distinct_items(matches: &[FileMatch], crate_names: &[String]) -> Vec<String> {
+    let mut items = std::collections::HashSet::new();
+
+    for m in matches {
+        let line = &m.line_content;
+
+        for name in crate_names {
+            // Match patterns like `name::Item` or `name::{Item1, Item2}`
+            let prefix = format!("{name}::");
+            for (idx, _) in line.match_indices(&prefix) {
+                let after = &line[idx + prefix.len()..];
+
+                if after.starts_with('{') {
+                    // use crate::{A, B, C}
+                    if let Some(close) = after.find('}') {
+                        for item in after[1..close].split(',') {
+                            let item = item.trim().split("::").next().unwrap_or("").trim();
+                            if !item.is_empty() && item != "*" {
+                                items.insert(item.to_string());
+                            }
+                        }
+                    }
+                } else {
+                    // use crate::Item or crate::Item::method
+                    let item: String = after
+                        .chars()
+                        .take_while(|c| c.is_alphanumeric() || *c == '_')
+                        .collect();
+                    if !item.is_empty() && item != "*" {
+                        items.insert(item);
+                    }
+                }
+            }
+        }
+    }
+
+    let mut sorted: Vec<String> = items.into_iter().collect();
+    sorted.sort();
+    sorted
 }

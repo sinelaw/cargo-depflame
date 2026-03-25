@@ -143,14 +143,22 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
 
             let scan = scanner::scan_files_with_aliases(&rs_files, &edge.fat_name, &aliases);
 
-            // Phase 4b: Compute unique subtree weight.
+            // Phase 4b: Measure fat dep LOC.
+            let fat_dep_loc = registry::find_crate_source(&edge.fat_name, &edge.fat_version)
+                .map(|fat_dir| {
+                    let fat_rs = registry::collect_rs_files(&fat_dir);
+                    registry::count_loc(&fat_rs)
+                })
+                .unwrap_or(0);
+
+            // Phase 4c: Compute unique subtree weight.
             let w_unique =
                 dep_graph.unique_subtree_weight(&edge.intermediate_id, &edge.fat_id);
 
-            // Phase 4c: Compute dependency chain.
+            // Phase 4d: Compute dependency chain.
             let dep_chain = dep_graph.dependency_chain(&edge.fat_id);
 
-            // Phase 4d: Check if a sibling dep transitively requires the fat dep.
+            // Phase 4e: Check if a sibling dep transitively requires the fat dep.
             let required_by_sibling =
                 dep_graph.sibling_requires(&edge.intermediate_id, &edge.fat_id);
 
@@ -180,6 +188,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 required_by_sibling,
                 phantom,
                 intermediate_is_ws,
+                fat_dep_loc,
             ))
         })
         .collect();

@@ -17,6 +17,14 @@ pub enum RemovalStrategy {
     AlreadyGated { detail: String },
     /// The dependency is required by a sibling dep — cannot be removed.
     RequiredBySibling { sibling: String },
+    /// The dependency is small or lightly used — propose inlining the used code
+    /// into the intermediate crate to eliminate the dep entirely.
+    InlineUpstream {
+        /// LOC of the fat dependency crate.
+        fat_loc: usize,
+        /// Number of distinct API items used.
+        api_items_used: usize,
+    },
 }
 
 impl std::fmt::Display for RemovalStrategy {
@@ -35,6 +43,15 @@ impl std::fmt::Display for RemovalStrategy {
             }
             Self::RequiredBySibling { sibling } => {
                 write!(f, "REQUIRED BY {sibling}")
+            }
+            Self::InlineUpstream {
+                fat_loc,
+                api_items_used,
+            } => {
+                write!(
+                    f,
+                    "INLINE ({fat_loc} LOC crate, {api_items_used} items used)"
+                )
             }
         }
     }
@@ -99,6 +116,9 @@ pub struct UpstreamTarget {
     /// True if the intermediate crate is a workspace member (user's own crate).
     #[serde(default)]
     pub intermediate_is_workspace_member: bool,
+    /// Lines of code in the fat dependency crate (0 if unknown).
+    #[serde(default)]
+    pub fat_dep_loc: usize,
 }
 
 /// Known crate -> std replacement mappings.
@@ -130,8 +150,10 @@ pub fn compute_target(
     required_by_sibling: Option<String>,
     phantom: bool,
     intermediate_is_workspace_member: bool,
+    fat_dep_loc: usize,
 ) -> UpstreamTarget {
     let c_ref = scan_result.ref_count;
+    let api_items_used = scan_result.distinct_items.len();
 
     let hurrs = if c_ref == 0 {
         None // infinity — dependency appears unused
@@ -152,7 +174,14 @@ pub fn compute_target(
     );
 
     // Determine suggestion.
-    let suggestion = compute_suggestion(c_ref, fat_name, &edge_meta, &required_by_sibling);
+    let suggestion = compute_suggestion(
+        c_ref,
+        fat_name,
+        &edge_meta,
+        &required_by_sibling,
+        fat_dep_loc,
+        api_items_used,
+    );
 
     UpstreamTarget {
         intermediate: PackageInfo {
@@ -175,14 +204,21 @@ pub fn compute_target(
         required_by_sibling,
         phantom,
         intermediate_is_workspace_member,
+        fat_dep_loc,
     }
 }
+
+/// Thresholds for suggesting "inline the code instead of depending on it".
+const SMALL_CRATE_LOC: usize = 500;
+const LIGHT_USAGE_ITEMS: usize = 3;
 
 fn compute_suggestion(
     c_ref: usize,
     fat_name: &str,
     edge_meta: &EdgeMeta,
     required_by_sibling: &Option<String>,
+    fat_dep_loc: usize,
+    api_items_used: usize,
 ) -> RemovalStrategy {
     // If a sibling dep transitively requires this, it can't be removed.
     if let Some(sibling) = required_by_sibling {
@@ -203,17 +239,34 @@ fn compute_suggestion(
     }
 
     if c_ref == 0 {
-        RemovalStrategy::Remove
-    } else if let Some((_, replacement)) = STD_REPLACEMENTS
+        return RemovalStrategy::Remove;
+    }
+
+    if let Some((_, replacement)) = STD_REPLACEMENTS
         .iter()
         .find(|(name, _)| *name == fat_name)
     {
-        RemovalStrategy::ReplaceWithStd {
+        return RemovalStrategy::ReplaceWithStd {
             suggestion: replacement.to_string(),
-        }
-    } else {
-        RemovalStrategy::FeatureGate
+        };
     }
+
+    // Small crate: suggest inlining regardless of usage breadth.
+    // Light usage of a moderate crate: suggest inlining the specific items.
+    // But never suggest inlining large crates (>2000 LOC) — feature-gate instead.
+    let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
+    let is_light = api_items_used > 0
+        && api_items_used <= LIGHT_USAGE_ITEMS
+        && fat_dep_loc > 0
+        && fat_dep_loc <= 2000;
+    if is_small || is_light {
+        return RemovalStrategy::InlineUpstream {
+            fat_loc: fat_dep_loc,
+            api_items_used,
+        };
+    }
+
+    RemovalStrategy::FeatureGate
 }
 
 fn compute_confidence(
