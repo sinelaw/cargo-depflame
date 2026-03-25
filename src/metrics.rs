@@ -13,7 +13,7 @@ pub enum RemovalStrategy {
     ReplaceWithStd { suggestion: String },
     /// A lighter alternative crate exists.
     ReplaceWithLighter { alternative: String },
-    /// The dependency is already optional/gated — no upstream change needed.
+    /// The dependency is already optional/gated in an upstream crate.
     AlreadyGated { detail: String },
     /// The dependency is required by a sibling dep — cannot be removed.
     RequiredBySibling { sibling: String },
@@ -93,10 +93,12 @@ pub struct UpstreamTarget {
     /// requires the fat dep — so removing it would break the build.
     #[serde(default)]
     pub required_by_sibling: Option<String>,
-    /// True if the fat dependency is not in the real platform-resolved tree
-    /// (i.e., it only appears in the full cross-platform metadata).
+    /// True if the fat dependency is not in the real platform-resolved tree.
     #[serde(default)]
     pub phantom: bool,
+    /// True if the intermediate crate is a workspace member (user's own crate).
+    #[serde(default)]
+    pub intermediate_is_workspace_member: bool,
 }
 
 /// Known crate -> std replacement mappings.
@@ -108,6 +110,10 @@ const STD_REPLACEMENTS: &[(&str, &str)] = &[
         "the built-in matches!() macro (stable since 1.42)",
     ),
 ];
+
+/// High C_ref threshold: if a direct dependency has this many references,
+/// it's deeply integrated and suggesting removal/gating is not useful.
+const DEEPLY_INTEGRATED_THRESHOLD: usize = 15;
 
 /// Compute hURRS, confidence, and determine the removal strategy.
 pub fn compute_target(
@@ -123,6 +129,7 @@ pub fn compute_target(
     was_renamed: bool,
     required_by_sibling: Option<String>,
     phantom: bool,
+    intermediate_is_workspace_member: bool,
 ) -> UpstreamTarget {
     let c_ref = scan_result.ref_count;
 
@@ -141,6 +148,7 @@ pub fn compute_target(
         was_renamed,
         &required_by_sibling,
         phantom,
+        intermediate_is_workspace_member,
     );
 
     // Determine suggestion.
@@ -166,6 +174,7 @@ pub fn compute_target(
         dep_chain,
         required_by_sibling,
         phantom,
+        intermediate_is_workspace_member,
     }
 }
 
@@ -215,6 +224,7 @@ fn compute_confidence(
     was_renamed: bool,
     required_by_sibling: &Option<String>,
     phantom: bool,
+    intermediate_is_workspace_member: bool,
 ) -> Confidence {
     // Phantom deps aren't compiled on this platform — noise.
     if phantom {
@@ -229,6 +239,18 @@ fn compute_confidence(
     // Already optional + platform-conditional = noise.
     if edge_meta.already_optional && edge_meta.platform_conditional {
         return Confidence::Noise;
+    }
+
+    // Workspace member's own optional dep: the author already knows about this.
+    // Not useful to tell them "your dep is optional" — they declared it.
+    if intermediate_is_workspace_member && edge_meta.already_optional {
+        return Confidence::Low;
+    }
+
+    // Deeply integrated dep in a workspace member: high C_ref means it's core,
+    // not something that can be realistically feature-gated.
+    if intermediate_is_workspace_member && c_ref >= DEEPLY_INTEGRATED_THRESHOLD {
+        return Confidence::Low;
     }
 
     // If we found refs, confidence is generally high.
@@ -261,7 +283,6 @@ fn compute_confidence(
     // we already searched under the alias, so this is more likely real.
     // But if we couldn't find the Cargo.toml (no rename info), medium.
     if was_renamed {
-        // We searched the alias and still found nothing — medium.
         return Confidence::Medium;
     }
 
@@ -287,12 +308,19 @@ pub fn rank_targets(
         if conf_cmp != std::cmp::Ordering::Equal {
             return conf_cmp;
         }
-        // Secondary: W_uniq descending (actual savings).
+        // Secondary: prefer upstream (non-workspace) targets over workspace members.
+        let upstream_a = !a.intermediate_is_workspace_member;
+        let upstream_b = !b.intermediate_is_workspace_member;
+        let upstream_cmp = upstream_b.cmp(&upstream_a);
+        if upstream_cmp != std::cmp::Ordering::Equal {
+            return upstream_cmp;
+        }
+        // Tertiary: W_uniq descending (actual savings).
         let uniq_cmp = b.w_unique.cmp(&a.w_unique);
         if uniq_cmp != std::cmp::Ordering::Equal {
             return uniq_cmp;
         }
-        // Tertiary: hURRS descending.
+        // Quaternary: hURRS descending.
         hurrs_value(b.hurrs)
             .partial_cmp(&hurrs_value(a.hurrs))
             .unwrap_or(std::cmp::Ordering::Equal)

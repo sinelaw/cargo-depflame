@@ -161,6 +161,10 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 &edge.fat_version,
             );
 
+            // Phase 4f: Check if intermediate is a workspace member.
+            let intermediate_is_ws =
+                dep_graph.workspace_members.contains(&edge.intermediate_id);
+
             // Phase 5: Compute metrics.
             Some(metrics::compute_target(
                 &edge.intermediate_name,
@@ -175,6 +179,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 was_renamed,
                 required_by_sibling,
                 phantom,
+                intermediate_is_ws,
             ))
         })
         .collect();
