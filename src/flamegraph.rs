@@ -382,8 +382,7 @@ pub fn render_flamegraph(
     // -- SVG header + embedded styles + JS -----------------------------------
     svg.push_str(&format!(
         r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {CHART_WIDTH} {svg_height}"
-     width="{CHART_WIDTH}" height="{svg_height}"
-     font-family="Consolas,monospace" font-size="11">
+     width="100%" font-family="Consolas,monospace" font-size="11">
 <style>
   .frame {{ cursor: pointer; }}
   .frame:hover rect {{ stroke: #222; stroke-width: 1.5; }}
@@ -510,37 +509,83 @@ pub fn render_flamegraph(
     ));
 
     // -- Legend + controls ----------------------------------------------------
-    let lx = CHART_WIDTH - 480.0;
-    svg.push_str(&format!(
-        r#"<rect x="{lx0}" y="4" width="12" height="10" rx="2" fill="rgb(70,130,180)" class="legend-rect"/>
-<text x="{lx1}" y="13" class="legend">workspace</text>
-<rect x="{lx2}" y="4" width="12" height="10" rx="2" fill="hsl(110,65%,55%)" class="legend-rect"/>
-<text x="{lx3}" y="13" class="legend">few deps</text>
-<rect x="{lx4}" y="4" width="12" height="10" rx="2" fill="hsl(40,72%,50%)" class="legend-rect"/>
-<text x="{lx5}" y="13" class="legend">moderate</text>
-<rect x="{lx6}" y="4" width="12" height="10" rx="2" fill="hsl(5,78%,47%)" class="legend-rect"/>
-<text x="{lx7}" y="13" class="legend">heavy</text>
-<rect x="{lx8}" y="4" width="12" height="10" rx="2" fill="hsl(270,50%,65%)" class="legend-rect" stroke-dasharray="4,2"/>
-<text x="{lx9}" y="13" class="legend">shared</text>
-<text x="{sx}" y="33" class="legend" style="cursor:pointer;text-decoration:underline" onclick="search()">[search]</text>
-<text x="{cx}" y="33" class="legend" style="cursor:pointer;text-decoration:underline" onclick="clearSearch()">[clear]</text>
-<text x="{rx}" y="33" class="legend" style="cursor:pointer;text-decoration:underline" onclick="resetZoom()">[reset zoom]</text>
-<text id="search-status" x="{ssx}" y="33" class="legend" fill="rgb(204,68,68)"></text>
+    // Build legend items right-aligned, flowing from right to left.
+    const LEGEND_FONT_WIDTH: f64 = 6.0; // approximate char width at font-size 10
+    const LEGEND_SWATCH: f64 = 12.0; // color swatch width
+    const LEGEND_GAP: f64 = 6.0; // gap between items
+    const SWATCH_TEXT_GAP: f64 = 3.0; // gap between swatch and its label
+
+    struct LegendItem {
+        label: &'static str,
+        fill: &'static str,
+        dash: bool,
+    }
+    let legend_items = [
+        LegendItem { label: "workspace", fill: "rgb(70,130,180)", dash: false },
+        LegendItem { label: "few deps", fill: "hsl(110,65%,55%)", dash: false },
+        LegendItem { label: "moderate", fill: "hsl(40,72%,50%)", dash: false },
+        LegendItem { label: "heavy", fill: "hsl(5,78%,47%)", dash: false },
+        LegendItem { label: "shared", fill: "hsl(270,50%,65%)", dash: true },
+    ];
+
+    // Compute total legend width so we can right-align it.
+    let legend_total_width: f64 = legend_items.iter().enumerate().map(|(i, item)| {
+        let text_w = item.label.len() as f64 * LEGEND_FONT_WIDTH;
+        let item_w = LEGEND_SWATCH + SWATCH_TEXT_GAP + text_w;
+        item_w + if i > 0 { LEGEND_GAP } else { 0.0 }
+    }).sum();
+
+    let mut lx = CHART_WIDTH - legend_total_width - 6.0; // 6px right margin
+    for item in &legend_items {
+        let dash_attr = if item.dash { r#" stroke-dasharray="4,2""# } else { "" };
+        let text_x = lx + LEGEND_SWATCH + SWATCH_TEXT_GAP;
+        let text_w = item.label.len() as f64 * LEGEND_FONT_WIDTH;
+        svg.push_str(&format!(
+            r#"<rect x="{lx}" y="4" width="{LEGEND_SWATCH}" height="10" rx="2" fill="{fill}" class="legend-rect"{dash}/>
+<text x="{tx}" y="13" class="legend">{label}</text>
 "#,
-        lx0 = lx,
-        lx1 = lx + 15.0,
-        lx2 = lx + 75.0,
-        lx3 = lx + 90.0,
-        lx4 = lx + 138.0,
-        lx5 = lx + 153.0,
-        lx6 = lx + 205.0,
-        lx7 = lx + 220.0,
-        lx8 = lx + 265.0,
-        lx9 = lx + 280.0,
-        sx = lx + 330.0,
-        cx = lx + 378.0,
-        rx = lx + 420.0,
-        ssx = lx + 330.0 - 80.0,
+            lx = lx,
+            fill = item.fill,
+            dash = dash_attr,
+            tx = text_x,
+            label = item.label,
+        ));
+        lx += LEGEND_SWATCH + SWATCH_TEXT_GAP + text_w + LEGEND_GAP;
+    }
+
+    // Controls row: right-align [search] [clear] [reset zoom]
+    struct ControlItem {
+        label: &'static str,
+        onclick: &'static str,
+    }
+    let controls = [
+        ControlItem { label: "[search]", onclick: "search()" },
+        ControlItem { label: "[clear]", onclick: "clearSearch()" },
+        ControlItem { label: "[reset zoom]", onclick: "resetZoom()" },
+    ];
+
+    let ctrl_total_width: f64 = controls.iter().enumerate().map(|(i, c)| {
+        c.label.len() as f64 * LEGEND_FONT_WIDTH + if i > 0 { LEGEND_GAP } else { 0.0 }
+    }).sum();
+
+    let mut cx = CHART_WIDTH - ctrl_total_width - 6.0;
+    for ctrl in &controls {
+        let text_w = ctrl.label.len() as f64 * LEGEND_FONT_WIDTH;
+        svg.push_str(&format!(
+            r#"<text x="{x}" y="33" class="legend" style="cursor:pointer;text-decoration:underline" onclick="{onclick}">{label}</text>
+"#,
+            x = cx,
+            onclick = ctrl.onclick,
+            label = ctrl.label,
+        ));
+        cx += text_w + LEGEND_GAP;
+    }
+
+    // Search status text (to the left of controls)
+    let ssx = CHART_WIDTH - ctrl_total_width - 6.0 - 80.0;
+    svg.push_str(&format!(
+        r#"<text id="search-status" x="{ssx}" y="33" class="legend" fill="rgb(204,68,68)"></text>
+"#,
     ));
 
     // -- Frames --------------------------------------------------------------
