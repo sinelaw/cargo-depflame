@@ -127,25 +127,29 @@ pub fn render_text(
         writeln!(writer)?;
         for target in &inline_candidates {
             let chain = format_short_chain(&target.dep_chain, &target.intermediate.name);
-            let items = &target.scan_result.distinct_items;
-            let items_str = if items.is_empty() {
-                String::new()
-            } else {
-                format!(" [uses: {}]", items.join(", "))
-            };
-            let loc_str = if target.fat_dep_loc > 0 {
+            let usage_str = if let Some(ref profile) = target.usage_profile {
+                if profile.reachable_loc > 0 {
+                    format!(
+                        " (~{} of {} LOC used)",
+                        profile.reachable_loc, profile.total_loc
+                    )
+                } else if target.fat_dep_loc > 0 {
+                    format!(" ({} LOC)", target.fat_dep_loc)
+                } else {
+                    String::new()
+                }
+            } else if target.fat_dep_loc > 0 {
                 format!(" ({} LOC)", target.fat_dep_loc)
             } else {
                 String::new()
             };
             writeln!(
                 writer,
-                "  {} Inline `{}`{} into `{}`{}  {}",
+                "  {} Inline `{}`{} into `{}`  {}",
                 format!("(-{} deps)", target.w_unique).green(),
                 target.fat_dependency.name.yellow(),
-                loc_str.dimmed(),
+                usage_str.dimmed(),
                 target.intermediate.name.cyan(),
-                items_str.dimmed(),
                 chain.dimmed(),
             )?;
         }

@@ -1,5 +1,6 @@
 use crate::graph::EdgeMeta;
 use crate::scanner::ScanResult;
+use crate::usage::UsageProfile;
 use serde::{Deserialize, Serialize};
 
 /// The recommended action for an upstream target.
@@ -119,6 +120,9 @@ pub struct UpstreamTarget {
     /// Lines of code in the fat dependency crate (0 if unknown).
     #[serde(default)]
     pub fat_dep_loc: usize,
+    /// Reachability analysis: how much of the fat dep is actually used.
+    #[serde(default)]
+    pub usage_profile: Option<UsageProfile>,
 }
 
 /// Known crate -> std replacement mappings.
@@ -151,6 +155,7 @@ pub fn compute_target(
     phantom: bool,
     intermediate_is_workspace_member: bool,
     fat_dep_loc: usize,
+    usage_profile: Option<UsageProfile>,
 ) -> UpstreamTarget {
     let c_ref = scan_result.ref_count;
     let api_items_used = scan_result.distinct_items.len();
@@ -181,6 +186,7 @@ pub fn compute_target(
         &required_by_sibling,
         fat_dep_loc,
         api_items_used,
+        &usage_profile,
     );
 
     UpstreamTarget {
@@ -205,6 +211,7 @@ pub fn compute_target(
         phantom,
         intermediate_is_workspace_member,
         fat_dep_loc,
+        usage_profile,
     }
 }
 
@@ -219,6 +226,7 @@ fn compute_suggestion(
     required_by_sibling: &Option<String>,
     fat_dep_loc: usize,
     api_items_used: usize,
+    usage_profile: &Option<UsageProfile>,
 ) -> RemovalStrategy {
     // If a sibling dep transitively requires this, it can't be removed.
     if let Some(sibling) = required_by_sibling {
@@ -251,15 +259,28 @@ fn compute_suggestion(
         };
     }
 
-    // Small crate: suggest inlining regardless of usage breadth.
-    // Light usage of a moderate crate: suggest inlining the specific items.
-    // But never suggest inlining large crates (>2000 LOC) — feature-gate instead.
-    let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
-    let is_light = api_items_used > 0
-        && api_items_used <= LIGHT_USAGE_ITEMS
-        && fat_dep_loc > 0
-        && fat_dep_loc <= 2000;
-    if is_small || is_light {
+    // Decide based on reachable LOC (actual code the intermediate uses).
+    // If we have a usage profile, use reachable_loc; otherwise fall back to
+    // heuristics based on crate size and symbol count.
+    let reachable = usage_profile
+        .as_ref()
+        .map(|p| p.reachable_loc)
+        .unwrap_or(0);
+
+    let should_inline = if reachable > 0 {
+        // We have call-graph data: suggest inline if the reachable code is small.
+        reachable <= SMALL_CRATE_LOC
+    } else {
+        // Fallback: small crate overall, or very light API usage of moderate crate.
+        let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
+        let is_light = api_items_used > 0
+            && api_items_used <= LIGHT_USAGE_ITEMS
+            && fat_dep_loc > 0
+            && fat_dep_loc <= 2000;
+        is_small || is_light
+    };
+
+    if should_inline {
         return RemovalStrategy::InlineUpstream {
             fat_loc: fat_dep_loc,
             api_items_used,
