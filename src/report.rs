@@ -1,3 +1,4 @@
+use crate::flamegraph::DepTreeData;
 use crate::metrics::{Confidence, RemovalStrategy, UpstreamTarget};
 use crate::scanner::display_path;
 use colored::Colorize;
@@ -22,6 +23,10 @@ pub struct AnalysisReport {
     pub phantom_dependencies: usize,
     pub fat_nodes_found: usize,
     pub targets: Vec<UpstreamTarget>,
+    /// Serialized dependency tree for flamegraph rendering.
+    /// Populated during `analyze`; allows `report --format svg` to work from saved JSON.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dep_tree: Option<DepTreeData>,
 }
 
 /// Render the report as JSON.

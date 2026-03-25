@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use cargo_upstream_triage::cargo_toml::CrateDepInfo;
 use cargo_upstream_triage::cli::{AnalyzeArgs, Cli, Command, OutputFormat, ReportArgs};
+use cargo_upstream_triage::flamegraph;
 use cargo_upstream_triage::report::AnalysisReport;
 use cargo_upstream_triage::{graph, metrics, platform, registry, report, scanner};
 use clap::Parser;
@@ -204,6 +205,10 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
     let platform_deps = real_deps.as_ref().map(|s| s.len());
     let phantom_deps = platform_deps.map(|p| total_deps.saturating_sub(p)).unwrap_or(0);
 
+    // Build serializable dep tree for flamegraph rendering.
+    eprintln!("Building dependency tree for visualization...");
+    let dep_tree = flamegraph::build_dep_tree(&dep_graph);
+
     let analysis = AnalysisReport {
         tool_version: env!("CARGO_PKG_VERSION").to_string(),
         timestamp: chrono::Utc::now().to_rfc3339(),
@@ -214,6 +219,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
         phantom_dependencies: phantom_deps,
         fat_nodes_found: fat_nodes.len(),
         targets: ranked,
+        dep_tree: Some(dep_tree),
     };
 
     let mut writer: Box<dyn Write> = match &args.output {
@@ -228,6 +234,13 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
     match args.format {
         OutputFormat::Json => report::render_json(&analysis, &mut writer)?,
         OutputFormat::Text => report::render_text(&analysis, &mut writer, args.verbose)?,
+        OutputFormat::Svg => {
+            let tree = analysis
+                .dep_tree
+                .as_ref()
+                .expect("dep_tree should always be present during analyze");
+            flamegraph::render_flamegraph(tree, analysis.total_dependencies, &mut writer)?;
+        }
     }
 
     // If writing to file, also save JSON alongside for the report subcommand.
@@ -262,6 +275,15 @@ fn run_report(args: ReportArgs) -> Result<()> {
     match args.format {
         OutputFormat::Json => report::render_json(&analysis, &mut writer)?,
         OutputFormat::Text => report::render_text(&analysis, &mut writer, args.verbose)?,
+        OutputFormat::Svg => {
+            let tree = analysis.dep_tree.as_ref().ok_or_else(|| {
+                anyhow::anyhow!(
+                    "This JSON report has no dep_tree data. \
+                     Re-run `analyze` to generate a report with tree data for SVG rendering."
+                )
+            })?;
+            flamegraph::render_flamegraph(tree, analysis.total_dependencies, &mut writer)?;
+        }
     }
 
     Ok(())
