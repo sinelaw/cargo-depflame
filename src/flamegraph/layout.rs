@@ -168,15 +168,7 @@ fn layout_node(
             collapsed += 1;
             continue;
         }
-        layout_node(
-            tree,
-            child_idx,
-            cx,
-            depth + 1,
-            cw,
-            state,
-            &node.name,
-        );
+        layout_node(tree, child_idx, cx, depth + 1, cw, state, &node.name);
         cx += cw;
     }
 

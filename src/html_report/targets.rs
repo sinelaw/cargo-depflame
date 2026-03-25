@@ -101,8 +101,13 @@ fn categorize_targets(report: &AnalysisReport) -> Vec<Section> {
             Category::NotActionable => 4,
         };
         let is_local_action = t.intermediate_is_workspace_member
-            || matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. });
-        let badge = if is_local_action { "" } else {
+            || matches!(
+                t.suggestion,
+                RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. }
+            );
+        let badge = if is_local_action {
+            ""
+        } else {
             " <span title=\"This change would be a PR to an upstream library, not your own code\" style=\"cursor:help\">\u{1f4e4}</span>"
         };
         sections[section_idx].targets.push((i, badge));
@@ -132,13 +137,19 @@ fn render_action_sections(html: &mut String, report: &AnalysisReport, sections: 
             let int_link = crate_link(&t.intermediate.name);
             let action_line = format_action_line(t, &prefix, &fat_link, &int_link);
             let is_local = t.intermediate_is_workspace_member
-                || matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. });
-            let diff_block = if is_local { build_cargo_diff(t) } else { String::new() };
+                || matches!(
+                    t.suggestion,
+                    RemovalStrategy::AlreadyGated { .. }
+                        | RemovalStrategy::RequiredBySibling { .. }
+                );
+            let diff_block = if is_local {
+                build_cargo_diff(t)
+            } else {
+                String::new()
+            };
 
             if diff_block.is_empty() {
-                html.push_str(&format!(
-                    "<li>{action_line}{upstream_badge}</li>\n",
-                ));
+                html.push_str(&format!("<li>{action_line}{upstream_badge}</li>\n",));
             } else {
                 html.push_str(&format!(
                     "<li>{action_line}{upstream_badge} \
@@ -190,7 +201,10 @@ fn render_detail_table(html: &mut String, report: &AnalysisReport) {
         };
 
         let is_local = t.intermediate_is_workspace_member
-            || matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. });
+            || matches!(
+                t.suggestion,
+                RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. }
+            );
         let upstream_indicator = if is_local {
             ""
         } else {
@@ -344,9 +358,7 @@ fn format_action_line(
             } else {
                 String::new()
             };
-            format!(
-                "{prefix} {fat_link} is already optional in {int_link} ({detail}){feat_hint}"
-            )
+            format!("{prefix} {fat_link} is already optional in {int_link} ({detail}){feat_hint}")
         }
         RemovalStrategy::FeatureGate => {
             if t.intermediate_is_workspace_member {
@@ -406,36 +418,91 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
             let feat_name = format!("use-{fat}");
             line!("diff-file", "# {toml_path} — [dependencies]");
             line!("diff-rm", "- {fat} = \"{fat_ver}\"");
-            line!("diff-add", "+ {fat} = {{ version = \"{fat_ver}\", optional = true }}");
+            line!(
+                "diff-add",
+                "+ {fat} = {{ version = \"{fat_ver}\", optional = true }}"
+            );
             line!("diff-comment", "");
-            line!("diff-comment", "# add a feature flag so users can opt in to this dependency:");
+            line!(
+                "diff-comment",
+                "# add a feature flag so users can opt in to this dependency:"
+            );
             line!("diff-file", "# {toml_path} — [features]");
-            line!("diff-add", "+ {feat_name} = [\"dep:{fat}\"]  # pick a name that makes sense for your crate");
+            line!(
+                "diff-add",
+                "+ {feat_name} = [\"dep:{fat}\"]  # pick a name that makes sense for your crate"
+            );
         }
-        RemovalStrategy::AlreadyGated { enabling_features, recommended_defaults, .. } => {
+        RemovalStrategy::AlreadyGated {
+            enabling_features,
+            recommended_defaults,
+            ..
+        } => {
             line!("diff-file", "# Cargo.toml");
             if enabling_features.is_empty() {
-                line!("diff-comment", "# check your [{int}] dependency — a feature is pulling in {fat}");
-                line!("diff-rm", "- {int} = {{ version = \"...\", features = [\"...\"] }}");
-                line!("diff-add", "+ {int} = {{ version = \"...\" }}  # try removing features that pull in {fat}");
+                line!(
+                    "diff-comment",
+                    "# check your [{int}] dependency — a feature is pulling in {fat}"
+                );
+                line!(
+                    "diff-rm",
+                    "- {int} = {{ version = \"...\", features = [\"...\"] }}"
+                );
+                line!(
+                    "diff-add",
+                    "+ {int} = {{ version = \"...\" }}  # try removing features that pull in {fat}"
+                );
             } else if let Some(keep) = recommended_defaults {
                 // The enabling feature is part of "default" — suggest disabling defaults.
-                let bad_feats = enabling_features.iter().map(|f| html_escape(f)).collect::<Vec<_>>();
-                let bad_str = bad_feats.iter().map(|f| format!("\"{f}\"")).collect::<Vec<_>>().join(", ");
-                line!("diff-comment", "# default feature(s) {bad_str} of {int} pull in {fat}");
+                let bad_feats = enabling_features
+                    .iter()
+                    .map(|f| html_escape(f))
+                    .collect::<Vec<_>>();
+                let bad_str = bad_feats
+                    .iter()
+                    .map(|f| format!("\"{f}\""))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                line!(
+                    "diff-comment",
+                    "# default feature(s) {bad_str} of {int} pull in {fat}"
+                );
                 line!("diff-rm", "- {int} = \"...\"");
                 if keep.is_empty() {
-                    line!("diff-add", "+ {int} = {{ version = \"...\", default-features = false }}");
+                    line!(
+                        "diff-add",
+                        "+ {int} = {{ version = \"...\", default-features = false }}"
+                    );
                 } else {
-                    let keep_str = keep.iter().map(|f| format!("\"{}\"", html_escape(f))).collect::<Vec<_>>().join(", ");
+                    let keep_str = keep
+                        .iter()
+                        .map(|f| format!("\"{}\"", html_escape(f)))
+                        .collect::<Vec<_>>()
+                        .join(", ");
                     line!("diff-add", "+ {int} = {{ version = \"...\", default-features = false, features = [{keep_str}] }}");
                 }
             } else {
-                let feats = enabling_features.iter().map(|f| html_escape(f)).collect::<Vec<_>>();
-                let feats_str = feats.iter().map(|f| format!("\"{f}\"")).collect::<Vec<_>>().join(", ");
-                line!("diff-comment", "# feature(s) {feats_str} of {int} pull in {fat}");
-                line!("diff-rm", "- {int} = {{ version = \"...\", features = [{feats_str}] }}");
-                line!("diff-add", "+ {int} = {{ version = \"...\" }}  # without {feats_str}");
+                let feats = enabling_features
+                    .iter()
+                    .map(|f| html_escape(f))
+                    .collect::<Vec<_>>();
+                let feats_str = feats
+                    .iter()
+                    .map(|f| format!("\"{f}\""))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                line!(
+                    "diff-comment",
+                    "# feature(s) {feats_str} of {int} pull in {fat}"
+                );
+                line!(
+                    "diff-rm",
+                    "- {int} = {{ version = \"...\", features = [{feats_str}] }}"
+                );
+                line!(
+                    "diff-add",
+                    "+ {int} = {{ version = \"...\" }}  # without {feats_str}"
+                );
             }
         }
         RemovalStrategy::ReplaceWithStd { suggestion } => {
@@ -454,7 +521,10 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
             let n = t.scan_result.distinct_items.len();
             line!("diff-file", "# {toml_path}");
             line!("diff-rm", "- {fat} = \"{fat_ver}\"");
-            line!("diff-comment", "# copy the {n} item(s) you use directly into your code");
+            line!(
+                "diff-comment",
+                "# copy the {n} item(s) you use directly into your code"
+            );
         }
         RemovalStrategy::RequiredBySibling { .. } => {
             return String::new();
