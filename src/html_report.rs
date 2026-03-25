@@ -85,8 +85,6 @@ body {{
   font-size: 12px; line-height: 1.6; overflow-x: auto;
   display: none;
 }}
-.action-summary li.clickable {{ cursor: pointer; }}
-.action-summary li.clickable:hover {{ background: #f0f0f0; border-radius: 4px; }}
 .show-diff-btn {{
   display: inline-block; font-size: 11px; color: #0066cc;
   border: 1px solid #0066cc; border-radius: 3px; padding: 1px 6px;
@@ -324,10 +322,17 @@ fn build_targets_html(report: &AnalysisReport) -> String {
                 )
             }
             RemovalStrategy::FeatureGate => {
-                format!(
-                    "{prefix} Propose making {fat_link} optional in {int_link} \
-                     &mdash; put it behind a Cargo feature flag"
-                )
+                if t.intermediate_is_workspace_member {
+                    format!(
+                        "{prefix} Make {fat_link} optional in {int_link} \
+                         &mdash; put it behind a Cargo feature flag"
+                    )
+                } else {
+                    format!(
+                        "{prefix} Propose making {fat_link} optional in {int_link} \
+                         &mdash; submit a PR to put it behind a feature flag"
+                    )
+                }
             }
             RemovalStrategy::ReplaceWithLighter { alternative } => {
                 format!(
@@ -352,8 +357,8 @@ fn build_targets_html(report: &AnalysisReport) -> String {
             ));
         } else {
             html.push_str(&format!(
-                "<li class=\"clickable\" onclick=\"toggleDiff(this)\">#{idx} {action_line}{upstream_badge} \
-                 <span class=\"show-diff-btn\">show diff</span>\n{diff_block}</li>\n",
+                "<li>#{idx} {action_line}{upstream_badge} \
+                 <span class=\"show-diff-btn\" onclick=\"toggleDiff(this.parentElement)\">show diff</span>\n{diff_block}</li>\n",
                 idx = i + 1
             ));
         }
