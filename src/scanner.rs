@@ -93,6 +93,11 @@ pub fn scan_files_with_aliases(
         pattern_parts.push(format!(r"\bextern\s+crate\s+{escaped}\b"));
     }
 
+    // Add macro/attribute patterns for crates commonly used via proc-macros,
+    // derive macros, or attribute macros rather than explicit `use` imports.
+    // Without these, the scanner reports 0 refs for macro-heavy crates.
+    add_macro_patterns(&mut pattern_parts, fat_crate_name, &names);
+
     let combined = pattern_parts
         .iter()
         .map(|p| format!("(?:{p})"))
@@ -184,6 +189,63 @@ pub fn display_path(path: &str) -> String {
         }
     }
     path.to_string()
+}
+
+/// Crates that are commonly used via proc-macro derives, attribute macros,
+/// or macro invocations (`crate_name!()`) rather than explicit `use` imports.
+/// The scanner adds extra patterns for these to reduce false positives.
+const MACRO_CRATES: &[(&str, &[&str])] = &[
+    // Derive macros: #[derive(Serialize, Deserialize)]
+    ("serde", &[r"#\[derive\([^)]*\b(Serialize|Deserialize)\b"]),
+    ("serde_json", &[r"\bserde_json!\b", r"\bjson!\b", r#"serde_json::from_"#, r#"serde_json::to_"#]),
+    ("clap", &[r"#\[derive\([^)]*\b(Parser|Args|Subcommand|ValueEnum)\b", r"#\[command\b", r"#\[arg\b"]),
+    ("thiserror", &[r"#\[derive\([^)]*\bError\b"]),
+    ("tokio", &[r"#\[tokio::", r"tokio::spawn\b", r"tokio::select!\b"]),
+    ("tracing", &[r"\btracing::(info|debug|warn|error|trace|instrument)\b",
+                   r"#\[instrument\b", r"#\[tracing::instrument\b",
+                   r"\b(info|debug|warn|error|trace)!\("]),
+    ("log", &[r"\b(info|debug|warn|error|trace)!\("]),
+    ("anyhow", &[r"\banyhow!\(", r"\bbail!\(", r"\bensure!\(",
+                  r"\bResult<", r"\banyhow::Result\b", r"\bContext\b"]),
+    ("async_trait", &[r"#\[async_trait\b"]),
+    ("strum", &[r"#\[derive\([^)]*\b(EnumString|Display|EnumIter|IntoStaticStr)\b"]),
+    ("derive_more", &[r"#\[derive\([^)]*\b(From|Into|Display|Deref|Constructor)\b"]),
+];
+
+/// Crates that are typically activated via `#[global_allocator]` static declarations
+/// rather than `use` imports.
+const ALLOCATOR_CRATES: &[(&str, &str)] = &[
+    ("mimalloc", "MiMalloc"),
+    ("tikv-jemallocator", "Jemalloc"),
+    ("jemallocator", "Jemalloc"),
+    ("snmalloc-rs", "SnMalloc"),
+];
+
+/// Add extra regex patterns for crates commonly used through macros/derives/attributes
+/// rather than explicit `use` imports.
+fn add_macro_patterns(patterns: &mut Vec<String>, fat_crate_name: &str, names: &[String]) {
+    let normalized = fat_crate_name.replace('-', "_");
+
+    // Check known macro crates.
+    for (crate_name, extra_patterns) in MACRO_CRATES {
+        if normalized == crate_name.replace('-', "_")
+            || names.iter().any(|n| *n == crate_name.replace('-', "_"))
+        {
+            for p in *extra_patterns {
+                patterns.push(p.to_string());
+            }
+        }
+    }
+
+    // Check allocator crates: look for `#[global_allocator]` + type name.
+    for (crate_name, type_name) in ALLOCATOR_CRATES {
+        if normalized == crate_name.replace('-', "_")
+            || names.iter().any(|n| *n == crate_name.replace('-', "_"))
+        {
+            patterns.push(r"#\[global_allocator\]".to_string());
+            patterns.push(format!(r"\b{type_name}\b"));
+        }
+    }
 }
 
 /// Extract distinct API items from matched lines.

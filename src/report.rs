@@ -31,6 +31,25 @@ pub struct AnalysisReport {
     /// Each entry is `(parent_name, child_name)`.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub unused_edges: Vec<(String, String)>,
+    /// Unused direct dependencies of workspace members detected in Phase 5d.
+    /// Each entry describes a workspace member -> dep edge with 0 code references.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub unused_direct_deps: Vec<UnusedDirectDep>,
+}
+
+/// A direct dependency of a workspace member that appears unused (0 code references).
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct UnusedDirectDep {
+    /// The workspace member that declares this dependency.
+    pub from_crate: String,
+    /// The dependency name.
+    pub dep_name: String,
+    /// The dependency version.
+    pub dep_version: String,
+    /// Number of real (non-phantom) deps that would be saved if removed.
+    pub real_deps_saved: usize,
+    /// Whether this dep is in a test/example/bench crate.
+    pub is_test_example: bool,
 }
 
 /// Render the report as JSON.
@@ -72,12 +91,137 @@ pub fn render_text(
         return Ok(());
     }
 
+    let is_actionable = |t: &UpstreamTarget| -> bool {
+        matches!(t.confidence, Confidence::High | Confidence::Medium)
+            && t.w_unique > 0
+    };
+
+    // ── YOUR CRATE: workspace-member findings (most actionable) ──
+
+    let ws_remove: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            is_actionable(t)
+                && matches!(t.suggestion, RemovalStrategy::Remove)
+                && t.intermediate_is_workspace_member
+        })
+        .collect();
+
+    let ws_feature_gate: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            is_actionable(t)
+                && matches!(t.suggestion, RemovalStrategy::FeatureGate)
+                && t.intermediate_is_workspace_member
+        })
+        .collect();
+
+    let ws_already_gated: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            is_actionable(t)
+                && matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. })
+                && t.intermediate_is_workspace_member
+        })
+        .collect();
+
+    let ws_std_replacements: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            is_actionable(t)
+                && matches!(t.suggestion, RemovalStrategy::ReplaceWithStd { .. })
+                && t.intermediate_is_workspace_member
+        })
+        .collect();
+
+    let has_ws_findings = !ws_remove.is_empty()
+        || !ws_feature_gate.is_empty()
+        || !ws_already_gated.is_empty()
+        || !ws_std_replacements.is_empty();
+
+    if has_ws_findings {
+        writeln!(
+            writer,
+            "{}",
+            "Your crate — recommended changes:".bold().green()
+        )?;
+        writeln!(writer)?;
+
+        // Removals first (highest impact, easiest wins).
+        for target in &ws_remove {
+            let test_badge = if is_test_or_example_crate(&target.intermediate.name) {
+                " [test/example]".dimmed().to_string()
+            } else {
+                String::new()
+            };
+            writeln!(
+                writer,
+                "  {} Remove `{}` from `{}`  (0 code references found){}",
+                format!("(-{} deps)", target.w_unique).green(),
+                target.fat_dependency.name.yellow(),
+                target.intermediate.name.cyan(),
+                test_badge,
+            )?;
+        }
+
+        // Feature-gate candidates.
+        for target in &ws_feature_gate {
+            let test_badge = if is_test_or_example_crate(&target.intermediate.name) {
+                " [test/example]".dimmed().to_string()
+            } else {
+                String::new()
+            };
+            writeln!(
+                writer,
+                "  {} Make `{}` optional in `{}`  ({} refs){}",
+                format!("(-{} deps)", target.w_unique).green(),
+                target.fat_dependency.name.yellow(),
+                target.intermediate.name.cyan(),
+                target.c_ref,
+                test_badge,
+            )?;
+        }
+
+        // Already-gated: user is enabling a heavy optional feature.
+        for target in &ws_already_gated {
+            writeln!(
+                writer,
+                "  {} `{}` is optional in `{}` — check if you need it",
+                format!("(-{} deps)", target.w_unique).green(),
+                target.fat_dependency.name.yellow(),
+                target.intermediate.name.cyan(),
+            )?;
+        }
+
+        // Std replacements in user's own crate.
+        for target in &ws_std_replacements {
+            if let RemovalStrategy::ReplaceWithStd { suggestion } = &target.suggestion {
+                writeln!(
+                    writer,
+                    "  {} Replace `{}` with {} in `{}`",
+                    format!("(-{} deps)", target.w_unique).green(),
+                    target.fat_dependency.name.yellow(),
+                    suggestion,
+                    target.intermediate.name.cyan(),
+                )?;
+            }
+        }
+
+        writeln!(writer)?;
+    }
+
+    // ── UPSTREAM: findings in third-party crates ──
+
     // Group targets by action type for the summary.
     let upstream_feature_gate: Vec<&UpstreamTarget> = report
         .targets
         .iter()
         .filter(|t| {
-            matches!(t.confidence, Confidence::High | Confidence::Medium)
+            is_actionable(t)
                 && matches!(t.suggestion, RemovalStrategy::FeatureGate)
                 && !t.intermediate_is_workspace_member
         })
@@ -87,7 +231,7 @@ pub fn render_text(
         .targets
         .iter()
         .filter(|t| {
-            matches!(t.confidence, Confidence::High | Confidence::Medium)
+            is_actionable(t)
                 && matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. })
                 && !t.intermediate_is_workspace_member
         })
@@ -97,7 +241,7 @@ pub fn render_text(
         .targets
         .iter()
         .filter(|t| {
-            matches!(t.confidence, Confidence::High | Confidence::Medium)
+            is_actionable(t)
                 && matches!(t.suggestion, RemovalStrategy::Remove)
                 && !t.intermediate_is_workspace_member
         })
@@ -107,8 +251,9 @@ pub fn render_text(
         .targets
         .iter()
         .filter(|t| {
-            matches!(t.confidence, Confidence::High | Confidence::Medium)
+            is_actionable(t)
                 && matches!(t.suggestion, RemovalStrategy::ReplaceWithStd { .. })
+                && !t.intermediate_is_workspace_member
         })
         .collect();
 
@@ -116,9 +261,8 @@ pub fn render_text(
         .targets
         .iter()
         .filter(|t| {
-            matches!(t.confidence, Confidence::High | Confidence::Medium)
+            is_actionable(t)
                 && matches!(t.suggestion, RemovalStrategy::InlineUpstream { .. })
-                && !t.intermediate_is_workspace_member
         })
         .collect();
 
@@ -196,7 +340,11 @@ pub fn render_text(
 
     // Section 3: Unused deps in upstream
     if !upstream_remove.is_empty() {
-        writeln!(writer, "{}", "Possibly unused (propose removal):".bold())?;
+        writeln!(
+            writer,
+            "{}",
+            "Possibly unused (propose removal in upstream):".bold()
+        )?;
         writeln!(writer)?;
         for target in &upstream_remove {
             writeln!(
@@ -229,6 +377,24 @@ pub fn render_text(
         writeln!(writer)?;
     }
 
+    // Summary: noise targets suppressed.
+    let noise_count = report
+        .targets
+        .iter()
+        .filter(|t| t.confidence == Confidence::Low && t.w_unique == 0)
+        .count();
+    if noise_count > 0 {
+        writeln!(
+            writer,
+            "{}",
+            format!(
+                "({noise_count} low-impact targets with 0 unique deps hidden. Use -v to see all.)"
+            )
+            .dimmed()
+        )?;
+        writeln!(writer)?;
+    }
+
     // Verbose: full details
     if verbose {
         writeln!(writer)?;
@@ -238,6 +404,16 @@ pub fn render_text(
     }
 
     Ok(())
+}
+
+/// Check if a crate name looks like a test, example, benchmark, or doc crate.
+fn is_test_or_example_crate(name: &str) -> bool {
+    let lower = name.to_lowercase();
+    let patterns = [
+        "test", "example", "bench", "doc-example", "stress",
+        "tester", "poc", "guide", "wasm-example",
+    ];
+    patterns.iter().any(|p| lower.contains(p))
 }
 
 /// Format a short dependency chain showing how the workspace reaches this dep.
@@ -306,7 +482,11 @@ fn render_detailed(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
             badges.push("PHANTOM");
         }
         if target.intermediate_is_workspace_member {
-            badges.push("YOUR-CRATE");
+            if is_test_or_example_crate(&target.intermediate.name) {
+                badges.push("YOUR-CRATE (test/example)");
+            } else {
+                badges.push("YOUR-CRATE");
+            }
         }
         if target.edge_meta.build_only {
             badges.push("BUILD-ONLY");

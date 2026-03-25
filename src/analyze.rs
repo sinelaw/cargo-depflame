@@ -10,7 +10,7 @@ use crate::graph::{DepGraph, EdgeMeta, IntermediateEdge};
 use crate::metrics::{
     self, ComputeTargetInput, Confidence, PackageInfo, RemovalStrategy, UpstreamTarget,
 };
-use crate::report::AnalysisReport;
+use crate::report::{AnalysisReport, UnusedDirectDep};
 use crate::{platform, registry, scanner};
 
 /// Run the full analysis pipeline and return the report.
@@ -101,6 +101,16 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         .map(|t| (t.intermediate.name.as_str(), t.fat_dependency.name.as_str()))
         .collect();
     let unused_deps = find_unused_deps(&dep_graph, &metadata, &real_deps, &already_analyzed);
+    let unused_direct_deps_summary: Vec<UnusedDirectDep> = unused_deps
+        .iter()
+        .map(|t| UnusedDirectDep {
+            from_crate: t.intermediate.name.clone(),
+            dep_name: t.fat_dependency.name.clone(),
+            dep_version: t.fat_dependency.version.clone(),
+            real_deps_saved: t.w_unique,
+            is_test_example: is_test_or_example_crate_name(&t.intermediate.name),
+        })
+        .collect();
     if !unused_deps.is_empty() {
         eprintln!("  Found {} unused direct dependencies", unused_deps.len());
         ranked = merge_unused(ranked, unused_deps);
@@ -133,7 +143,18 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         targets: ranked,
         dep_tree: Some(dep_tree),
         unused_edges,
+        unused_direct_deps: unused_direct_deps_summary,
     })
+}
+
+/// Check if a crate name looks like a test, example, benchmark, or doc crate.
+fn is_test_or_example_crate_name(name: &str) -> bool {
+    let lower = name.to_lowercase();
+    let patterns = [
+        "test", "example", "bench", "doc-example", "stress",
+        "tester", "poc", "guide", "wasm-example",
+    ];
+    patterns.iter().any(|p| lower.contains(p))
 }
 
 /// Scan a single intermediate edge: locate source, run heuristic scanner,
@@ -435,5 +456,6 @@ fn empty_report(workspace_root: String, threshold: f64, total_deps: usize) -> An
         targets: Vec::new(),
         dep_tree: None,
         unused_edges: Vec::new(),
+        unused_direct_deps: Vec::new(),
     }
 }
