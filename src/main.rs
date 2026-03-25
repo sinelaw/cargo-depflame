@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use cargo_upstream_triage::cargo_toml::CrateDepInfo;
 use cargo_upstream_triage::cli::{AnalyzeArgs, Cli, Command, OutputFormat, ReportArgs};
 use cargo_upstream_triage::report::AnalysisReport;
-use cargo_upstream_triage::{graph, metrics, platform, registry, report, scanner, usage};
+use cargo_upstream_triage::{graph, metrics, platform, registry, report, scanner};
 use clap::Parser;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -143,20 +143,13 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
 
             let scan = scanner::scan_files_with_aliases(&rs_files, &edge.fat_name, &aliases);
 
-            // Phase 4b: Measure fat dep LOC and (optionally) usage profile.
-            let deep = args.deep_analysis;
-            let (fat_dep_loc, usage_profile) = registry::find_crate_source(&edge.fat_name, &edge.fat_version)
+            // Phase 4b: Measure fat dep LOC.
+            let fat_dep_loc = registry::find_crate_source(&edge.fat_name, &edge.fat_version)
                 .map(|fat_dir| {
                     let fat_rs = registry::collect_rs_files(&fat_dir);
-                    let loc = registry::count_loc(&fat_rs);
-                    let profile = if deep && !scan.distinct_items.is_empty() {
-                        Some(usage::analyze_usage(&fat_rs, &scan.distinct_items))
-                    } else {
-                        None
-                    };
-                    (loc, profile)
+                    registry::count_loc(&fat_rs)
                 })
-                .unwrap_or((0, None));
+                .unwrap_or(0);
 
             // Phase 4c: Compute unique subtree weight.
             let w_unique =
@@ -196,7 +189,6 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 phantom,
                 intermediate_is_ws,
                 fat_dep_loc,
-                usage_profile,
             ))
         })
         .collect();

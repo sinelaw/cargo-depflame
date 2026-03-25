@@ -54,11 +54,6 @@ pub struct AnalyzeArgs {
     /// Show detailed analysis (file matches, dep chains, metrics).
     #[arg(long, short)]
     pub verbose: bool,
-
-    /// Run deep call-graph analysis to measure reachable LOC in dependencies.
-    /// Slow (minutes for large workspaces) but gives precise inline suggestions.
-    #[arg(long)]
-    pub deep_analysis: bool,
 }
 
 #[derive(Parser, Debug)]

@@ -127,18 +127,7 @@ pub fn render_text(
         writeln!(writer)?;
         for target in &inline_candidates {
             let chain = format_short_chain(&target.dep_chain, &target.intermediate.name);
-            let usage_str = if let Some(ref profile) = target.usage_profile {
-                if profile.reachable_loc > 0 {
-                    format!(
-                        " (~{} of {} LOC used)",
-                        profile.reachable_loc, profile.total_loc
-                    )
-                } else if target.fat_dep_loc > 0 {
-                    format!(" ({} LOC)", target.fat_dep_loc)
-                } else {
-                    String::new()
-                }
-            } else if target.fat_dep_loc > 0 {
+            let usage_str = if target.fat_dep_loc > 0 {
                 format!(" ({} LOC)", target.fat_dep_loc)
             } else {
                 String::new()

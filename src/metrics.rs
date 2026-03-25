@@ -1,6 +1,5 @@
 use crate::graph::EdgeMeta;
 use crate::scanner::ScanResult;
-use crate::usage::UsageProfile;
 use serde::{Deserialize, Serialize};
 
 /// The recommended action for an upstream target.
@@ -120,9 +119,39 @@ pub struct UpstreamTarget {
     /// Lines of code in the fat dependency crate (0 if unknown).
     #[serde(default)]
     pub fat_dep_loc: usize,
-    /// Reachability analysis: how much of the fat dep is actually used.
-    #[serde(default)]
-    pub usage_profile: Option<UsageProfile>,
+    // TODO: Future — deep usage analysis via reachable LOC
+    //
+    // Currently we estimate "light usage" by counting distinct API symbols
+    // referenced at call sites (e.g., "uses Adapter, from_u8"). This is a
+    // rough proxy — one symbol might fan out to thousands of LOC internally.
+    //
+    // The ideal approach: measure how much code inside the fat dep is actually
+    // *reachable* from the entry points the intermediate crate uses. This
+    // requires intra-crate call graph analysis:
+    //   1. Extract fn/method definitions and their line spans
+    //   2. For each definition, identify callees (other fns in the same crate)
+    //   3. BFS/DFS from the used entry points through the call graph
+    //   4. Sum LOC of all reachable definitions
+    //   5. Report "uses ~X of Y LOC" — if X is small, inlining is practical
+    //
+    // Implementation options (tradeoffs):
+    //   - Regex-based (tried, removed): fast to implement but too slow on large
+    //     crates (>200KB source), can't handle traits/generics/macros, and regex
+    //     over function bodies produces many false callee matches.
+    //   - rust-analyzer APIs (ra_ap_ide / ra_ap_hir): would give real semantic
+    //     call graphs including trait dispatch, generics, and macro expansion.
+    //     Heavy dependency (~100+ crates) but accurate. Could run on-demand per
+    //     crate rather than loading the whole workspace.
+    //   - cargo check + MIR: drive rustc to emit MIR, then analyze reachability
+    //     at the MIR level. Most accurate (post-monomorphization) but requires
+    //     compiling each crate. Could cache results.
+    //   - syn-based AST parsing: lighter than rust-analyzer, can extract fn
+    //     signatures and bodies accurately, but still can't resolve traits or
+    //     macros. Good middle ground for a v2.
+    //
+    // For now, the heuristic (crate LOC + distinct symbol count) catches the
+    // obvious cases: tiny crates (<500 LOC) and single-function usage of
+    // moderate crates (<2000 LOC, <=3 API items).
 }
 
 /// Known crate -> std replacement mappings.
@@ -155,7 +184,6 @@ pub fn compute_target(
     phantom: bool,
     intermediate_is_workspace_member: bool,
     fat_dep_loc: usize,
-    usage_profile: Option<UsageProfile>,
 ) -> UpstreamTarget {
     let c_ref = scan_result.ref_count;
     let api_items_used = scan_result.distinct_items.len();
@@ -186,7 +214,6 @@ pub fn compute_target(
         &required_by_sibling,
         fat_dep_loc,
         api_items_used,
-        &usage_profile,
     );
 
     UpstreamTarget {
@@ -211,7 +238,6 @@ pub fn compute_target(
         phantom,
         intermediate_is_workspace_member,
         fat_dep_loc,
-        usage_profile,
     }
 }
 
@@ -226,7 +252,6 @@ fn compute_suggestion(
     required_by_sibling: &Option<String>,
     fat_dep_loc: usize,
     api_items_used: usize,
-    usage_profile: &Option<UsageProfile>,
 ) -> RemovalStrategy {
     // If a sibling dep transitively requires this, it can't be removed.
     if let Some(sibling) = required_by_sibling {
@@ -259,28 +284,16 @@ fn compute_suggestion(
         };
     }
 
-    // Decide based on reachable LOC (actual code the intermediate uses).
-    // If we have a usage profile, use reachable_loc; otherwise fall back to
-    // heuristics based on crate size and symbol count.
-    let reachable = usage_profile
-        .as_ref()
-        .map(|p| p.reachable_loc)
-        .unwrap_or(0);
+    // Small crate: suggest inlining regardless of usage breadth.
+    // Light usage of a moderate crate: suggest inlining the specific items.
+    // But never suggest inlining large crates (>2000 LOC) — feature-gate instead.
+    let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
+    let is_light = api_items_used > 0
+        && api_items_used <= LIGHT_USAGE_ITEMS
+        && fat_dep_loc > 0
+        && fat_dep_loc <= 2000;
 
-    let should_inline = if reachable > 0 {
-        // We have call-graph data: suggest inline if the reachable code is small.
-        reachable <= SMALL_CRATE_LOC
-    } else {
-        // Fallback: small crate overall, or very light API usage of moderate crate.
-        let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
-        let is_light = api_items_used > 0
-            && api_items_used <= LIGHT_USAGE_ITEMS
-            && fat_dep_loc > 0
-            && fat_dep_loc <= 2000;
-        is_small || is_light
-    };
-
-    if should_inline {
+    if is_small || is_light {
         return RemovalStrategy::InlineUpstream {
             fat_loc: fat_dep_loc,
             api_items_used,
