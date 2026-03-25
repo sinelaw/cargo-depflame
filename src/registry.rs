@@ -48,6 +48,24 @@ pub fn collect_rs_files(root: &Path) -> Vec<PathBuf> {
     files
 }
 
+/// Count non-blank, non-comment lines of Rust code in a set of .rs files.
+pub fn count_loc(rs_files: &[PathBuf]) -> usize {
+    let mut count = 0;
+    for path in rs_files {
+        let content = match std::fs::read_to_string(path) {
+            Ok(c) => c,
+            Err(_) => continue,
+        };
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if !trimmed.is_empty() && !trimmed.starts_with("//") {
+                count += 1;
+            }
+        }
+    }
+    count
+}
+
 fn collect_rs_files_recursive(dir: &Path, files: &mut Vec<PathBuf>) {
     let entries = match std::fs::read_dir(dir) {
         Ok(e) => e,

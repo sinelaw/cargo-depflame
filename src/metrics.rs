@@ -17,6 +17,14 @@ pub enum RemovalStrategy {
     AlreadyGated { detail: String },
     /// The dependency is required by a sibling dep — cannot be removed.
     RequiredBySibling { sibling: String },
+    /// The dependency is small or lightly used — propose inlining the used code
+    /// into the intermediate crate to eliminate the dep entirely.
+    InlineUpstream {
+        /// LOC of the fat dependency crate.
+        fat_loc: usize,
+        /// Number of distinct API items used.
+        api_items_used: usize,
+    },
 }
 
 impl std::fmt::Display for RemovalStrategy {
@@ -35,6 +43,15 @@ impl std::fmt::Display for RemovalStrategy {
             }
             Self::RequiredBySibling { sibling } => {
                 write!(f, "REQUIRED BY {sibling}")
+            }
+            Self::InlineUpstream {
+                fat_loc,
+                api_items_used,
+            } => {
+                write!(
+                    f,
+                    "INLINE ({fat_loc} LOC crate, {api_items_used} items used)"
+                )
             }
         }
     }
@@ -99,6 +116,42 @@ pub struct UpstreamTarget {
     /// True if the intermediate crate is a workspace member (user's own crate).
     #[serde(default)]
     pub intermediate_is_workspace_member: bool,
+    /// Lines of code in the fat dependency crate (0 if unknown).
+    #[serde(default)]
+    pub fat_dep_loc: usize,
+    // TODO: Future — deep usage analysis via reachable LOC
+    //
+    // Currently we estimate "light usage" by counting distinct API symbols
+    // referenced at call sites (e.g., "uses Adapter, from_u8"). This is a
+    // rough proxy — one symbol might fan out to thousands of LOC internally.
+    //
+    // The ideal approach: measure how much code inside the fat dep is actually
+    // *reachable* from the entry points the intermediate crate uses. This
+    // requires intra-crate call graph analysis:
+    //   1. Extract fn/method definitions and their line spans
+    //   2. For each definition, identify callees (other fns in the same crate)
+    //   3. BFS/DFS from the used entry points through the call graph
+    //   4. Sum LOC of all reachable definitions
+    //   5. Report "uses ~X of Y LOC" — if X is small, inlining is practical
+    //
+    // Implementation options (tradeoffs):
+    //   - Regex-based (tried, removed): fast to implement but too slow on large
+    //     crates (>200KB source), can't handle traits/generics/macros, and regex
+    //     over function bodies produces many false callee matches.
+    //   - rust-analyzer APIs (ra_ap_ide / ra_ap_hir): would give real semantic
+    //     call graphs including trait dispatch, generics, and macro expansion.
+    //     Heavy dependency (~100+ crates) but accurate. Could run on-demand per
+    //     crate rather than loading the whole workspace.
+    //   - cargo check + MIR: drive rustc to emit MIR, then analyze reachability
+    //     at the MIR level. Most accurate (post-monomorphization) but requires
+    //     compiling each crate. Could cache results.
+    //   - syn-based AST parsing: lighter than rust-analyzer, can extract fn
+    //     signatures and bodies accurately, but still can't resolve traits or
+    //     macros. Good middle ground for a v2.
+    //
+    // For now, the heuristic (crate LOC + distinct symbol count) catches the
+    // obvious cases: tiny crates (<500 LOC) and single-function usage of
+    // moderate crates (<2000 LOC, <=3 API items).
 }
 
 /// Known crate -> std replacement mappings.
@@ -130,8 +183,10 @@ pub fn compute_target(
     required_by_sibling: Option<String>,
     phantom: bool,
     intermediate_is_workspace_member: bool,
+    fat_dep_loc: usize,
 ) -> UpstreamTarget {
     let c_ref = scan_result.ref_count;
+    let api_items_used = scan_result.distinct_items.len();
 
     let hurrs = if c_ref == 0 {
         None // infinity — dependency appears unused
@@ -152,7 +207,14 @@ pub fn compute_target(
     );
 
     // Determine suggestion.
-    let suggestion = compute_suggestion(c_ref, fat_name, &edge_meta, &required_by_sibling);
+    let suggestion = compute_suggestion(
+        c_ref,
+        fat_name,
+        &edge_meta,
+        &required_by_sibling,
+        fat_dep_loc,
+        api_items_used,
+    );
 
     UpstreamTarget {
         intermediate: PackageInfo {
@@ -175,14 +237,21 @@ pub fn compute_target(
         required_by_sibling,
         phantom,
         intermediate_is_workspace_member,
+        fat_dep_loc,
     }
 }
+
+/// Thresholds for suggesting "inline the code instead of depending on it".
+const SMALL_CRATE_LOC: usize = 500;
+const LIGHT_USAGE_ITEMS: usize = 3;
 
 fn compute_suggestion(
     c_ref: usize,
     fat_name: &str,
     edge_meta: &EdgeMeta,
     required_by_sibling: &Option<String>,
+    fat_dep_loc: usize,
+    api_items_used: usize,
 ) -> RemovalStrategy {
     // If a sibling dep transitively requires this, it can't be removed.
     if let Some(sibling) = required_by_sibling {
@@ -203,17 +272,35 @@ fn compute_suggestion(
     }
 
     if c_ref == 0 {
-        RemovalStrategy::Remove
-    } else if let Some((_, replacement)) = STD_REPLACEMENTS
+        return RemovalStrategy::Remove;
+    }
+
+    if let Some((_, replacement)) = STD_REPLACEMENTS
         .iter()
         .find(|(name, _)| *name == fat_name)
     {
-        RemovalStrategy::ReplaceWithStd {
+        return RemovalStrategy::ReplaceWithStd {
             suggestion: replacement.to_string(),
-        }
-    } else {
-        RemovalStrategy::FeatureGate
+        };
     }
+
+    // Small crate: suggest inlining regardless of usage breadth.
+    // Light usage of a moderate crate: suggest inlining the specific items.
+    // But never suggest inlining large crates (>2000 LOC) — feature-gate instead.
+    let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
+    let is_light = api_items_used > 0
+        && api_items_used <= LIGHT_USAGE_ITEMS
+        && fat_dep_loc > 0
+        && fat_dep_loc <= 2000;
+
+    if is_small || is_light {
+        return RemovalStrategy::InlineUpstream {
+            fat_loc: fat_dep_loc,
+            api_items_used,
+        };
+    }
+
+    RemovalStrategy::FeatureGate
 }
 
 fn compute_confidence(
