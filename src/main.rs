@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use cargo_upstream_triage::cargo_toml::CrateDepInfo;
-use cargo_upstream_triage::cli::{AnalyzeArgs, Cli, Command, OutputFormat, ReportArgs};
+use cargo_upstream_triage::cli::{AnalyzeArgs, Cli, Command, FlameArgs, OutputFormat, ReportArgs};
 use cargo_upstream_triage::flamegraph;
 use cargo_upstream_triage::report::AnalysisReport;
 use cargo_upstream_triage::{graph, metrics, platform, registry, report, scanner};
@@ -17,6 +17,7 @@ fn main() -> Result<()> {
     match cli.command {
         Command::Analyze(args) => run_analyze(args),
         Command::Report(args) => run_report(args),
+        Command::Flame(args) => run_flame(args),
     }
 }
 
@@ -155,8 +156,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
             let has_re_export_all = scan.has_re_export_all;
 
             // Phase 4c: Compute unique subtree weight.
-            let w_unique =
-                dep_graph.unique_subtree_weight(&edge.intermediate_id, &edge.fat_id);
+            let w_unique = dep_graph.unique_subtree_weight(&edge.intermediate_id, &edge.fat_id);
 
             // Phase 4d: Compute dependency chain.
             let dep_chain = dep_graph.dependency_chain(&edge.fat_id);
@@ -166,15 +166,10 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 dep_graph.sibling_requires(&edge.intermediate_id, &edge.fat_id);
 
             // Phase 4e: Check if the fat dep is a phantom (not on this platform).
-            let phantom = !platform::is_real_dep(
-                &real_deps,
-                &edge.fat_name,
-                &edge.fat_version,
-            );
+            let phantom = !platform::is_real_dep(&real_deps, &edge.fat_name, &edge.fat_version);
 
             // Phase 4f: Check if intermediate is a workspace member.
-            let intermediate_is_ws =
-                dep_graph.workspace_members.contains(&edge.intermediate_id);
+            let intermediate_is_ws = dep_graph.workspace_members.contains(&edge.intermediate_id);
 
             // Phase 5: Compute metrics.
             Some(metrics::compute_target(
@@ -203,7 +198,9 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
 
     // Phase 6: Report.
     let platform_deps = real_deps.as_ref().map(|s| s.len());
-    let phantom_deps = platform_deps.map(|p| total_deps.saturating_sub(p)).unwrap_or(0);
+    let phantom_deps = platform_deps
+        .map(|p| total_deps.saturating_sub(p))
+        .unwrap_or(0);
 
     // Build serializable dep tree for flamegraph rendering.
     eprintln!("Building dependency tree for visualization...");
@@ -253,6 +250,44 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
             eprintln!("JSON report saved to: {}", json_path.display());
         }
     }
+
+    Ok(())
+}
+
+fn run_flame(args: FlameArgs) -> Result<()> {
+    let analyze_args = AnalyzeArgs {
+        manifest_path: args.manifest_path,
+        threshold: args.threshold,
+        top: args.top,
+        fat_threshold: args.fat_threshold,
+        format: OutputFormat::Svg,
+        output: None,
+        verbose: args.verbose,
+    };
+
+    // Create a named temp file for the SVG output.
+    // Use keep() so the file persists for the browser to read.
+    let tmp_file = tempfile::Builder::new()
+        .prefix("upstream-triage-")
+        .suffix(".svg")
+        .tempfile()
+        .context("failed to create temp file")?;
+    let svg_path = tmp_file
+        .into_temp_path()
+        .keep()
+        .context("failed to persist temp file")?;
+
+    // Run the analyze pipeline, writing SVG to the temp file.
+    let analyze_args = AnalyzeArgs {
+        output: Some(svg_path.clone()),
+        ..analyze_args
+    };
+    run_analyze(analyze_args)?;
+
+    // Open the SVG in the user's default browser.
+    let uri = format!("file://{}", svg_path.display());
+    eprintln!("Opening flamegraph: {}", uri);
+    open::that(&uri).with_context(|| format!("failed to open browser for {}", uri))?;
 
     Ok(())
 }

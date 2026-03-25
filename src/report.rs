@@ -44,11 +44,7 @@ pub fn render_text(
 ) -> anyhow::Result<()> {
     // Header.
     writeln!(writer)?;
-    writeln!(
-        writer,
-        "{}",
-        "Upstream Dependency Triage Report".bold()
-    )?;
+    writeln!(writer, "{}", "Upstream Dependency Triage Report".bold())?;
 
     if let Some(platform_deps) = report.platform_dependencies {
         writeln!(
@@ -216,11 +212,7 @@ pub fn render_text(
 
     // Section 4: std replacements
     if !std_replacements.is_empty() {
-        writeln!(
-            writer,
-            "{}",
-            "Replace with std equivalents:".bold()
-        )?;
+        writeln!(writer, "{}", "Replace with std equivalents:".bold())?;
         writeln!(writer)?;
         for target in &std_replacements {
             if let RemovalStrategy::ReplaceWithStd { suggestion } = &target.suggestion {
@@ -258,9 +250,7 @@ fn format_short_chain(dep_chain: &[String], intermediate_name: &str) -> String {
     if dep_chain.len() == 3 {
         format!("(via {first} -> {intermediate_name})")
     } else {
-        format!(
-            "(via {first} -> ... -> {intermediate_name})",
-        )
+        format!("(via {first} -> ... -> {intermediate_name})",)
     }
 }
 
@@ -281,11 +271,7 @@ fn render_detailed(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
             Confidence::Noise => format!("{}", target.confidence).dimmed(),
         };
 
-        writeln!(
-            writer,
-            "{}",
-            format!("--- #{rank} ---").yellow().bold()
-        )?;
+        writeln!(writer, "{}", format!("--- #{rank} ---").yellow().bold())?;
 
         writeln!(
             writer,
@@ -383,7 +369,13 @@ fn render_detailed(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
         .load_preset(UTF8_FULL)
         .apply_modifier(UTF8_ROUND_CORNERS)
         .set_header(vec![
-            "#", "Intermediate", "Fat Dep", "W_uniq", "C_ref", "Confidence", "Action",
+            "#",
+            "Intermediate",
+            "Fat Dep",
+            "W_uniq",
+            "C_ref",
+            "Confidence",
+            "Action",
         ]);
 
     for (i, target) in report.targets.iter().enumerate() {

@@ -18,6 +18,5 @@ semver = "1"
 rayon = "1"
 home = "0.5"
 chrono = { version = "0.4", features = ["serde"] }
-
-[dev-dependencies]
+open = "5"
 tempfile = "3"
