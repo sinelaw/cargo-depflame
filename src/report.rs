@@ -92,8 +92,7 @@ pub fn render_text(
     }
 
     let is_actionable = |t: &UpstreamTarget| -> bool {
-        matches!(t.confidence, Confidence::High | Confidence::Medium)
-            && t.w_unique > 0
+        matches!(t.confidence, Confidence::High | Confidence::Medium) && t.w_unique > 0
     };
 
     // ── YOUR CRATE: workspace-member findings (most actionable) ──
@@ -261,8 +260,7 @@ pub fn render_text(
         .targets
         .iter()
         .filter(|t| {
-            is_actionable(t)
-                && matches!(t.suggestion, RemovalStrategy::InlineUpstream { .. })
+            is_actionable(t) && matches!(t.suggestion, RemovalStrategy::InlineUpstream { .. })
         })
         .collect();
 
@@ -410,8 +408,15 @@ pub fn render_text(
 fn is_test_or_example_crate(name: &str) -> bool {
     let lower = name.to_lowercase();
     let patterns = [
-        "test", "example", "bench", "doc-example", "stress",
-        "tester", "poc", "guide", "wasm-example",
+        "test",
+        "example",
+        "bench",
+        "doc-example",
+        "stress",
+        "tester",
+        "poc",
+        "guide",
+        "wasm-example",
     ];
     patterns.iter().any(|p| lower.contains(p))
 }

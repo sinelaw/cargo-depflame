@@ -151,8 +151,15 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
 fn is_test_or_example_crate_name(name: &str) -> bool {
     let lower = name.to_lowercase();
     let patterns = [
-        "test", "example", "bench", "doc-example", "stress",
-        "tester", "poc", "guide", "wasm-example",
+        "test",
+        "example",
+        "bench",
+        "doc-example",
+        "stress",
+        "tester",
+        "poc",
+        "guide",
+        "wasm-example",
     ];
     patterns.iter().any(|p| lower.contains(p))
 }
