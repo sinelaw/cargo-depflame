@@ -66,7 +66,10 @@ pub struct DepGraph {
 impl DepGraph {
     /// Build the dependency graph from cargo_metadata output.
     pub fn from_metadata(metadata: &Metadata) -> Result<Self, TriageError> {
-        let resolve = metadata.resolve.as_ref().ok_or(TriageError::NoResolveGraph)?;
+        let resolve = metadata
+            .resolve
+            .as_ref()
+            .ok_or(TriageError::NoResolveGraph)?;
 
         let workspace_members: HashSet<PackageId> =
             metadata.workspace_members.iter().cloned().collect();
@@ -116,10 +119,8 @@ impl DepGraph {
 
                 // Check if any dep_kind has a target (platform-conditional).
                 let platform_conditional = dep_info.dep_kinds.iter().all(|dk| {
-                    matches!(
-                        dk.kind,
-                        DependencyKind::Normal | DependencyKind::Build
-                    ) && dk.target.is_some()
+                    matches!(dk.kind, DependencyKind::Normal | DependencyKind::Build)
+                        && dk.target.is_some()
                 });
 
                 deps.push(dep_info.pkg.clone());
@@ -156,12 +157,18 @@ impl DepGraph {
     }
 
     /// Enrich edge metadata with optional/platform info from Cargo.toml parsing.
-    pub fn enrich_edge_meta(&mut self, from_id: &PackageId, to_package_name: &str, meta: &crate::cargo_toml::CrateDepInfo) {
+    pub fn enrich_edge_meta(
+        &mut self,
+        from_id: &PackageId,
+        to_package_name: &str,
+        meta: &crate::cargo_toml::CrateDepInfo,
+    ) {
         if let Some(edge) = self.forward.get(from_id) {
             for to_id in edge {
                 if let Some(to_node) = self.nodes.get(to_id) {
                     if to_node.name == to_package_name {
-                        if let Some(em) = self.edge_meta.get_mut(&(from_id.clone(), to_id.clone())) {
+                        if let Some(em) = self.edge_meta.get_mut(&(from_id.clone(), to_id.clone()))
+                        {
                             if meta.is_optional(to_package_name) {
                                 em.already_optional = true;
                             }
@@ -226,11 +233,7 @@ impl DepGraph {
     /// Compute the "unique subtree weight" for an edge (intermediate -> fat):
     /// How many transitive deps of `fat` would be removed from the entire workspace
     /// if this single edge were cut?
-    pub fn unique_subtree_weight(
-        &self,
-        intermediate_id: &PackageId,
-        fat_id: &PackageId,
-    ) -> usize {
+    pub fn unique_subtree_weight(&self, intermediate_id: &PackageId, fat_id: &PackageId) -> usize {
         let fat_set = match self.nodes.get(fat_id) {
             Some(n) => &n.transitive_set,
             None => return 0,

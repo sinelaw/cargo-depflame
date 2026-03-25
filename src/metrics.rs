@@ -299,10 +299,7 @@ fn compute_suggestion(
         return RemovalStrategy::Remove;
     }
 
-    if let Some((_, replacement)) = STD_REPLACEMENTS
-        .iter()
-        .find(|(name, _)| *name == fat_name)
-    {
+    if let Some((_, replacement)) = STD_REPLACEMENTS.iter().find(|(name, _)| *name == fat_name) {
         return RemovalStrategy::ReplaceWithStd {
             suggestion: replacement.to_string(),
         };

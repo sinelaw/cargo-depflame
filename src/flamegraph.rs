@@ -237,7 +237,16 @@ fn layout_node(
             collapsed += 1;
             continue;
         }
-        layout_node(tree, child_idx, cx, depth + 1, cw, rects, path, ancestor_counts);
+        layout_node(
+            tree,
+            child_idx,
+            cx,
+            depth + 1,
+            cw,
+            rects,
+            path,
+            ancestor_counts,
+        );
         cx += cw;
     }
 
@@ -323,10 +332,7 @@ fn fit_label(name: &str, weight: usize, avail_width: f64) -> String {
 
 fn tooltip(r: &LayoutRect) -> String {
     let shared_note = if r.is_shared {
-        format!(
-            "\n[shared: {} parents in dep graph]",
-            r.ancestor_count
-        )
+        format!("\n[shared: {} parents in dep graph]", r.ancestor_count)
     } else {
         String::new()
     };

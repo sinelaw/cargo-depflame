@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
@@ -23,6 +23,8 @@ pub enum Command {
     Analyze(AnalyzeArgs),
     /// Re-render a previously saved JSON analysis.
     Report(ReportArgs),
+    /// Analyze and open an SVG flamegraph in the default browser.
+    Flame(FlameArgs),
 }
 
 #[derive(Parser, Debug)]
@@ -69,6 +71,30 @@ pub struct ReportArgs {
     /// Write report to a file instead of stdout.
     #[arg(long)]
     pub output: Option<PathBuf>,
+
+    /// Show detailed analysis (file matches, dep chains, metrics).
+    #[arg(long, short)]
+    pub verbose: bool,
+}
+
+/// Arguments shared between Analyze and Flame commands.
+#[derive(Args, Debug)]
+pub struct FlameArgs {
+    /// Path to the workspace Cargo.toml.
+    #[arg(long, default_value = "Cargo.toml")]
+    pub manifest_path: PathBuf,
+
+    /// Minimum hURRS score to include in the report.
+    #[arg(long, default_value_t = 3.0)]
+    pub threshold: f64,
+
+    /// Show only the top N results.
+    #[arg(long, default_value_t = 10)]
+    pub top: usize,
+
+    /// Minimum transitive weight for a node to be considered "fat".
+    #[arg(long, default_value_t = 10)]
+    pub fat_threshold: usize,
 
     /// Show detailed analysis (file matches, dep chains, metrics).
     #[arg(long, short)]

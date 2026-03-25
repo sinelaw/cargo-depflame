@@ -61,10 +61,7 @@ impl CrateDepInfo {
                      build: bool,
                      platform: bool| {
             if let Some(local_name) = dep_name {
-                let package_name = pkg
-                    .as_ref()
-                    .cloned()
-                    .unwrap_or_else(|| local_name.clone());
+                let package_name = pkg.as_ref().cloned().unwrap_or_else(|| local_name.clone());
                 deps.insert(
                     package_name.clone(),
                     DepMeta {
@@ -168,15 +165,12 @@ impl CrateDepInfo {
                             if let Some(p) = extract_field(val, "package") {
                                 pkg_name = Some(p);
                             }
-                            if extract_field(val, "optional")
-                                .is_some_and(|v| v == "true")
-                            {
+                            if extract_field(val, "optional").is_some_and(|v| v == "true") {
                                 opt = true;
                             }
                         }
 
-                        let package_name =
-                            pkg_name.unwrap_or_else(|| key.to_string());
+                        let package_name = pkg_name.unwrap_or_else(|| key.to_string());
                         deps.insert(
                             package_name.clone(),
                             DepMeta {
@@ -227,9 +221,7 @@ impl CrateDepInfo {
 
     /// Check if a dependency is optional.
     pub fn is_optional(&self, package_name: &str) -> bool {
-        self.deps
-            .get(package_name)
-            .is_some_and(|d| d.optional)
+        self.deps.get(package_name).is_some_and(|d| d.optional)
     }
 
     /// Check if a dependency is platform-conditional.
@@ -241,9 +233,7 @@ impl CrateDepInfo {
 
     /// Check if a dependency is a build-dependency.
     pub fn is_build_dep(&self, package_name: &str) -> bool {
-        self.deps
-            .get(package_name)
-            .is_some_and(|d| d.build_dep)
+        self.deps.get(package_name).is_some_and(|d| d.build_dep)
     }
 }
 
