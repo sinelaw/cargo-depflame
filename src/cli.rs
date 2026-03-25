@@ -23,7 +23,7 @@ pub enum Command {
     Analyze(AnalyzeArgs),
     /// Re-render a previously saved JSON analysis.
     Report(ReportArgs),
-    /// Analyze and open an SVG flamegraph in the default browser.
+    /// Analyze and open an interactive HTML report in the default browser.
     Flame(FlameArgs),
 }
 
@@ -107,4 +107,6 @@ pub enum OutputFormat {
     Json,
     /// Flamegraph / icicle-chart SVG showing dependency tree breakdown.
     Svg,
+    /// Self-contained HTML report with flamegraph, targets table, and JSON.
+    Html,
 }

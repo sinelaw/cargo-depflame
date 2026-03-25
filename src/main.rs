@@ -238,6 +238,9 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 .expect("dep_tree should always be present during analyze");
             flamegraph::render_flamegraph(tree, analysis.total_dependencies, &mut writer)?;
         }
+        OutputFormat::Html => {
+            cargo_upstream_triage::html_report::render_html_report(&analysis, &mut writer)?;
+        }
     }
 
     // If writing to file, also save JSON alongside for the report subcommand.
@@ -260,7 +263,7 @@ fn run_flame(args: FlameArgs) -> Result<()> {
         threshold: args.threshold,
         top: args.top,
         fat_threshold: args.fat_threshold,
-        format: OutputFormat::Svg,
+        format: OutputFormat::Html,
         output: None,
         verbose: args.verbose,
     };
@@ -269,7 +272,7 @@ fn run_flame(args: FlameArgs) -> Result<()> {
     // Use keep() so the file persists for the browser to read.
     let tmp_file = tempfile::Builder::new()
         .prefix("upstream-triage-")
-        .suffix(".svg")
+        .suffix(".html")
         .tempfile()
         .context("failed to create temp file")?;
     let svg_path = tmp_file
@@ -286,7 +289,7 @@ fn run_flame(args: FlameArgs) -> Result<()> {
 
     // Open the SVG in the user's default browser.
     let uri = format!("file://{}", svg_path.display());
-    eprintln!("Opening flamegraph: {}", uri);
+    eprintln!("Opening report: {}", uri);
     open::that(&uri).with_context(|| format!("failed to open browser for {}", uri))?;
 
     Ok(())
@@ -318,6 +321,9 @@ fn run_report(args: ReportArgs) -> Result<()> {
                 )
             })?;
             flamegraph::render_flamegraph(tree, analysis.total_dependencies, &mut writer)?;
+        }
+        OutputFormat::Html => {
+            cargo_upstream_triage::html_report::render_html_report(&analysis, &mut writer)?;
         }
     }
 
