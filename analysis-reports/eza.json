@@ -1,6 +1,6 @@
 {
   "tool_version": "0.1.0",
-  "timestamp": "2026-03-25T21:28:09.999463209+00:00",
+  "timestamp": "2026-03-25T23:48:06.843033344+00:00",
   "workspace_root": "/tmp/rust-projects/eza",
   "threshold": 3.0,
   "total_dependencies": 240,
@@ -1363,38 +1363,349 @@
       "fat_dep_loc": 2843,
       "fat_dep_own_deps": 7,
       "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "dirs-sys",
+        "version": "0.5.0"
+      },
+      "fat_dependency": {
+        "name": "redox_users",
+        "version": "0.5.2"
+      },
+      "w_transitive": 14,
+      "w_unique": 7,
+      "c_ref": 3,
+      "hurrs": 4.666666666666667,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "redox_users",
+        "searched_names": [
+          "redox_users"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dirs-sys-0.5.0/src/lib.rs",
+            "line_number": 79,
+            "line_content": "extern crate redox_users;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dirs-sys-0.5.0/src/lib.rs",
+            "line_number": 86,
+            "line_content": "use super::redox_users::{All, AllUsers, Config};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dirs-sys-0.5.0/src/lib.rs",
+            "line_number": 89,
+            "line_content": "let current_uid = redox_users::get_uid().ok()?;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "All",
+          "AllUsers",
+          "Config",
+          "get_uid"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "eza",
+        "dirs",
+        "dirs-sys",
+        "redox_users"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 1128,
+      "fat_dep_own_deps": 3,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0"
+      },
+      "fat_dependency": {
+        "name": "wit-bindgen-rust",
+        "version": "0.51.0"
+      },
+      "w_transitive": 32,
+      "w_unique": 5,
+      "c_ref": 3,
+      "hurrs": 10.666666666666666,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wit-bindgen-rust",
+        "searched_names": [
+          "wit_bindgen_rust"
+        ],
+        "ref_count": 3,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 13,
+            "line_content": "use wit_bindgen_rust::{Opts, Ownership, WithOption};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 33,
+            "line_content": "if let Some(e) = err.downcast_ref::<wit_bindgen_rust::MissingWith>() {",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-macro-0.51.0/src/lib.rs",
+            "line_number": 340,
+            "line_content": "impl From<ExportKey> for wit_bindgen_rust::ExportKey {",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "ExportKey",
+          "MissingWith",
+          "Opts",
+          "Ownership",
+          "WithOption"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "eza",
+        "git2",
+        "libgit2-sys",
+        "cc",
+        "jobserver",
+        "getrandom",
+        "wasip2",
+        "wit-bindgen",
+        "wit-bindgen-rust-macro",
+        "wit-bindgen-rust"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 5141,
+      "fat_dep_own_deps": 8,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "iana-time-zone",
+        "version": "0.1.65"
+      },
+      "fat_dependency": {
+        "name": "iana-time-zone-haiku",
+        "version": "0.1.2"
+      },
+      "w_transitive": 44,
+      "w_unique": 1,
+      "c_ref": 1,
+      "hurrs": 44.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "iana-time-zone-haiku",
+        "searched_names": [
+          "iana_time_zone_haiku"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iana-time-zone-0.1.65/src/tz_haiku.rs",
+            "line_number": 2,
+            "line_content": "iana_time_zone_haiku::get_timezone().ok_or(crate::GetTimezoneError::OsError)",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "get_timezone"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "eza",
+        "chrono",
+        "iana-time-zone",
+        "iana-time-zone-haiku"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 62,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "wit-bindgen-rust",
+        "version": "0.51.0"
+      },
+      "fat_dependency": {
+        "name": "wit-component",
+        "version": "0.244.0"
+      },
+      "w_transitive": 28,
+      "w_unique": 1,
+      "c_ref": 2,
+      "hurrs": 14.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wit-component",
+        "searched_names": [
+          "wit_component"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-0.51.0/src/lib.rs",
+            "line_number": 929,
+            "line_content": "let component_type = wit_component::metadata::encode(",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wit-bindgen-rust-0.51.0/src/lib.rs",
+            "line_number": 932,
+            "line_content": "wit_component::StringEncoding::UTF8,",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "StringEncoding",
+          "metadata"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "eza",
+        "git2",
+        "libgit2-sys",
+        "cc",
+        "jobserver",
+        "getrandom",
+        "wasip2",
+        "wit-bindgen",
+        "wit-bindgen-rust-macro",
+        "wit-bindgen-rust",
+        "wit-component"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 11183,
+      "fat_dep_own_deps": 11,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "iana-time-zone",
+        "version": "0.1.65"
+      },
+      "fat_dependency": {
+        "name": "js-sys",
+        "version": "0.3.85"
+      },
+      "w_transitive": 13,
+      "w_unique": 1,
+      "c_ref": 1,
+      "hurrs": 13.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "js-sys",
+        "searched_names": [
+          "js_sys"
+        ],
+        "ref_count": 1,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/iana-time-zone-0.1.65/src/tz_wasm32_unknown.rs",
+            "line_number": 1,
+            "line_content": "use js_sys::{Array, Intl, Object, Reflect};",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Array",
+          "Intl",
+          "Object",
+          "Reflect"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": "FeatureGate",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "eza",
+        "chrono",
+        "iana-time-zone",
+        "js-sys"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 3338,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
     }
   ],
   "dep_tree": {
     "nodes": [
       {
-        "name": "indexmap",
-        "version": "2.13.0",
-        "transitive_weight": 10,
-        "is_workspace": false,
-        "children": [
-          60,
-          5,
-          175,
-          39
-        ]
-      },
-      {
-        "name": "page_size",
-        "version": "0.6.0",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          85,
-          94
-        ]
-      },
-      {
-        "name": "utf8_iter",
-        "version": "1.0.4",
+        "name": "find-msvc-tools",
+        "version": "0.1.9",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
+      },
+      {
+        "name": "addr2line",
+        "version": "0.25.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          64
+        ]
       },
       {
         "name": "serde_spanned",
@@ -1402,574 +1713,20 @@
         "transitive_weight": 7,
         "is_workspace": false,
         "children": [
-          5
+          144
         ]
       },
       {
-        "name": "syn",
-        "version": "2.0.116",
-        "transitive_weight": 4,
+        "name": "rustix",
+        "version": "1.1.3",
+        "transitive_weight": 7,
         "is_workspace": false,
         "children": [
-          140,
-          170,
-          220
-        ]
-      },
-      {
-        "name": "serde_core",
-        "version": "1.0.228",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          27
-        ]
-      },
-      {
-        "name": "windows_aarch64_msvc",
-        "version": "0.53.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "once_cell_polyfill",
-        "version": "1.70.2",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "crunchy",
-        "version": "0.2.4",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "iana-time-zone-haiku",
-        "version": "0.1.2",
-        "transitive_weight": 44,
-        "is_workspace": false,
-        "children": [
-          43
-        ]
-      },
-      {
-        "name": "regex-automata",
-        "version": "0.4.14",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          34,
-          178,
-          222
-        ]
-      },
-      {
-        "name": "phf_macros",
-        "version": "0.13.1",
-        "transitive_weight": 9,
-        "is_workspace": false,
-        "children": [
-          36,
-          4,
-          140,
-          72,
-          170
-        ]
-      },
-      {
-        "name": "normalize-line-endings",
-        "version": "0.3.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "anes",
-        "version": "0.1.6",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "fast-srgb8",
-        "version": "1.0.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "potential_utf",
-        "version": "0.1.4",
-        "transitive_weight": 13,
-        "is_workspace": false,
-        "children": [
-          181
-        ]
-      },
-      {
-        "name": "humantime-serde",
-        "version": "1.1.1",
-        "transitive_weight": 9,
-        "is_workspace": false,
-        "children": [
-          60,
-          162
-        ]
-      },
-      {
-        "name": "os_pipe",
-        "version": "1.2.3",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          229,
-          94
-        ]
-      },
-      {
-        "name": "crossbeam-epoch",
-        "version": "0.9.18",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          209
-        ]
-      },
-      {
-        "name": "wasm-encoder",
-        "version": "0.244.0",
-        "transitive_weight": 17,
-        "is_workspace": false,
-        "children": [
-          136,
-          32
-        ]
-      },
-      {
-        "name": "unsafe-libyaml-norway",
-        "version": "0.2.15",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "icu_locale_core",
-        "version": "2.1.1",
-        "transitive_weight": 17,
-        "is_workspace": false,
-        "children": [
-          189,
-          181,
-          137,
-          113,
-          240
-        ]
-      },
-      {
-        "name": "percent-encoding",
-        "version": "2.3.2",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "time-core",
-        "version": "0.1.8",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "itertools",
-        "version": "0.13.0",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          204
-        ]
-      },
-      {
-        "name": "thiserror-impl",
-        "version": "2.0.18",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "idna_adapter",
-        "version": "1.2.1",
-        "transitive_weight": 27,
-        "is_workspace": false,
-        "children": [
-          185,
-          55
-        ]
-      },
-      {
-        "name": "serde_derive",
-        "version": "1.0.228",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "path-clean",
-        "version": "1.0.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "once_cell",
-        "version": "1.21.3",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "zerofrom-derive",
-        "version": "0.1.6",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          33,
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "windows-targets",
-        "version": "0.53.5",
-        "transitive_weight": 10,
-        "is_workspace": false,
-        "children": [
-          42,
-          100,
-          6,
-          167,
-          217,
-          139,
-          168,
-          180,
-          38
-        ]
-      },
-      {
-        "name": "leb128fmt",
-        "version": "0.1.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "synstructure",
-        "version": "0.13.2",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "aho-corasick",
-        "version": "1.1.4",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          178
-        ]
-      },
-      {
-        "name": "terminal_size",
-        "version": "0.4.3",
-        "transitive_weight": 18,
-        "is_workspace": false,
-        "children": [
-          201,
-          73
-        ]
-      },
-      {
-        "name": "phf_generator",
-        "version": "0.13.1",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          72,
-          151
-        ]
-      },
-      {
-        "name": "content_inspector",
-        "version": "0.2.4",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          178
-        ]
-      },
-      {
-        "name": "windows_x86_64_msvc",
-        "version": "0.53.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "hashbrown",
-        "version": "0.16.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "stable_deref_trait",
-        "version": "1.2.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "yoke",
-        "version": "0.8.1",
-        "transitive_weight": 10,
-        "is_workspace": false,
-        "children": [
-          212,
-          171,
-          40
-        ]
-      },
-      {
-        "name": "windows-link",
-        "version": "0.2.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "cc",
-        "version": "1.2.56",
-        "transitive_weight": 43,
-        "is_workspace": false,
-        "children": [
-          172,
+          174,
+          26,
+          16,
           149,
-          94,
-          186
-        ]
-      },
-      {
-        "name": "itoa",
-        "version": "1.0.17",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "filetime",
-        "version": "0.2.27",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          232,
-          105,
-          94
-        ]
-      },
-      {
-        "name": "partition-identity",
-        "version": "0.3.0",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          188
-        ]
-      },
-      {
-        "name": "uutils_term_grid",
-        "version": "0.7.0",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          104
-        ]
-      },
-      {
-        "name": "zmij",
-        "version": "1.0.21",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "tempfile",
-        "version": "3.25.0",
-        "transitive_weight": 48,
-        "is_workspace": false,
-        "children": [
-          95,
-          73,
-          229,
-          151,
-          29
-        ]
-      },
-      {
-        "name": "wasm-bindgen-macro-support",
-        "version": "0.2.108",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170,
-          115,
-          65
-        ]
-      },
-      {
-        "name": "windows-strings",
-        "version": "0.5.1",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          42
-        ]
-      },
-      {
-        "name": "prettyplease",
-        "version": "0.2.37",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          4,
-          170
-        ]
-      },
-      {
-        "name": "unicode-width",
-        "version": "0.2.2",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "wit-bindgen-core",
-        "version": "0.51.0",
-        "transitive_weight": 26,
-        "is_workspace": false,
-        "children": [
-          92,
-          61,
-          107
-        ]
-      },
-      {
-        "name": "icu_properties",
-        "version": "2.1.2",
-        "transitive_weight": 23,
-        "is_workspace": false,
-        "children": [
-          67,
-          21,
-          225,
-          239,
-          181,
-          210
-        ]
-      },
-      {
-        "name": "rustc-demangle",
-        "version": "0.1.27",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "wait-timeout",
-        "version": "0.2.1",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          94
-        ]
-      },
-      {
-        "name": "base64",
-        "version": "0.22.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "serde_norway",
-        "version": "0.9.42",
-        "transitive_weight": 14,
-        "is_workspace": false,
-        "children": [
-          0,
-          60,
-          44,
-          219,
-          20
-        ]
-      },
-      {
-        "name": "serde",
-        "version": "1.0.228",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          5,
-          27
-        ]
-      },
-      {
-        "name": "anyhow",
-        "version": "1.0.101",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "strsim",
-        "version": "0.11.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "form_urlencoded",
-        "version": "1.2.2",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          22
-        ]
-      },
-      {
-        "name": "uzers",
-        "version": "0.12.2",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          94,
-          198
+          5
         ]
       },
       {
@@ -1980,750 +1737,56 @@
         "children": []
       },
       {
-        "name": "automod",
-        "version": "1.0.16",
-        "transitive_weight": 5,
+        "name": "linux-raw-sys",
+        "version": "0.11.0",
+        "transitive_weight": 1,
         "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170
-        ]
+        "children": []
       },
       {
-        "name": "icu_provider",
+        "name": "icu_normalizer",
         "version": "2.1.1",
-        "transitive_weight": 19,
+        "transitive_weight": 26,
         "is_workspace": false,
         "children": [
-          21,
-          239,
-          181,
-          41,
-          212,
-          137,
-          240
-        ]
-      },
-      {
-        "name": "windows-core",
-        "version": "0.62.2",
-        "transitive_weight": 10,
-        "is_workspace": false,
-        "children": [
-          110,
-          183,
-          236,
-          51,
-          42
-        ]
-      },
-      {
-        "name": "option-ext",
-        "version": "0.2.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "natord-plus-plus",
-        "version": "2.0.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "clap_derive",
-        "version": "4.5.55",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170,
-          107
-        ]
-      },
-      {
-        "name": "phf_shared",
-        "version": "0.13.1",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          146
-        ]
-      },
-      {
-        "name": "rustix",
-        "version": "1.1.3",
-        "transitive_weight": 7,
-        "is_workspace": false,
-        "children": [
-          126,
-          229,
-          79,
-          94,
-          153
-        ]
-      },
-      {
-        "name": "anstyle",
-        "version": "1.0.13",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "serde_json",
-        "version": "1.0.149",
-        "transitive_weight": 11,
-        "is_workspace": false,
-        "children": [
-          60,
-          5,
-          44,
-          178,
-          48
-        ]
-      },
-      {
-        "name": "tinytemplate",
-        "version": "1.2.1",
-        "transitive_weight": 12,
-        "is_workspace": false,
-        "children": [
-          75,
-          60
-        ]
-      },
-      {
-        "name": "deranged",
-        "version": "0.5.6",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          235
-        ]
-      },
-      {
-        "name": "getrandom",
-        "version": "0.3.4",
-        "transitive_weight": 39,
-        "is_workspace": false,
-        "children": [
-          207,
-          105,
-          94,
-          82
-        ]
-      },
-      {
-        "name": "bitflags",
-        "version": "2.11.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "anstyle-parse",
-        "version": "0.2.7",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          195
-        ]
-      },
-      {
-        "name": "timeago",
-        "version": "0.6.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "r-efi",
-        "version": "5.3.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "unicode-xid",
-        "version": "0.2.6",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "id-arena",
-        "version": "2.3.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "winapi",
-        "version": "0.3.9",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          218,
-          109
-        ]
-      },
-      {
-        "name": "snapbox-macros",
-        "version": "1.0.0",
-        "transitive_weight": 12,
-        "is_workspace": false,
-        "children": [
-          206
-        ]
-      },
-      {
-        "name": "time-macros",
-        "version": "0.2.27",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          120,
-          23
-        ]
-      },
-      {
-        "name": "wasm-bindgen-macro",
-        "version": "0.2.108",
-        "transitive_weight": 8,
-        "is_workspace": false,
-        "children": [
-          50,
-          140
-        ]
-      },
-      {
-        "name": "getrandom",
-        "version": "0.2.17",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          105,
-          94,
-          116
-        ]
-      },
-      {
-        "name": "phf",
-        "version": "0.13.1",
-        "transitive_weight": 13,
-        "is_workspace": false,
-        "children": [
-          11,
-          60,
-          72
-        ]
-      },
-      {
-        "name": "wasm-bindgen",
-        "version": "0.2.108",
-        "transitive_weight": 12,
-        "is_workspace": false,
-        "children": [
-          88,
-          115,
-          105,
-          29,
-          98
-        ]
-      },
-      {
-        "name": "wit-parser",
-        "version": "0.244.0",
-        "transitive_weight": 24,
-        "is_workspace": false,
-        "children": [
-          136,
-          75,
-          0,
-          60,
-          27,
-          61,
-          84,
-          198,
-          211,
-          83
-        ]
-      },
-      {
-        "name": "approx",
-        "version": "0.5.1",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          117
-        ]
-      },
-      {
-        "name": "libc",
-        "version": "0.2.182",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "getrandom",
-        "version": "0.4.1",
-        "transitive_weight": 40,
-        "is_workspace": false,
-        "children": [
-          207,
-          159,
-          105,
-          94,
-          82
-        ]
-      },
-      {
-        "name": "plotters-svg",
-        "version": "0.3.7",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          142
-        ]
-      },
-      {
-        "name": "zerocopy-derive",
-        "version": "0.8.39",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "rustversion",
-        "version": "1.0.22",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "oorandom",
-        "version": "11.1.5",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "windows_aarch64_gnullvm",
-        "version": "0.53.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "is_terminal_polyfill",
-        "version": "1.70.2",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "redox_users",
-        "version": "0.5.2",
-        "transitive_weight": 14,
-        "is_workspace": false,
-        "children": [
+          234,
           226,
-          89,
-          232
-        ]
-      },
-      {
-        "name": "icu_normalizer_data",
-        "version": "2.1.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "ansi-width",
-        "version": "0.1.0",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          147
-        ]
-      },
-      {
-        "name": "cfg-if",
-        "version": "1.0.4",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "anstyle-wincon",
-        "version": "3.0.11",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          229,
-          74,
-          7
-        ]
-      },
-      {
-        "name": "heck",
-        "version": "0.5.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "zerovec-derive",
-        "version": "0.11.2",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "winapi-x86_64-pc-windows-gnu",
-        "version": "0.4.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "windows-implement",
-        "version": "0.60.2",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "android_system_properties",
-        "version": "0.1.5",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          94
-        ]
-      },
-      {
-        "name": "adler2",
-        "version": "2.0.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "litemap",
-        "version": "0.8.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "snapbox",
-        "version": "1.0.0",
-        "transitive_weight": 81,
-        "is_workspace": false,
-        "children": [
-          49,
-          86,
-          206,
-          201,
-          45,
-          182,
-          17,
-          37,
-          57,
-          74,
-          233,
-          94,
-          12,
-          187
-        ]
-      },
-      {
-        "name": "wasm-bindgen-shared",
-        "version": "0.2.108",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          220
-        ]
-      },
-      {
-        "name": "wasi",
-        "version": "0.11.1+wasi-snapshot-preview1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "num-traits",
-        "version": "0.2.19",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          150
-        ]
-      },
-      {
-        "name": "crossbeam-deque",
-        "version": "0.8.6",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          18,
-          209
-        ]
-      },
-      {
-        "name": "git2",
-        "version": "0.20.4",
-        "transitive_weight": 76,
-        "is_workspace": false,
-        "children": [
-          179,
-          197,
-          79,
-          94,
-          198
-        ]
-      },
-      {
-        "name": "num-conv",
-        "version": "0.2.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "ciborium",
-        "version": "0.2.2",
-        "transitive_weight": 15,
-        "is_workspace": false,
-        "children": [
-          173,
-          60,
-          193
-        ]
-      },
-      {
-        "name": "smallvec",
-        "version": "1.15.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "object",
-        "version": "0.37.3",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          178
-        ]
-      },
-      {
-        "name": "wit-bindgen-rust-macro",
-        "version": "0.51.0",
-        "transitive_weight": 33,
-        "is_workspace": false,
-        "children": [
-          228,
-          54,
-          52,
-          4,
-          140,
-          170,
-          61
-        ]
-      },
-      {
-        "name": "core-foundation-sys",
-        "version": "0.8.7",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "errno",
-        "version": "0.3.14",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          229,
-          94
-        ]
-      },
-      {
-        "name": "criterion-plot",
-        "version": "0.8.2",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          24,
-          230
-        ]
-      },
-      {
-        "name": "quick-xml",
-        "version": "0.38.4",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          178
-        ]
-      },
-      {
-        "name": "dirs-sys",
-        "version": "0.5.0",
-        "transitive_weight": 18,
-        "is_workspace": false,
-        "children": [
-          102,
-          229,
-          94,
-          69
-        ]
-      },
-      {
-        "name": "toml_edit",
-        "version": "0.23.10+spec-1.0.0",
-        "transitive_weight": 17,
-        "is_workspace": false,
-        "children": [
-          0,
-          3,
-          190,
-          5,
-          200,
-          221,
-          205
-        ]
-      },
-      {
-        "name": "anstyle-query",
-        "version": "1.1.5",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          229
-        ]
-      },
-      {
-        "name": "proc-mounts",
-        "version": "0.3.0",
-        "transitive_weight": 8,
-        "is_workspace": false,
-        "children": [
-          46
-        ]
-      },
-      {
-        "name": "eza",
-        "version": "0.23.4",
-        "transitive_weight": 189,
-        "is_workspace": true,
-        "children": [
-          119,
-          154,
-          144,
-          194,
-          216,
-          35,
-          59,
-          90,
-          134,
-          164,
-          231,
-          132,
-          60,
-          196,
-          47,
-          64,
-          104,
-          238,
-          229,
-          156,
-          94,
-          198,
-          70,
-          28,
-          22,
-          81,
-          53,
-          223
-        ]
-      },
-      {
-        "name": "backtrace",
-        "version": "0.3.76",
-        "transitive_weight": 11,
-        "is_workspace": false,
-        "children": [
-          161,
-          141,
-          123,
-          105,
-          94,
-          56,
-          42
-        ]
-      },
-      {
-        "name": "plotters",
-        "version": "0.3.7",
-        "transitive_weight": 19,
-        "is_workspace": false,
-        "children": [
           224,
-          91,
-          117,
-          96,
-          142
+          181,
+          111,
+          154
         ]
       },
       {
-        "name": "wasmparser",
-        "version": "0.244.0",
-        "transitive_weight": 15,
+        "name": "form_urlencoded",
+        "version": "1.2.2",
+        "transitive_weight": 2,
         "is_workspace": false,
         "children": [
-          0,
-          158,
-          79,
-          211
+          8
         ]
       },
       {
-        "name": "displaydoc",
-        "version": "0.2.5",
-        "transitive_weight": 5,
+        "name": "percent-encoding",
+        "version": "2.3.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "regex-automata",
+        "version": "0.4.14",
+        "transitive_weight": 4,
         "is_workspace": false,
         "children": [
-          4,
-          140,
-          170
+          121,
+          85,
+          53
         ]
       },
       {
-        "name": "by_address",
-        "version": "1.2.1",
+        "name": "shlex",
+        "version": "1.3.0",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
@@ -2736,197 +1799,274 @@
         "children": []
       },
       {
-        "name": "quote",
-        "version": "1.0.44",
-        "transitive_weight": 3,
+        "name": "crossbeam-utils",
+        "version": "0.8.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "yoke",
+        "version": "0.8.1",
+        "transitive_weight": 10,
         "is_workspace": false,
         "children": [
-          170
+          94,
+          73,
+          100
         ]
       },
       {
-        "name": "miniz_oxide",
-        "version": "0.8.9",
+        "name": "winapi-x86_64-pc-windows-gnu",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "android_system_properties",
+        "version": "0.1.5",
         "transitive_weight": 2,
         "is_workspace": false,
         "children": [
-          112
+          149
         ]
       },
       {
-        "name": "plotters-backend",
-        "version": "0.3.7",
+        "name": "bitflags",
+        "version": "2.11.0",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "regex",
-        "version": "1.12.3",
-        "transitive_weight": 5,
+        "name": "clap_derive",
+        "version": "4.5.55",
+        "transitive_weight": 6,
         "is_workspace": false,
         "children": [
-          10,
-          34,
-          178,
-          222
-        ]
-      },
-      {
-        "name": "clap",
-        "version": "4.5.59",
-        "transitive_weight": 21,
-        "is_workspace": false,
-        "children": [
-          145,
-          71
-        ]
-      },
-      {
-        "name": "clap_builder",
-        "version": "4.5.59",
-        "transitive_weight": 14,
-        "is_workspace": false,
-        "children": [
-          206,
-          74,
-          214,
-          62
-        ]
-      },
-      {
-        "name": "siphasher",
-        "version": "1.0.2",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "unicode-width",
-        "version": "0.1.14",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "vcpkg",
-        "version": "0.2.15",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "find-msvc-tools",
-        "version": "0.1.9",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "autocfg",
-        "version": "1.5.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "fastrand",
-        "version": "2.3.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "half",
-        "version": "2.7.1",
-        "transitive_weight": 9,
-        "is_workspace": false,
-        "children": [
-          184,
+          20,
+          75,
           105,
-          8
+          189
         ]
       },
       {
-        "name": "linux-raw-sys",
-        "version": "0.11.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "chrono",
-        "version": "0.4.43",
-        "transitive_weight": 64,
-        "is_workspace": false,
-        "children": [
-          227,
-          117,
-          42
-        ]
-      },
-      {
-        "name": "js-sys",
-        "version": "0.3.85",
-        "transitive_weight": 13,
-        "is_workspace": false,
-        "children": [
-          91,
-          29
-        ]
-      },
-      {
-        "name": "glob",
-        "version": "0.3.3",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "winapi-util",
-        "version": "0.1.11",
+        "name": "crossbeam-deque",
+        "version": "0.8.6",
         "transitive_weight": 3,
         "is_workspace": false,
         "children": [
-          229
+          43,
+          12
         ]
       },
       {
-        "name": "hashbrown",
-        "version": "0.15.5",
+        "name": "quick-xml",
+        "version": "0.38.4",
         "transitive_weight": 2,
         "is_workspace": false,
         "children": [
-          202
+          85
         ]
       },
       {
-        "name": "wasip3",
-        "version": "0.4.0+wasi-0.3.0-rc-2026-01-06",
-        "transitive_weight": 35,
+        "name": "syn",
+        "version": "2.0.116",
+        "transitive_weight": 4,
         "is_workspace": false,
         "children": [
-          199
+          75,
+          105,
+          78
         ]
       },
       {
-        "name": "thiserror-impl",
-        "version": "1.0.69",
+        "name": "synstructure",
+        "version": "0.13.2",
         "transitive_weight": 5,
         "is_workspace": false,
         "children": [
-          4,
-          140,
-          170
+          20,
+          75,
+          105
         ]
       },
       {
-        "name": "addr2line",
-        "version": "0.25.1",
+        "name": "libgit2-sys",
+        "version": "0.18.3+1.9.2",
+        "transitive_weight": 47,
+        "is_workspace": false,
+        "children": [
+          67,
+          208,
+          149,
+          83
+        ]
+      },
+      {
+        "name": "winnow",
+        "version": "0.7.14",
         "transitive_weight": 2,
         "is_workspace": false,
         "children": [
-          208
+          85
+        ]
+      },
+      {
+        "name": "snapbox",
+        "version": "1.0.0",
+        "transitive_weight": 81,
+        "is_workspace": false,
+        "children": [
+          61,
+          230,
+          40,
+          122,
+          168,
+          147,
+          74,
+          56,
+          39,
+          145,
+          48,
+          149,
+          37,
+          128
+        ]
+      },
+      {
+        "name": "timeago",
+        "version": "0.6.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.61.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          115
+        ]
+      },
+      {
+        "name": "nu-ansi-term",
+        "version": "0.50.3",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          182,
+          26
+        ]
+      },
+      {
+        "name": "once_cell",
+        "version": "1.21.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "by_address",
+        "version": "1.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rustc-demangle",
+        "version": "0.1.27",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ryu",
+        "version": "1.0.23",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winapi-i686-pc-windows-gnu",
+        "version": "0.4.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_aarch64_msvc",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_x86_64_msvc",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wit-bindgen",
+        "version": "0.51.0",
+        "transitive_weight": 34,
+        "is_workspace": false,
+        "children": [
+          225
+        ]
+      },
+      {
+        "name": "dirs-sys",
+        "version": "0.5.0",
+        "transitive_weight": 18,
+        "is_workspace": false,
+        "children": [
+          213,
+          26,
+          149,
+          211
+        ]
+      },
+      {
+        "name": "normalize-line-endings",
+        "version": "0.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "core-foundation-sys",
+        "version": "0.8.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wait-timeout",
+        "version": "0.2.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          149
+        ]
+      },
+      {
+        "name": "anstream",
+        "version": "0.6.21",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          233,
+          175,
+          54,
+          145,
+          228,
+          126,
+          173
         ]
       },
       {
@@ -2937,54 +2077,385 @@
         "children": []
       },
       {
+        "name": "displaydoc",
+        "version": "0.2.5",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "crossbeam-epoch",
+        "version": "0.9.18",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          12
+        ]
+      },
+      {
         "name": "trycmd",
         "version": "1.0.0",
         "transitive_weight": 99,
         "is_workspace": false,
         "children": [
-          114,
-          130,
-          206,
-          16,
-          60,
-          196,
-          66,
+          24,
+          79,
+          40,
+          63,
+          182,
           156,
-          162,
-          186
+          227,
+          137,
+          41,
+          10
         ]
       },
       {
-        "name": "palette",
-        "version": "0.7.5",
-        "transitive_weight": 11,
+        "name": "winapi-util",
+        "version": "0.1.11",
+        "transitive_weight": 3,
         "is_workspace": false,
         "children": [
-          169,
-          93,
-          14
+          26
         ]
       },
       {
-        "name": "colorchoice",
+        "name": "wasmparser",
+        "version": "0.244.0",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          130,
+          200,
+          16,
+          59
+        ]
+      },
+      {
+        "name": "adler2",
+        "version": "2.0.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "dunce",
+        "version": "1.0.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "num-traits",
+        "version": "0.2.19",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          96
+        ]
+      },
+      {
+        "name": "equivalent",
+        "version": "1.0.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "thiserror-impl",
+        "version": "1.0.69",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "toml_parser",
+        "version": "1.0.9+spec-1.1.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          23
+        ]
+      },
+      {
+        "name": "regex-syntax",
+        "version": "0.8.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "anstyle-parse",
+        "version": "0.2.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          173
+        ]
+      },
+      {
+        "name": "clap_lex",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "content_inspector",
+        "version": "0.2.4",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          85
+        ]
+      },
+      {
+        "name": "uzers",
+        "version": "0.12.2",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          149,
+          152
+        ]
+      },
+      {
+        "name": "plist",
+        "version": "1.8.0",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          66,
+          130,
+          19,
+          215
+        ]
+      },
+      {
+        "name": "semver",
+        "version": "1.0.27",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "path-clean",
+        "version": "1.0.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "tempfile",
+        "version": "3.25.0",
+        "transitive_weight": 48,
+        "is_workspace": false,
+        "children": [
+          62,
+          3,
+          26,
+          210,
+          28
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.4.1",
+        "transitive_weight": 40,
+        "is_workspace": false,
+        "children": [
+          70,
+          148,
+          68,
+          149,
+          76
+        ]
+      },
+      {
+        "name": "humantime-serde",
+        "version": "1.1.1",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          182,
+          41
+        ]
+      },
+      {
+        "name": "gimli",
+        "version": "0.32.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "litemap",
+        "version": "0.8.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "time",
+        "version": "0.3.47",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          144,
+          114,
+          97,
+          159,
+          132,
+          238,
+          110
+        ]
+      },
+      {
+        "name": "libz-sys",
+        "version": "1.1.23",
+        "transitive_weight": 46,
+        "is_workspace": false,
+        "children": [
+          208,
+          149,
+          83,
+          138
+        ]
+      },
+      {
+        "name": "cfg-if",
         "version": "1.0.4",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "idna",
-        "version": "1.1.0",
-        "transitive_weight": 29,
+        "name": "tinystr",
+        "version": "0.8.2",
+        "transitive_weight": 14,
         "is_workspace": false,
         "children": [
-          26,
-          122,
-          2
+          181,
+          42
         ]
       },
       {
-        "name": "windows_i686_gnu",
+        "name": "wasip2",
+        "version": "1.0.2+wasi-0.2.9",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          35
+        ]
+      },
+      {
+        "name": "potential_utf",
+        "version": "0.1.4",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          181
+        ]
+      },
+      {
+        "name": "toml_datetime",
+        "version": "0.7.5+spec-1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          144
+        ]
+      },
+      {
+        "name": "yoke-derive",
+        "version": "0.8.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          21,
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "os_pipe",
+        "version": "1.2.3",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          26,
+          149
+        ]
+      },
+      {
+        "name": "quote",
+        "version": "1.0.44",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          105
+        ]
+      },
+      {
+        "name": "r-efi",
+        "version": "5.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "js-sys",
+        "version": "0.3.85",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          92,
+          28
+        ]
+      },
+      {
+        "name": "unicode-ident",
+        "version": "1.0.24",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "toml_edit",
+        "version": "0.23.10+spec-1.0.0",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          130,
+          2,
+          72,
+          144,
+          52,
+          23,
+          158
+        ]
+      },
+      {
+        "name": "terminal_size",
+        "version": "0.4.3",
+        "transitive_weight": 18,
+        "is_workspace": false,
+        "children": [
+          122,
+          3
+        ]
+      },
+      {
+        "name": "windows_aarch64_gnullvm",
         "version": "0.53.1",
         "transitive_weight": 1,
         "is_workspace": false,
@@ -2998,113 +2469,18 @@
         "children": []
       },
       {
-        "name": "palette_derive",
-        "version": "0.7.6",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170,
-          138
-        ]
-      },
-      {
-        "name": "proc-macro2",
-        "version": "1.0.106",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          220
-        ]
-      },
-      {
-        "name": "yoke-derive",
-        "version": "0.8.1",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          33,
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "jobserver",
-        "version": "0.1.34",
-        "transitive_weight": 40,
-        "is_workspace": false,
-        "children": [
-          78,
-          94
-        ]
-      },
-      {
-        "name": "ciborium-ll",
-        "version": "0.2.2",
-        "transitive_weight": 11,
-        "is_workspace": false,
-        "children": [
-          152,
-          193
-        ]
-      },
-      {
-        "name": "time",
-        "version": "0.3.47",
-        "transitive_weight": 13,
-        "is_workspace": false,
-        "children": [
-          5,
-          87,
-          77,
-          44,
-          120,
-          235,
-          23
-        ]
-      },
-      {
-        "name": "equivalent",
-        "version": "1.0.2",
+        "name": "pkg-config",
+        "version": "0.3.32",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "criterion",
-        "version": "0.8.2",
-        "transitive_weight": 105,
+        "name": "id-arena",
+        "version": "2.3.0",
+        "transitive_weight": 1,
         "is_workspace": false,
-        "children": [
-          203,
-          144,
-          135,
-          121,
-          76,
-          75,
-          60,
-          196,
-          1,
-          143,
-          182,
-          127,
-          24,
-          117,
-          13,
-          230,
-          99
-        ]
-      },
-      {
-        "name": "same-file",
-        "version": "1.0.6",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          157
-        ]
+        "children": []
       },
       {
         "name": "memchr",
@@ -3114,16 +2490,33 @@
         "children": []
       },
       {
-        "name": "libgit2-sys",
-        "version": "0.18.3+1.9.2",
-        "transitive_weight": 47,
+        "name": "ciborium",
+        "version": "0.2.2",
+        "transitive_weight": 15,
         "is_workspace": false,
         "children": [
-          213,
-          43,
-          94,
-          234
+          116,
+          182,
+          103
         ]
+      },
+      {
+        "name": "serde_derive",
+        "version": "1.0.228",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "siphasher",
+        "version": "1.0.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
       },
       {
         "name": "windows_x86_64_gnullvm",
@@ -3133,121 +2526,126 @@
         "children": []
       },
       {
-        "name": "zerovec",
-        "version": "0.11.5",
+        "name": "tinytemplate",
+        "version": "1.2.1",
         "transitive_weight": 12,
         "is_workspace": false,
         "children": [
-          41,
-          212,
-          108
+          192,
+          182
         ]
       },
       {
-        "name": "walkdir",
-        "version": "2.5.0",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          177,
-          157
-        ]
-      },
-      {
-        "name": "windows-interface",
-        "version": "0.59.3",
-        "transitive_weight": 5,
-        "is_workspace": false,
-        "children": [
-          4,
-          140,
-          170
-        ]
-      },
-      {
-        "name": "zerocopy",
-        "version": "0.8.39",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          97
-        ]
-      },
-      {
-        "name": "icu_normalizer",
-        "version": "2.1.1",
-        "transitive_weight": 26,
-        "is_workspace": false,
-        "children": [
-          55,
-          67,
-          225,
-          181,
-          103,
-          122
-        ]
-      },
-      {
-        "name": "shlex",
-        "version": "1.3.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "similar",
-        "version": "2.7.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "thiserror",
-        "version": "1.0.69",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          160
-        ]
-      },
-      {
-        "name": "tinystr",
-        "version": "0.8.2",
+        "name": "web-sys",
+        "version": "0.3.85",
         "transitive_weight": 14,
         "is_workspace": false,
         "children": [
-          181,
-          137
+          77,
+          92
         ]
       },
       {
-        "name": "toml_datetime",
-        "version": "0.7.5+spec-1.1.0",
+        "name": "wasm-bindgen",
+        "version": "0.2.108",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          163,
+          101,
+          68,
+          28,
+          166
+        ]
+      },
+      {
+        "name": "zerocopy-derive",
+        "version": "0.8.39",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "zerofrom",
+        "version": "0.1.6",
         "transitive_weight": 7,
         "is_workspace": false,
         "children": [
-          5
+          177
         ]
       },
       {
-        "name": "redox_syscall",
-        "version": "0.7.1",
+        "name": "iana-time-zone-haiku",
+        "version": "0.1.2",
+        "transitive_weight": 44,
+        "is_workspace": false,
+        "children": [
+          208
+        ]
+      },
+      {
+        "name": "autocfg",
+        "version": "1.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "deranged",
+        "version": "0.5.6",
         "transitive_weight": 2,
         "is_workspace": false,
         "children": [
-          79
+          238
         ]
       },
       {
-        "name": "wasm-metadata",
-        "version": "0.244.0",
-        "transitive_weight": 19,
+        "name": "leb128fmt",
+        "version": "0.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "partition-identity",
+        "version": "0.3.0",
+        "transitive_weight": 7,
         "is_workspace": false,
         "children": [
-          19,
-          136,
-          0,
-          61
+          205
+        ]
+      },
+      {
+        "name": "stable_deref_trait",
+        "version": "1.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-shared",
+        "version": "0.2.108",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          78
+        ]
+      },
+      {
+        "name": "icu_locale_core",
+        "version": "2.1.1",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          69,
+          181,
+          42,
+          65,
+          196
         ]
       },
       {
@@ -3258,94 +2656,51 @@
         "children": []
       },
       {
-        "name": "plist",
-        "version": "1.8.0",
-        "transitive_weight": 21,
-        "is_workspace": false,
-        "children": [
-          174,
-          0,
-          128,
-          58
-        ]
-      },
-      {
-        "name": "utf8parse",
-        "version": "0.2.2",
+        "name": "anes",
+        "version": "0.1.6",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "rayon",
-        "version": "1.11.0",
-        "transitive_weight": 6,
+        "name": "proc-macro2",
+        "version": "1.0.106",
+        "transitive_weight": 2,
         "is_workspace": false,
         "children": [
-          237,
-          204
+          78
         ]
       },
       {
-        "name": "url",
-        "version": "2.5.8",
-        "transitive_weight": 35,
-        "is_workspace": false,
-        "children": [
-          166,
-          60,
-          63,
-          22
-        ]
-      },
-      {
-        "name": "log",
-        "version": "0.4.29",
+        "name": "wasi",
+        "version": "0.11.1+wasi-snapshot-preview1",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "wit-bindgen",
-        "version": "0.51.0",
-        "transitive_weight": 34,
+        "name": "criterion",
+        "version": "0.8.2",
+        "transitive_weight": 105,
         "is_workspace": false,
         "children": [
-          124
-        ]
-      },
-      {
-        "name": "toml_parser",
-        "version": "1.0.9+spec-1.1.0",
-        "transitive_weight": 3,
-        "is_workspace": false,
-        "children": [
-          221
-        ]
-      },
-      {
-        "name": "windows-sys",
-        "version": "0.60.2",
-        "transitive_weight": 11,
-        "is_workspace": false,
-        "children": [
-          31
-        ]
-      },
-      {
-        "name": "foldhash",
-        "version": "0.1.5",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "alloca",
-        "version": "0.4.0",
-        "transitive_weight": 44,
-        "is_workspace": false,
-        "children": [
-          43
+          161,
+          178,
+          190,
+          86,
+          90,
+          192,
+          182,
+          156,
+          109,
+          172,
+          147,
+          191,
+          219,
+          49,
+          104,
+          143,
+          223
         ]
       },
       {
@@ -3356,6 +2711,476 @@
         "children": []
       },
       {
+        "name": "page_size",
+        "version": "0.6.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          179,
+          149
+        ]
+      },
+      {
+        "name": "time-core",
+        "version": "0.1.8",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "icu_normalizer_data",
+        "version": "2.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows_i686_gnu",
+        "version": "0.53.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "eza",
+        "version": "0.23.4",
+        "transitive_weight": 189,
+        "is_workspace": true,
+        "children": [
+          222,
+          231,
+          178,
+          58,
+          199,
+          80,
+          139,
+          198,
+          209,
+          194,
+          27,
+          155,
+          182,
+          156,
+          142,
+          57,
+          150,
+          123,
+          26,
+          137,
+          149,
+          152,
+          118,
+          60,
+          8,
+          25,
+          237,
+          216
+        ]
+      },
+      {
+        "name": "time-macros",
+        "version": "0.2.27",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          132,
+          110
+        ]
+      },
+      {
+        "name": "windows-link",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ciborium-ll",
+        "version": "0.2.2",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          183,
+          103
+        ]
+      },
+      {
+        "name": "iana-time-zone",
+        "version": "0.1.65",
+        "transitive_weight": 61,
+        "is_workspace": false,
+        "children": [
+          95,
+          77,
+          92,
+          193,
+          15,
+          38,
+          152
+        ]
+      },
+      {
+        "name": "natord-plus-plus",
+        "version": "2.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "thiserror-impl",
+        "version": "2.0.18",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "zmij",
+        "version": "1.0.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "aho-corasick",
+        "version": "1.1.4",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          85
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.60.2",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          206
+        ]
+      },
+      {
+        "name": "locale",
+        "version": "0.2.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          149
+        ]
+      },
+      {
+        "name": "phf_macros",
+        "version": "0.13.1",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          212,
+          20,
+          75,
+          165,
+          105
+        ]
+      },
+      {
+        "name": "utf8_iter",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "is_terminal_polyfill",
+        "version": "1.70.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "object",
+        "version": "0.37.3",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          85
+        ]
+      },
+      {
+        "name": "similar",
+        "version": "2.7.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unsafe-libyaml-norway",
+        "version": "0.2.15",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "indexmap",
+        "version": "2.13.0",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          182,
+          144,
+          50,
+          239
+        ]
+      },
+      {
+        "name": "zerotrie",
+        "version": "0.2.3",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          13,
+          94,
+          42
+        ]
+      },
+      {
+        "name": "num-conv",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-encoder",
+        "version": "0.244.0",
+        "transitive_weight": 17,
+        "is_workspace": false,
+        "children": [
+          46,
+          98
+        ]
+      },
+      {
+        "name": "once_cell_polyfill",
+        "version": "1.70.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-result",
+        "version": "0.4.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          115
+        ]
+      },
+      {
+        "name": "same-file",
+        "version": "1.0.6",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          45
+        ]
+      },
+      {
+        "name": "glob",
+        "version": "0.3.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "vcpkg",
+        "version": "0.2.15",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_norway",
+        "version": "0.9.42",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          130,
+          182,
+          159,
+          31,
+          129
+        ]
+      },
+      {
+        "name": "unicode-xid",
+        "version": "0.2.6",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "idna",
+        "version": "1.1.0",
+        "transitive_weight": 29,
+        "is_workspace": false,
+        "children": [
+          203,
+          154,
+          125
+        ]
+      },
+      {
+        "name": "uutils_term_grid",
+        "version": "0.7.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          150
+        ]
+      },
+      {
+        "name": "cast",
+        "version": "0.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_core",
+        "version": "1.0.228",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          87
+        ]
+      },
+      {
+        "name": "anstyle",
+        "version": "1.0.13",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wit-parser",
+        "version": "0.244.0",
+        "transitive_weight": 24,
+        "is_workspace": false,
+        "children": [
+          46,
+          192,
+          130,
+          182,
+          87,
+          236,
+          84,
+          152,
+          59,
+          140
+        ]
+      },
+      {
+        "name": "walkdir",
+        "version": "2.5.0",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          136,
+          45
+        ]
+      },
+      {
+        "name": "wasip3",
+        "version": "0.4.0+wasi-0.3.0-rc-2026-01-06",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          35
+        ]
+      },
+      {
+        "name": "libc",
+        "version": "0.2.182",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ansi-width",
+        "version": "0.1.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          229
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.3.4",
+        "transitive_weight": 39,
+        "is_workspace": false,
+        "children": [
+          70,
+          68,
+          149,
+          76
+        ]
+      },
+      {
+        "name": "log",
+        "version": "0.4.29",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "prettyplease",
+        "version": "0.2.37",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          105
+        ]
+      },
+      {
+        "name": "smallvec",
+        "version": "1.15.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "proc-mounts",
+        "version": "0.3.0",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          99
+        ]
+      },
+      {
+        "name": "rayon",
+        "version": "1.11.0",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          207,
+          108
+        ]
+      },
+      {
+        "name": "approx",
+        "version": "0.5.1",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          49
+        ]
+      },
+      {
         "name": "toml_writer",
         "version": "1.0.6+spec-1.1.0",
         "transitive_weight": 1,
@@ -3363,39 +3188,373 @@
         "children": []
       },
       {
-        "name": "anstream",
-        "version": "0.6.21",
-        "transitive_weight": 11,
-        "is_workspace": false,
-        "children": [
-          106,
-          131,
-          80,
-          74,
-          165,
-          101,
-          195
-        ]
-      },
-      {
-        "name": "wasip2",
-        "version": "1.0.2+wasi-0.2.9",
-        "transitive_weight": 35,
-        "is_workspace": false,
-        "children": [
-          199
-        ]
-      },
-      {
-        "name": "gimli",
-        "version": "0.32.3",
+        "name": "itoa",
+        "version": "1.0.17",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "crossbeam-utils",
-        "version": "0.8.21",
+        "name": "jobserver",
+        "version": "0.1.34",
+        "transitive_weight": 40,
+        "is_workspace": false,
+        "children": [
+          151,
+          149
+        ]
+      },
+      {
+        "name": "alloca",
+        "version": "0.4.0",
+        "transitive_weight": 44,
+        "is_workspace": false,
+        "children": [
+          208
+        ]
+      },
+      {
+        "name": "strsim",
+        "version": "0.11.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-macro",
+        "version": "0.2.108",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          184,
+          75
+        ]
+      },
+      {
+        "name": "libredox",
+        "version": "0.1.12",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          176,
+          16,
+          149
+        ]
+      },
+      {
+        "name": "phf_shared",
+        "version": "0.13.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          88
+        ]
+      },
+      {
+        "name": "rustversion",
+        "version": "1.0.22",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-interface",
+        "version": "0.59.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "filetime",
+        "version": "0.2.27",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          164,
+          68,
+          149
+        ]
+      },
+      {
+        "name": "windows-implement",
+        "version": "0.60.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "crunchy",
+        "version": "0.2.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "miniz_oxide",
+        "version": "0.8.9",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          47
+        ]
+      },
+      {
+        "name": "regex",
+        "version": "1.12.3",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          9,
+          121,
+          85,
+          53
+        ]
+      },
+      {
+        "name": "utf8parse",
+        "version": "0.2.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "errno",
+        "version": "0.3.14",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          26,
+          149
+        ]
+      },
+      {
+        "name": "anstyle-query",
+        "version": "1.1.5",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          26
+        ]
+      },
+      {
+        "name": "redox_syscall",
+        "version": "0.7.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          16
+        ]
+      },
+      {
+        "name": "zerofrom-derive",
+        "version": "0.1.6",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          21,
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "clap",
+        "version": "4.5.59",
+        "transitive_weight": 21,
+        "is_workspace": false,
+        "children": [
+          214,
+          17
+        ]
+      },
+      {
+        "name": "winapi",
+        "version": "0.3.9",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          32,
+          14
+        ]
+      },
+      {
+        "name": "foldhash",
+        "version": "0.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerovec",
+        "version": "0.11.5",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          13,
+          94,
+          185
+        ]
+      },
+      {
+        "name": "serde",
+        "version": "1.0.228",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          144,
+          87
+        ]
+      },
+      {
+        "name": "half",
+        "version": "2.7.1",
+        "transitive_weight": 9,
+        "is_workspace": false,
+        "children": [
+          187,
+          68,
+          170
+        ]
+      },
+      {
+        "name": "wasm-bindgen-macro-support",
+        "version": "0.2.108",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105,
+          101,
+          4
+        ]
+      },
+      {
+        "name": "zerovec-derive",
+        "version": "0.11.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "plotters-backend",
+        "version": "0.3.7",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerocopy",
+        "version": "0.8.39",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          93
+        ]
+      },
+      {
+        "name": "thiserror",
+        "version": "2.0.18",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          119
+        ]
+      },
+      {
+        "name": "heck",
+        "version": "0.5.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "plotters",
+        "version": "0.3.7",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          91,
+          92,
+          49,
+          221,
+          186
+        ]
+      },
+      {
+        "name": "criterion-plot",
+        "version": "0.8.2",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          219,
+          143
+        ]
+      },
+      {
+        "name": "serde_json",
+        "version": "1.0.149",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          182,
+          144,
+          159,
+          85,
+          120
+        ]
+      },
+      {
+        "name": "windows-core",
+        "version": "0.62.2",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          169,
+          167,
+          135,
+          235,
+          115
+        ]
+      },
+      {
+        "name": "palette",
+        "version": "0.7.5",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          201,
+          157,
+          220
+        ]
+      },
+      {
+        "name": "wasm-metadata",
+        "version": "0.244.0",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          133,
+          46,
+          130,
+          236
+        ]
+      },
+      {
+        "name": "writeable",
+        "version": "0.6.2",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
@@ -3408,57 +3567,14 @@
         "children": []
       },
       {
-        "name": "semver",
-        "version": "1.0.27",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "zerofrom",
-        "version": "0.1.6",
-        "transitive_weight": 7,
+        "name": "phf",
+        "version": "0.13.1",
+        "transitive_weight": 13,
         "is_workspace": false,
         "children": [
-          30
-        ]
-      },
-      {
-        "name": "libz-sys",
-        "version": "1.1.23",
-        "transitive_weight": 46,
-        "is_workspace": false,
-        "children": [
-          43,
-          94,
-          234,
-          148
-        ]
-      },
-      {
-        "name": "clap_lex",
-        "version": "1.0.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "wit-component",
-        "version": "0.244.0",
-        "transitive_weight": 28,
-        "is_workspace": false,
-        "children": [
-          92,
-          192,
-          19,
-          136,
-          75,
-          0,
-          60,
-          27,
-          61,
-          79,
-          198
+          124,
+          182,
+          165
         ]
       },
       {
@@ -3467,49 +3583,175 @@
         "transitive_weight": 19,
         "is_workspace": false,
         "children": [
-          129
+          36
         ]
       },
       {
-        "name": "windows_i686_gnullvm",
-        "version": "0.53.1",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "winapi-i686-pc-windows-gnu",
-        "version": "0.4.0",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "ryu",
-        "version": "1.0.23",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "unicode-ident",
-        "version": "1.0.24",
-        "transitive_weight": 1,
-        "is_workspace": false,
-        "children": []
-      },
-      {
-        "name": "winnow",
-        "version": "0.7.14",
+        "name": "hashbrown",
+        "version": "0.15.5",
         "transitive_weight": 2,
         "is_workspace": false,
         "children": [
-          178
+          180
         ]
       },
       {
-        "name": "regex-syntax",
-        "version": "0.8.9",
+        "name": "palette_derive",
+        "version": "0.7.6",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105,
+          29
+        ]
+      },
+      {
+        "name": "wit-bindgen-core",
+        "version": "0.51.0",
+        "transitive_weight": 26,
+        "is_workspace": false,
+        "children": [
+          146,
+          236,
+          189
+        ]
+      },
+      {
+        "name": "idna_adapter",
+        "version": "1.2.1",
+        "transitive_weight": 27,
+        "is_workspace": false,
+        "children": [
+          6,
+          234
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.2.17",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          68,
+          149,
+          106
+        ]
+      },
+      {
+        "name": "thiserror",
+        "version": "1.0.69",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          51
+        ]
+      },
+      {
+        "name": "windows-targets",
+        "version": "0.53.5",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          115,
+          81,
+          33,
+          112,
+          217,
+          11,
+          82,
+          89,
+          34
+        ]
+      },
+      {
+        "name": "rayon-core",
+        "version": "1.13.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          18,
+          12
+        ]
+      },
+      {
+        "name": "cc",
+        "version": "1.2.56",
+        "transitive_weight": 43,
+        "is_workspace": false,
+        "children": [
+          160,
+          0,
+          149,
+          10
+        ]
+      },
+      {
+        "name": "backtrace",
+        "version": "0.3.76",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          1,
+          171,
+          127,
+          68,
+          149,
+          30,
+          115
+        ]
+      },
+      {
+        "name": "fastrand",
+        "version": "2.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "option-ext",
+        "version": "0.2.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "phf_generator",
+        "version": "0.13.1",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          165,
+          210
+        ]
+      },
+      {
+        "name": "redox_users",
+        "version": "0.5.2",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          188,
+          204,
+          164
+        ]
+      },
+      {
+        "name": "clap_builder",
+        "version": "4.5.59",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          40,
+          145,
+          55,
+          162
+        ]
+      },
+      {
+        "name": "base64",
+        "version": "0.22.1",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
@@ -3522,51 +3764,11 @@
         "children": []
       },
       {
-        "name": "web-sys",
-        "version": "0.3.85",
-        "transitive_weight": 14,
+        "name": "windows_i686_gnullvm",
+        "version": "0.53.1",
+        "transitive_weight": 1,
         "is_workspace": false,
-        "children": [
-          155,
-          91
-        ]
-      },
-      {
-        "name": "icu_collections",
-        "version": "2.1.1",
-        "transitive_weight": 15,
-        "is_workspace": false,
-        "children": [
-          15,
-          181,
-          41,
-          212,
-          137
-        ]
-      },
-      {
-        "name": "thiserror",
-        "version": "2.0.18",
-        "transitive_weight": 6,
-        "is_workspace": false,
-        "children": [
-          25
-        ]
-      },
-      {
-        "name": "iana-time-zone",
-        "version": "0.1.65",
-        "transitive_weight": 61,
-        "is_workspace": false,
-        "children": [
-          9,
-          155,
-          91,
-          68,
-          111,
-          125,
-          198
-        ]
+        "children": []
       },
       {
         "name": "wit-bindgen-rust",
@@ -3574,63 +3776,212 @@
         "transitive_weight": 32,
         "is_workspace": false,
         "children": [
-          215,
-          54,
-          192,
-          0,
-          52,
-          4,
-          61,
-          107
+          232,
+          202,
+          195,
+          130,
+          153,
+          20,
+          236,
+          189
         ]
       },
       {
-        "name": "windows-sys",
-        "version": "0.61.2",
+        "name": "itertools",
+        "version": "0.13.0",
         "transitive_weight": 2,
         "is_workspace": false,
         "children": [
+          108
+        ]
+      },
+      {
+        "name": "fast-srgb8",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "plotters-svg",
+        "version": "0.3.7",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          186
+        ]
+      },
+      {
+        "name": "git2",
+        "version": "0.20.4",
+        "transitive_weight": 76,
+        "is_workspace": false,
+        "children": [
+          22,
+          240,
+          16,
+          149,
+          152
+        ]
+      },
+      {
+        "name": "oorandom",
+        "version": "11.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "icu_collections",
+        "version": "2.1.1",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          71,
+          181,
+          13,
+          94,
           42
         ]
       },
       {
-        "name": "cast",
-        "version": "0.3.0",
+        "name": "wit-bindgen-rust-macro",
+        "version": "0.51.0",
+        "transitive_weight": 33,
+        "is_workspace": false,
+        "children": [
+          218,
+          202,
+          153,
+          20,
+          75,
+          105,
+          236
+        ]
+      },
+      {
+        "name": "icu_provider",
+        "version": "2.1.1",
+        "transitive_weight": 19,
+        "is_workspace": false,
+        "children": [
+          102,
+          131,
+          181,
+          13,
+          94,
+          42,
+          196
+        ]
+      },
+      {
+        "name": "automod",
+        "version": "1.0.16",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          20,
+          75,
+          105
+        ]
+      },
+      {
+        "name": "colorchoice",
+        "version": "1.0.4",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "nu-ansi-term",
-        "version": "0.50.3",
-        "transitive_weight": 10,
-        "is_workspace": false,
-        "children": [
-          60,
-          229
-        ]
-      },
-      {
-        "name": "libredox",
-        "version": "0.1.12",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          191,
-          79,
-          94
-        ]
-      },
-      {
-        "name": "dunce",
-        "version": "1.0.5",
+        "name": "unicode-width",
+        "version": "0.1.14",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
       },
       {
-        "name": "pkg-config",
-        "version": "0.3.32",
+        "name": "snapbox-macros",
+        "version": "1.0.0",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          40
+        ]
+      },
+      {
+        "name": "chrono",
+        "version": "0.4.43",
+        "transitive_weight": 64,
+        "is_workspace": false,
+        "children": [
+          117,
+          49,
+          115
+        ]
+      },
+      {
+        "name": "wit-component",
+        "version": "0.244.0",
+        "transitive_weight": 28,
+        "is_workspace": false,
+        "children": [
+          146,
+          195,
+          133,
+          46,
+          192,
+          130,
+          182,
+          87,
+          236,
+          16,
+          152
+        ]
+      },
+      {
+        "name": "anstyle-wincon",
+        "version": "3.0.11",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          26,
+          145,
+          134
+        ]
+      },
+      {
+        "name": "icu_properties",
+        "version": "2.1.2",
+        "transitive_weight": 23,
+        "is_workspace": false,
+        "children": [
+          226,
+          102,
+          224,
+          131,
+          181,
+          197
+        ]
+      },
+      {
+        "name": "windows-strings",
+        "version": "0.5.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          115
+        ]
+      },
+      {
+        "name": "anyhow",
+        "version": "1.0.101",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-width",
+        "version": "0.2.2",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
@@ -3643,54 +3994,27 @@
         "children": []
       },
       {
-        "name": "windows-result",
-        "version": "0.4.1",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          42
-        ]
-      },
-      {
-        "name": "rayon-core",
-        "version": "1.13.0",
-        "transitive_weight": 4,
-        "is_workspace": false,
-        "children": [
-          118,
-          209
-        ]
-      },
-      {
-        "name": "locale",
-        "version": "0.2.2",
-        "transitive_weight": 2,
-        "is_workspace": false,
-        "children": [
-          94
-        ]
-      },
-      {
-        "name": "zerotrie",
-        "version": "0.2.3",
-        "transitive_weight": 12,
-        "is_workspace": false,
-        "children": [
-          41,
-          212,
-          137
-        ]
-      },
-      {
-        "name": "writeable",
-        "version": "0.6.2",
+        "name": "hashbrown",
+        "version": "0.16.1",
         "transitive_weight": 1,
         "is_workspace": false,
         "children": []
+      },
+      {
+        "name": "url",
+        "version": "2.5.8",
+        "transitive_weight": 35,
+        "is_workspace": false,
+        "children": [
+          141,
+          182,
+          7,
+          8
+        ]
       }
     ],
     "root_indices": [
-      133
+      113
     ]
   },
   "unused_edges": [
@@ -3706,5 +4030,21 @@
       "eza",
       "backtrace"
     ]
+  ],
+  "unused_direct_deps": [
+    {
+      "from_crate": "eza",
+      "dep_name": "natord-plus-plus",
+      "dep_version": "2.0.0",
+      "real_deps_saved": 1,
+      "is_test_example": false
+    },
+    {
+      "from_crate": "eza",
+      "dep_name": "uutils_term_grid",
+      "dep_version": "0.7.0",
+      "real_deps_saved": 1,
+      "is_test_example": false
+    }
   ]
 }

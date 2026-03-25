@@ -133,7 +133,7 @@ body {
     <span title="Dependencies that appear in metadata but are not compiled on your current platform (e.g. windows-only crates on linux). These are typically not actionable.">53 phantom deps</span>
     <span title="Crates with a high transitive dependency count (above the --fat-threshold). These are the heavy hitters that the tool analyzes for removal opportunities.">9 heavy crates analyzed</span>
     <span title="Number of upstream edges identified as potential optimization targets, ranked by impact.">6 targets found</span>
-    <span style="color:#aaa">v0.1.0 &middot; 2026-03-25T21:28:09.860162022+00:00</span>
+    <span style="color:#aaa">v0.1.0 &middot; 2026-03-25T23:48:11.902461835+00:00</span>
   </div>
 </div>
 
@@ -2388,7 +2388,7 @@ depth 2
   <button class="copy-btn" onclick="copyJson()">Copy</button>
   <pre><code>{
   &quot;tool_version&quot;: &quot;0.1.0&quot;,
-  &quot;timestamp&quot;: &quot;2026-03-25T21:28:09.860162022+00:00&quot;,
+  &quot;timestamp&quot;: &quot;2026-03-25T23:48:11.902461835+00:00&quot;,
   &quot;workspace_root&quot;: &quot;/tmp/rust-projects/rkyv&quot;,
   &quot;threshold&quot;: 3.0,
   &quot;total_dependencies&quot;: 69,
@@ -2724,73 +2724,8 @@ depth 2
   &quot;dep_tree&quot;: {
     &quot;nodes&quot;: [
       {
-        &quot;name&quot;: &quot;wasip2&quot;,
-        &quot;version&quot;: &quot;1.0.2+wasi-0.2.9&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          44
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;ptr_meta&quot;,
-        &quot;version&quot;: &quot;0.3.1&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          29
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;bumpalo&quot;,
-        &quot;version&quot;: &quot;3.20.2&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;windows-link&quot;,
-        &quot;version&quot;: &quot;0.2.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;hashbrown&quot;,
-        &quot;version&quot;: &quot;0.16.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;equivalent&quot;,
-        &quot;version&quot;: &quot;1.0.2&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;munge&quot;,
-        &quot;version&quot;: &quot;0.4.7&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          15
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;clap_builder&quot;,
-        &quot;version&quot;: &quot;4.6.0&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          69,
-          58
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;version_check&quot;,
-        &quot;version&quot;: &quot;0.9.5&quot;,
+        &quot;name&quot;: &quot;anstyle&quot;,
+        &quot;version&quot;: &quot;1.0.14&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
@@ -2801,562 +2736,27 @@ depth 2
         &quot;transitive_weight&quot;: 14,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: [
-          49,
-          43
+          53,
+          48
         ]
       },
       {
-        &quot;name&quot;: &quot;windows-sys&quot;,
-        &quot;version&quot;: &quot;0.61.2&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          3
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;termcolor&quot;,
-        &quot;version&quot;: &quot;1.4.1&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          28
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rancor&quot;,
-        &quot;version&quot;: &quot;0.1.1&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          1
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;serde&quot;,
-        &quot;version&quot;: &quot;1.0.228&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          47
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;bytecheck_derive&quot;,
-        &quot;version&quot;: &quot;0.8.2&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;munge_macro&quot;,
-        &quot;version&quot;: &quot;0.4.7&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;simdutf8&quot;,
-        &quot;version&quot;: &quot;0.1.5&quot;,
+        &quot;name&quot;: &quot;equivalent&quot;,
+        &quot;version&quot;: &quot;1.0.2&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;rkyv_derive&quot;,
-        &quot;version&quot;: &quot;0.8.15&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: true,
-        &quot;children&quot;: [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;serde_json&quot;,
-        &quot;version&quot;: &quot;1.0.149&quot;,
-        &quot;transitive_weight&quot;: 11,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          13,
-          47,
-          20,
-          52,
-          53
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasm-bindgen-shared&quot;,
-        &quot;version&quot;: &quot;0.2.114&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          70
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;itoa&quot;,
-        &quot;version&quot;: &quot;1.0.18&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;proc-macro2&quot;,
-        &quot;version&quot;: &quot;1.0.106&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          70
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;quote&quot;,
-        &quot;version&quot;: &quot;1.0.45&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          21
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;divan-macros&quot;,
-        &quot;version&quot;: &quot;0.1.21&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;bytecheck&quot;,
-        &quot;version&quot;: &quot;0.8.2&quot;,
-        &quot;transitive_weight&quot;: 10,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          12,
-          1,
-          14,
-          16
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;zerocopy-derive&quot;,
-        &quot;version&quot;: &quot;0.8.47&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;benchlib&quot;,
-        &quot;version&quot;: &quot;0.8.15&quot;,
-        &quot;transitive_weight&quot;: 18,
-        &quot;is_workspace&quot;: true,
-        &quot;children&quot;: [
-          41,
-          35,
-          39
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;tinyvec_macros&quot;,
-        &quot;version&quot;: &quot;0.1.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;winapi-util&quot;,
-        &quot;version&quot;: &quot;0.1.11&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          10
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;ptr_meta_derive&quot;,
-        &quot;version&quot;: &quot;0.3.1&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rend&quot;,
-        &quot;version&quot;: &quot;0.5.3&quot;,
-        &quot;transitive_weight&quot;: 11,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          24
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;condtype&quot;,
-        &quot;version&quot;: &quot;1.3.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;libc&quot;,
-        &quot;version&quot;: &quot;0.2.183&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;once_cell&quot;,
-        &quot;version&quot;: &quot;1.21.4&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;serde_spanned&quot;,
-        &quot;version&quot;: &quot;1.1.0&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          47
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rand&quot;,
-        &quot;version&quot;: &quot;0.8.5&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          42
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;toml_datetime&quot;,
-        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          47
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;tinyvec&quot;,
-        &quot;version&quot;: &quot;1.11.0&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          27
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;trybuild&quot;,
-        &quot;version&quot;: &quot;1.0.116&quot;,
-        &quot;transitive_weight&quot;: 27,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          64,
-          18,
-          13,
-          55,
-          11,
-          63,
-          71
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rand_pcg&quot;,
-        &quot;version&quot;: &quot;0.3.1&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          42
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rkyv&quot;,
-        &quot;version&quot;: &quot;0.8.15&quot;,
-        &quot;transitive_weight&quot;: 31,
-        &quot;is_workspace&quot;: true,
-        &quot;children&quot;: [
-          9,
-          30,
-          24,
-          12,
-          6,
-          1,
-          17,
-          46,
-          37,
-          66,
-          4
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;divan&quot;,
-        &quot;version&quot;: &quot;0.1.21&quot;,
-        &quot;transitive_weight&quot;: 14,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          23,
-          54,
-          67,
-          31,
-          32,
-          50
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;rand_core&quot;,
-        &quot;version&quot;: &quot;0.6.4&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;wasm-bindgen&quot;,
-        &quot;version&quot;: &quot;0.2.114&quot;,
-        &quot;transitive_weight&quot;: 12,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          59,
-          19,
-          67,
-          33,
-          68
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wit-bindgen&quot;,
-        &quot;version&quot;: &quot;0.51.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;ahash&quot;,
-        &quot;version&quot;: &quot;0.8.12&quot;,
-        &quot;transitive_weight&quot;: 15,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          62,
-          61,
-          67,
-          33,
-          8
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;indexmap&quot;,
-        &quot;version&quot;: &quot;2.13.0&quot;,
-        &quot;transitive_weight&quot;: 3,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          5,
-          4
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;serde_core&quot;,
-        &quot;version&quot;: &quot;1.0.228&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          55
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;toml_writer&quot;,
-        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;js-sys&quot;,
-        &quot;version&quot;: &quot;0.3.91&quot;,
-        &quot;transitive_weight&quot;: 13,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          43,
-          33
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;regex-lite&quot;,
-        &quot;version&quot;: &quot;0.1.9&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;syn&quot;,
-        &quot;version&quot;: &quot;2.0.117&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          22,
-          21,
-          70
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;memchr&quot;,
-        &quot;version&quot;: &quot;2.8.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;zmij&quot;,
-        &quot;version&quot;: &quot;1.0.21&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;clap&quot;,
-        &quot;version&quot;: &quot;4.6.0&quot;,
-        &quot;transitive_weight&quot;: 4,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          7
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;serde_derive&quot;,
-        &quot;version&quot;: &quot;1.0.228&quot;,
-        &quot;transitive_weight&quot;: 5,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          51,
-          22,
-          21
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;wasm-bindgen-macro-support&quot;,
-        &quot;version&quot;: &quot;0.2.114&quot;,
-        &quot;transitive_weight&quot;: 7,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          51,
-          22,
-          21,
-          19,
-          2
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;r-efi&quot;,
-        &quot;version&quot;: &quot;5.3.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;clap_lex&quot;,
-        &quot;version&quot;: &quot;1.1.0&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;wasm-bindgen-macro&quot;,
-        &quot;version&quot;: &quot;0.2.114&quot;,
-        &quot;transitive_weight&quot;: 8,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          56,
-          22
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;winnow&quot;,
+        &quot;name&quot;: &quot;target-triple&quot;,
         &quot;version&quot;: &quot;1.0.0&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;zerocopy&quot;,
-        &quot;version&quot;: &quot;0.8.47&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          25
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;getrandom&quot;,
-        &quot;version&quot;: &quot;0.3.4&quot;,
-        &quot;transitive_weight&quot;: 6,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          0,
-          67,
-          32,
-          57
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;glob&quot;,
-        &quot;version&quot;: &quot;0.3.3&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;toml&quot;,
-        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
-        &quot;transitive_weight&quot;: 15,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          34,
-          36,
-          47,
-          46,
-          65,
-          48,
-          60
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;toml_parser&quot;,
-        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
-        &quot;transitive_weight&quot;: 2,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: [
-          60
-        ]
-      },
-      {
-        &quot;name&quot;: &quot;bytes&quot;,
-        &quot;version&quot;: &quot;1.11.1&quot;,
-        &quot;transitive_weight&quot;: 1,
-        &quot;is_workspace&quot;: false,
-        &quot;children&quot;: []
-      },
-      {
-        &quot;name&quot;: &quot;cfg-if&quot;,
-        &quot;version&quot;: &quot;1.0.4&quot;,
+        &quot;name&quot;: &quot;tinyvec_macros&quot;,
+        &quot;version&quot;: &quot;0.1.1&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
@@ -3369,8 +2769,158 @@ depth 2
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;anstyle&quot;,
-        &quot;version&quot;: &quot;1.0.14&quot;,
+        &quot;name&quot;: &quot;termcolor&quot;,
+        &quot;version&quot;: &quot;1.4.1&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          21
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;memchr&quot;,
+        &quot;version&quot;: &quot;2.8.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;zerocopy-derive&quot;,
+        &quot;version&quot;: &quot;0.8.47&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;clap_lex&quot;,
+        &quot;version&quot;: &quot;1.1.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;ptr_meta_derive&quot;,
+        &quot;version&quot;: &quot;0.3.1&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;libc&quot;,
+        &quot;version&quot;: &quot;0.2.183&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;cfg-if&quot;,
+        &quot;version&quot;: &quot;1.0.4&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;quote&quot;,
+        &quot;version&quot;: &quot;1.0.45&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;glob&quot;,
+        &quot;version&quot;: &quot;0.3.3&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;serde&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          43
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;proc-macro2&quot;,
+        &quot;version&quot;: &quot;1.0.106&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          23
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rkyv&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;,
+        &quot;transitive_weight&quot;: 31,
+        &quot;is_workspace&quot;: true,
+        &quot;children&quot;: [
+          1,
+          65,
+          64,
+          68,
+          59,
+          25,
+          29,
+          39,
+          27,
+          35,
+          47
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;benchlib&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;,
+        &quot;transitive_weight&quot;: 18,
+        &quot;is_workspace&quot;: true,
+        &quot;children&quot;: [
+          32,
+          54,
+          60
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;clap&quot;,
+        &quot;version&quot;: &quot;4.6.0&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          45
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde_spanned&quot;,
+        &quot;version&quot;: &quot;1.1.0&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          43
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;winapi-util&quot;,
+        &quot;version&quot;: &quot;0.1.11&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          34
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rand_core&quot;,
+        &quot;version&quot;: &quot;0.6.4&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
@@ -3383,17 +2933,467 @@ depth 2
         &quot;children&quot;: []
       },
       {
-        &quot;name&quot;: &quot;target-triple&quot;,
+        &quot;name&quot;: &quot;windows-link&quot;,
+        &quot;version&quot;: &quot;0.2.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;ptr_meta&quot;,
+        &quot;version&quot;: &quot;0.3.1&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          10
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;divan-macros&quot;,
+        &quot;version&quot;: &quot;0.1.21&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;tinyvec&quot;,
+        &quot;version&quot;: &quot;1.11.0&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          4
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;once_cell&quot;,
+        &quot;version&quot;: &quot;1.21.4&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;rkyv_derive&quot;,
+        &quot;version&quot;: &quot;0.8.15&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: true,
+        &quot;children&quot;: [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;toml_parser&quot;,
+        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          38
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wasip2&quot;,
+        &quot;version&quot;: &quot;1.0.2+wasi-0.2.9&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          52
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;divan&quot;,
+        &quot;version&quot;: &quot;0.1.21&quot;,
+        &quot;transitive_weight&quot;: 14,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          26,
+          19,
+          12,
+          58,
+          11,
+          33
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;regex-lite&quot;,
+        &quot;version&quot;: &quot;0.1.9&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;windows-sys&quot;,
+        &quot;version&quot;: &quot;0.61.2&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          24
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;bytes&quot;,
+        &quot;version&quot;: &quot;1.11.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-shared&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          23
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-macro-support&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          13,
+          16,
+          36,
+          63
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;winnow&quot;,
         &quot;version&quot;: &quot;1.0.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;indexmap&quot;,
+        &quot;version&quot;: &quot;2.13.0&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          2,
+          47
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;munge_macro&quot;,
+        &quot;version&quot;: &quot;0.4.7&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;toml_writer&quot;,
+        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;version_check&quot;,
+        &quot;version&quot;: &quot;0.9.5&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;serde_core&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          66
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen-macro&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;,
+        &quot;transitive_weight&quot;: 8,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          37,
+          13
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;clap_builder&quot;,
+        &quot;version&quot;: &quot;4.6.0&quot;,
+        &quot;transitive_weight&quot;: 3,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          0,
+          9
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zerocopy&quot;,
+        &quot;version&quot;: &quot;0.8.47&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          8
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;hashbrown&quot;,
+        &quot;version&quot;: &quot;0.16.1&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;wasm-bindgen&quot;,
+        &quot;version&quot;: &quot;0.2.114&quot;,
+        &quot;transitive_weight&quot;: 12,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          44,
+          36,
+          12,
+          28,
+          5
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;zmij&quot;,
+        &quot;version&quot;: &quot;1.0.21&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;simdutf8&quot;,
+        &quot;version&quot;: &quot;0.1.5&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;toml_datetime&quot;,
+        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          43
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;wit-bindgen&quot;,
+        &quot;version&quot;: &quot;0.51.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;js-sys&quot;,
+        &quot;version&quot;: &quot;0.3.91&quot;,
+        &quot;transitive_weight&quot;: 13,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          48,
+          28
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rand&quot;,
+        &quot;version&quot;: &quot;0.8.5&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          22
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;r-efi&quot;,
+        &quot;version&quot;: &quot;5.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;getrandom&quot;,
+        &quot;version&quot;: &quot;0.3.4&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          31,
+          12,
+          11,
+          55
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;ahash&quot;,
+        &quot;version&quot;: &quot;0.8.12&quot;,
+        &quot;transitive_weight&quot;: 15,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          56,
+          46,
+          12,
+          28,
+          42
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;condtype&quot;,
+        &quot;version&quot;: &quot;1.3.0&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;munge&quot;,
+        &quot;version&quot;: &quot;0.4.7&quot;,
+        &quot;transitive_weight&quot;: 6,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          40
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rand_pcg&quot;,
+        &quot;version&quot;: &quot;0.3.1&quot;,
+        &quot;transitive_weight&quot;: 2,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          22
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;bytecheck_derive&quot;,
+        &quot;version&quot;: &quot;0.8.2&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;trybuild&quot;,
+        &quot;version&quot;: &quot;1.0.116&quot;,
+        &quot;transitive_weight&quot;: 27,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          67,
+          69,
+          15,
+          66,
+          6,
+          14,
+          3
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;bumpalo&quot;,
+        &quot;version&quot;: &quot;3.20.2&quot;,
+        &quot;transitive_weight&quot;: 1,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: []
+      },
+      {
+        &quot;name&quot;: &quot;bytecheck&quot;,
+        &quot;version&quot;: &quot;0.8.2&quot;,
+        &quot;transitive_weight&quot;: 10,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          68,
+          25,
+          61,
+          50
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rend&quot;,
+        &quot;version&quot;: &quot;0.5.3&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          64
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde_derive&quot;,
+        &quot;version&quot;: &quot;1.0.228&quot;,
+        &quot;transitive_weight&quot;: 5,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          70,
+          13,
+          16
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;toml&quot;,
+        &quot;version&quot;: &quot;1.1.0+spec-1.1.0&quot;,
+        &quot;transitive_weight&quot;: 15,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          20,
+          51,
+          43,
+          39,
+          30,
+          41,
+          38
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;rancor&quot;,
+        &quot;version&quot;: &quot;0.1.1&quot;,
+        &quot;transitive_weight&quot;: 7,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          25
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;serde_json&quot;,
+        &quot;version&quot;: &quot;1.0.149&quot;,
+        &quot;transitive_weight&quot;: 11,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          15,
+          43,
+          71,
+          7,
+          49
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;syn&quot;,
+        &quot;version&quot;: &quot;2.0.117&quot;,
+        &quot;transitive_weight&quot;: 4,
+        &quot;is_workspace&quot;: false,
+        &quot;children&quot;: [
+          13,
+          16,
+          23
+        ]
+      },
+      {
+        &quot;name&quot;: &quot;itoa&quot;,
+        &quot;version&quot;: &quot;1.0.18&quot;,
         &quot;transitive_weight&quot;: 1,
         &quot;is_workspace&quot;: false,
         &quot;children&quot;: []
       }
     ],
     &quot;root_indices&quot;: [
-      40,
-      26,
-      17
+      17,
+      18,
+      29
     ]
   },
   &quot;unused_edges&quot;: [
@@ -3409,6 +3409,29 @@ depth 2
       &quot;rkyv&quot;,
       &quot;bytes&quot;
     ]
+  ],
+  &quot;unused_direct_deps&quot;: [
+    {
+      &quot;from_crate&quot;: &quot;rkyv&quot;,
+      &quot;dep_name&quot;: &quot;bytes&quot;,
+      &quot;dep_version&quot;: &quot;1.11.1&quot;,
+      &quot;real_deps_saved&quot;: 1,
+      &quot;is_test_example&quot;: false
+    },
+    {
+      &quot;from_crate&quot;: &quot;rkyv&quot;,
+      &quot;dep_name&quot;: &quot;indexmap&quot;,
+      &quot;dep_version&quot;: &quot;2.13.0&quot;,
+      &quot;real_deps_saved&quot;: 2,
+      &quot;is_test_example&quot;: false
+    },
+    {
+      &quot;from_crate&quot;: &quot;rkyv&quot;,
+      &quot;dep_name&quot;: &quot;tinyvec&quot;,
+      &quot;dep_version&quot;: &quot;1.11.0&quot;,
+      &quot;real_deps_saved&quot;: 2,
+      &quot;is_test_example&quot;: false
+    }
   ]
 }</code></pre>
 </div>
