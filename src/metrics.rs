@@ -15,6 +15,8 @@ pub enum RemovalStrategy {
     ReplaceWithLighter { alternative: String },
     /// The dependency is already optional/gated — no upstream change needed.
     AlreadyGated { detail: String },
+    /// The dependency is required by a sibling dep — cannot be removed.
+    RequiredBySibling { sibling: String },
 }
 
 impl std::fmt::Display for RemovalStrategy {
@@ -30,6 +32,9 @@ impl std::fmt::Display for RemovalStrategy {
             }
             Self::AlreadyGated { detail } => {
                 write!(f, "ALREADY GATED ({detail})")
+            }
+            Self::RequiredBySibling { sibling } => {
+                write!(f, "REQUIRED BY {sibling}")
             }
         }
     }
@@ -84,6 +89,10 @@ pub struct UpstreamTarget {
     /// Shortest dependency chain from workspace to the fat dependency.
     #[serde(default)]
     pub dep_chain: Vec<String>,
+    /// If set, a sibling dependency of the intermediate crate transitively
+    /// requires the fat dep — so removing it would break the build.
+    #[serde(default)]
+    pub required_by_sibling: Option<String>,
 }
 
 /// Known crate -> std replacement mappings.
@@ -108,6 +117,7 @@ pub fn compute_target(
     edge_meta: EdgeMeta,
     dep_chain: Vec<String>,
     was_renamed: bool,
+    required_by_sibling: Option<String>,
 ) -> UpstreamTarget {
     let c_ref = scan_result.ref_count;
 
@@ -124,10 +134,11 @@ pub fn compute_target(
         &edge_meta,
         fat_name,
         was_renamed,
+        &required_by_sibling,
     );
 
     // Determine suggestion.
-    let suggestion = compute_suggestion(c_ref, fat_name, &edge_meta);
+    let suggestion = compute_suggestion(c_ref, fat_name, &edge_meta, &required_by_sibling);
 
     UpstreamTarget {
         intermediate: PackageInfo {
@@ -147,10 +158,23 @@ pub fn compute_target(
         suggestion,
         edge_meta,
         dep_chain,
+        required_by_sibling,
     }
 }
 
-fn compute_suggestion(c_ref: usize, fat_name: &str, edge_meta: &EdgeMeta) -> RemovalStrategy {
+fn compute_suggestion(
+    c_ref: usize,
+    fat_name: &str,
+    edge_meta: &EdgeMeta,
+    required_by_sibling: &Option<String>,
+) -> RemovalStrategy {
+    // If a sibling dep transitively requires this, it can't be removed.
+    if let Some(sibling) = required_by_sibling {
+        return RemovalStrategy::RequiredBySibling {
+            sibling: sibling.clone(),
+        };
+    }
+
     if edge_meta.already_optional && edge_meta.platform_conditional {
         return RemovalStrategy::AlreadyGated {
             detail: "optional + platform-conditional".to_string(),
@@ -182,7 +206,13 @@ fn compute_confidence(
     edge_meta: &EdgeMeta,
     fat_name: &str,
     was_renamed: bool,
+    required_by_sibling: &Option<String>,
 ) -> Confidence {
+    // If a sibling dep transitively requires this, it's not removable — noise.
+    if required_by_sibling.is_some() {
+        return Confidence::Noise;
+    }
+
     // Already optional + platform-conditional = noise.
     if edge_meta.already_optional && edge_meta.platform_conditional {
         return Confidence::Noise;

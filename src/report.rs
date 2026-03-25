@@ -351,6 +351,17 @@ fn render_action_detail(writer: &mut dyn Write, target: &UpstreamTarget) -> anyh
                 "    Check if your Cargo.toml enables this feature unnecessarily."
             )?;
         }
+        RemovalStrategy::RequiredBySibling { sibling } => {
+            writeln!(
+                writer,
+                "    `{}` is not directly used in `{}`'s source, but sibling",
+                target.fat_dependency.name, target.intermediate.name
+            )?;
+            writeln!(
+                writer,
+                "    dependency `{sibling}` transitively requires it. Cannot remove."
+            )?;
+        }
     }
     Ok(())
 }

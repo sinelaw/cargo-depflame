@@ -144,6 +144,10 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
             // Phase 4c: Compute dependency chain.
             let dep_chain = dep_graph.dependency_chain(&edge.fat_id);
 
+            // Phase 4d: Check if a sibling dep transitively requires the fat dep.
+            let required_by_sibling =
+                dep_graph.sibling_requires(&edge.intermediate_id, &edge.fat_id);
+
             // Phase 5: Compute metrics.
             Some(metrics::compute_target(
                 &edge.intermediate_name,
@@ -156,6 +160,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 edge_meta,
                 dep_chain,
                 was_renamed,
+                required_by_sibling,
             ))
         })
         .collect();

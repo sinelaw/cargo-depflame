@@ -315,6 +315,33 @@ impl DepGraph {
             .collect()
     }
 
+    /// Check if any sibling dependency of `intermediate_id` transitively
+    /// depends on `fat_id`. If so, the fat dep is required even if intermediate
+    /// doesn't reference it in source code.
+    /// Returns the name of the sibling that requires it, if any.
+    pub fn sibling_requires(
+        &self,
+        intermediate_id: &PackageId,
+        fat_id: &PackageId,
+    ) -> Option<String> {
+        let siblings = match self.forward.get(intermediate_id) {
+            Some(deps) => deps,
+            None => return None,
+        };
+
+        for sibling_id in siblings {
+            if sibling_id == fat_id {
+                continue;
+            }
+            if let Some(sibling_node) = self.nodes.get(sibling_id) {
+                if sibling_node.transitive_set.contains(fat_id) {
+                    return Some(sibling_node.name.clone());
+                }
+            }
+        }
+        None
+    }
+
     /// Find all non-workspace nodes with W_transitive > threshold.
     pub fn fat_nodes(&self, threshold: usize) -> Vec<FatNode> {
         self.nodes
