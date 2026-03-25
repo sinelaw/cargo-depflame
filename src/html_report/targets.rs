@@ -1,265 +1,10 @@
-use crate::flamegraph;
 use crate::metrics::RemovalStrategy;
 use crate::report::AnalysisReport;
-use std::io::Write;
 
-/// Render a self-contained HTML report with three tabs:
-///   1. Flamegraph (interactive SVG)
-///   2. Targets table (basic summary + expandable verbose detail)
-///   3. Raw JSON
-pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::Result<()> {
-    // Generate SVG into a buffer.
-    let svg_content = if let Some(tree) = &report.dep_tree {
-        let mut buf = Vec::new();
-        flamegraph::render_flamegraph_with_unused(
-            tree,
-            report.total_dependencies,
-            &report.unused_edges,
-            &mut buf,
-        )?;
-        String::from_utf8(buf)?
-    } else {
-        String::from("<p>No dependency tree data available.</p>")
-    };
-
-    // Generate JSON.
-    let json_raw = serde_json::to_string_pretty(report)?;
-    let json_escaped = html_escape(&json_raw);
-
-    // Build targets table rows.
-    let targets_html = build_targets_html(report);
-
-    // Platform deps display.
-    let platform_info = match report.platform_dependencies {
-        Some(p) => format!("{p} platform"),
-        None => String::new(),
-    };
-
-    write!(
-        writer,
-        r##"<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Upstream Dependency Triage Report</title>
-<style>
-* {{ box-sizing: border-box; margin: 0; padding: 0; }}
-body {{
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  background: #f5f5f5; color: #333; line-height: 1.5;
-}}
-.header {{
-  background: #fff; border-bottom: 1px solid #ddd; padding: 16px 24px;
-}}
-.header h1 {{ font-size: 20px; margin-bottom: 4px; }}
-.header .stats {{ font-size: 13px; color: #666; }}
-.header .stats span {{ margin-right: 16px; }}
-.header .stats span[title] {{ cursor: help; border-bottom: 1px dashed #aaa; }}
-.tabs {{
-  display: flex; background: #fff; border-bottom: 2px solid #ddd;
-  padding: 0 24px; gap: 0;
-}}
-.tab-btn {{
-  padding: 10px 20px; border: none; background: none; cursor: pointer;
-  font-size: 14px; font-weight: 500; color: #666;
-  border-bottom: 2px solid transparent; margin-bottom: -2px;
-  transition: color 0.15s, border-color 0.15s;
-}}
-.tab-btn:hover {{ color: #333; }}
-.tab-btn.active {{ color: #0066cc; border-bottom-color: #0066cc; }}
-.tab-content {{ display: none; }}
-.tab-content.active {{ display: block; }}
-
-/* Flamegraph tab */
-#tab-flamegraph {{ background: #fff; }}
-#tab-flamegraph svg {{ display: block; width: 100%; height: auto; }}
-
-/* Targets tab */
-#tab-targets {{ padding: 24px; }}
-.action-summary {{
-  background: #fff; border: 1px solid #ddd; border-radius: 6px;
-  padding: 16px 20px; margin-bottom: 20px;
-}}
-.action-summary h3 {{ font-size: 14px; margin-bottom: 8px; color: #444; }}
-.action-summary ul {{ list-style: none; padding: 0; }}
-.action-summary li {{ font-size: 13px; padding: 3px 0; }}
-.cargo-diff {{
-  background: #1e1e1e; border-radius: 4px; padding: 8px 12px;
-  margin: 6px 0 10px 20px; font-family: "Consolas", "Fira Code", monospace;
-  font-size: 12px; line-height: 1.6; overflow-x: auto;
-  display: none;
-}}
-.show-diff-btn {{
-  display: inline-block; font-size: 11px; color: #0066cc;
-  border: 1px solid #0066cc; border-radius: 3px; padding: 1px 6px;
-  margin-left: 6px; cursor: pointer; vertical-align: middle;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}}
-.cargo-diff .diff-file {{ color: #888; }}
-.cargo-diff .diff-rm {{ color: #f44; }}
-.cargo-diff .diff-add {{ color: #4c4; }}
-.cargo-diff .diff-comment {{ color: #888; font-style: italic; }}
-.targets-table {{
-  width: 100%; border-collapse: collapse; background: #fff;
-  border: 1px solid #ddd; border-radius: 6px; overflow: hidden;
-  font-size: 13px;
-}}
-.targets-table th {{
-  background: #f8f8f8; text-align: left; padding: 10px 12px;
-  border-bottom: 2px solid #ddd; font-weight: 600; font-size: 12px;
-  text-transform: uppercase; color: #555; white-space: nowrap;
-}}
-.targets-table th[title] {{
-  cursor: help; border-bottom: 1px dashed #999;
-}}
-.targets-table td {{
-  padding: 8px 12px; border-bottom: 1px solid #eee;
-  vertical-align: top;
-}}
-.targets-table tr:hover {{ background: #f9f9f9; }}
-.targets-table tr.expandable {{ cursor: pointer; }}
-.detail-row {{ display: none; }}
-.detail-row.open {{ display: table-row; }}
-.detail-row td {{
-  background: #fafafa; padding: 12px 20px;
-  border-bottom: 1px solid #ddd;
-}}
-.detail-box {{
-  font-family: "Consolas", monospace; font-size: 12px; line-height: 1.6;
-}}
-.detail-box .label {{ color: #888; }}
-.badge {{
-  display: inline-block; padding: 1px 6px; border-radius: 3px;
-  font-size: 11px; font-weight: 600;
-}}
-.badge-high {{ background: #e8f5e9; color: #2e7d32; }}
-.badge-medium {{ background: #fff3e0; color: #e65100; }}
-.badge-low {{ background: #fce4ec; color: #c62828; }}
-.badge-noise {{ background: #f3e5f5; color: #6a1b9a; }}
-.badge-flag {{
-  background: #e3f2fd; color: #1565c0; margin-right: 4px;
-}}
-.ref-file {{ color: #0066cc; }}
-.ref-line {{ color: #888; margin-left: 16px; }}
-
-/* JSON tab */
-#tab-json {{ padding: 24px; }}
-.json-container {{
-  position: relative; background: #1e1e1e; border-radius: 6px;
-  overflow: hidden;
-}}
-.json-container pre {{
-  padding: 20px; overflow-x: auto; color: #d4d4d4;
-  font-family: "Consolas", "Fira Code", monospace; font-size: 12px;
-  line-height: 1.5; margin: 0;
-}}
-.copy-btn {{
-  position: absolute; top: 8px; right: 8px; padding: 6px 14px;
-  background: #333; color: #ccc; border: 1px solid #555;
-  border-radius: 4px; cursor: pointer; font-size: 12px;
-}}
-.copy-btn:hover {{ background: #444; }}
-</style>
-</head>
-<body>
-
-<div class="header">
-  <h1>Upstream Dependency Triage Report</h1>
-  <div class="stats">
-    <span title="Total number of crate dependencies in the full cross-platform resolve graph (includes all targets/platforms).">{total_deps} total deps</span>
-    {platform_html}
-    <span title="Dependencies that appear in metadata but are not compiled on your current platform (e.g. windows-only crates on linux). These are typically not actionable.">{phantom} phantom deps</span>
-    <span title="Crates with a high transitive dependency count (above the --fat-threshold). These are the heavy hitters that the tool analyzes for removal opportunities.">{fat_nodes} heavy crates analyzed</span>
-    <span title="Number of upstream edges identified as potential optimization targets, ranked by impact.">{n_targets} targets found</span>
-    <span style="color:#aaa">v{version} &middot; {timestamp}</span>
-  </div>
-</div>
-
-<div class="tabs">
-  <button class="tab-btn active" onclick="showTab('flamegraph')">Flamegraph</button>
-  <button class="tab-btn" onclick="showTab('targets')">Suggestions ({n_targets})</button>
-  <button class="tab-btn" onclick="showTab('json')">Raw JSON</button>
-</div>
-
-<div id="tab-flamegraph" class="tab-content active">
-{svg_content}
-</div>
-
-<div id="tab-targets" class="tab-content">
-{targets_html}
-</div>
-
-<div id="tab-json" class="tab-content">
-<div class="json-container">
-  <button class="copy-btn" onclick="copyJson()">Copy</button>
-  <pre><code>{json_escaped}</code></pre>
-</div>
-</div>
-
-<script>
-function showTab(name) {{
-  document.querySelectorAll('.tab-content').forEach(function(el) {{
-    el.classList.remove('active');
-  }});
-  document.querySelectorAll('.tab-btn').forEach(function(btn) {{
-    btn.classList.remove('active');
-  }});
-  document.getElementById('tab-' + name).classList.add('active');
-  // Find the button whose onclick contains the tab name.
-  document.querySelectorAll('.tab-btn').forEach(function(btn) {{
-    if (btn.getAttribute('onclick').indexOf(name) !== -1) {{
-      btn.classList.add('active');
-    }}
-  }});
-}}
-function toggleDetail(n) {{
-  var row = document.getElementById('detail-' + n);
-  if (row) row.classList.toggle('open');
-}}
-function toggleDiff(li) {{
-  var diff = li.querySelector('.cargo-diff');
-  var btn = li.querySelector('.show-diff-btn');
-  if (diff) {{
-    var show = diff.style.display !== 'block';
-    diff.style.display = show ? 'block' : 'none';
-    if (btn) btn.textContent = show ? 'hide diff' : 'show diff';
-  }}
-}}
-function copyJson() {{
-  var text = document.querySelector('#tab-json pre code').textContent;
-  navigator.clipboard.writeText(text).then(function() {{
-    var btn = document.querySelector('.copy-btn');
-    btn.textContent = 'Copied!';
-    setTimeout(function() {{ btn.textContent = 'Copy'; }}, 1500);
-  }});
-}}
-</script>
-
-</body>
-</html>
-"##,
-        total_deps = report.total_dependencies,
-        platform_html = if platform_info.is_empty() {
-            String::new()
-        } else {
-            format!("<span title=\"Dependencies actually compiled for your current platform/target. This is the number that matters for your build times.\">{platform_info} deps</span>")
-        },
-        phantom = report.phantom_dependencies,
-        fat_nodes = report.fat_nodes_found,
-        n_targets = report.targets.len(),
-        version = html_escape(&report.tool_version),
-        timestamp = html_escape(&report.timestamp),
-        svg_content = svg_content,
-        targets_html = targets_html,
-        json_escaped = json_escaped,
-    )?;
-
-    Ok(())
-}
+use super::{crate_link, html_escape};
 
 /// Build the targets tab HTML: action summary + ranked table with expandable rows.
-fn build_targets_html(report: &AnalysisReport) -> String {
+pub(super) fn build_targets_html(report: &AnalysisReport) -> String {
     let mut html = String::new();
 
     // --- Disclaimer banner ---
@@ -274,31 +19,41 @@ fn build_targets_html(report: &AnalysisReport) -> String {
          </div>\n",
     );
 
-    // --- Categorize targets into sections ---
-    enum Category {
-        RemoveUnused,
-        ChangeFeatures,
-        MakeOptional,
-        Upstream,
-        NotActionable,
-    }
+    // --- Categorize and render action sections ---
+    let sections = categorize_targets(report);
+    render_action_sections(&mut html, report, &sections);
 
-    fn categorize(t: &crate::metrics::UpstreamTarget) -> Category {
-        match &t.suggestion {
-            RemovalStrategy::Remove if t.intermediate_is_workspace_member => Category::RemoveUnused,
-            RemovalStrategy::AlreadyGated { .. } => Category::ChangeFeatures,
-            _ if !t.intermediate_is_workspace_member => Category::Upstream,
-            RemovalStrategy::RequiredBySibling { .. } => Category::NotActionable,
-            _ => Category::MakeOptional,
-        }
-    }
+    // --- Ranked targets table ---
+    render_detail_table(&mut html, report);
 
-    struct Section {
-        title: &'static str,
-        description: &'static str,
-        targets: Vec<(usize, &'static str)>, // (original index, upstream_badge)
-    }
+    html
+}
 
+enum Category {
+    RemoveUnused,
+    ChangeFeatures,
+    MakeOptional,
+    Upstream,
+    NotActionable,
+}
+
+fn categorize(t: &crate::metrics::UpstreamTarget) -> Category {
+    match &t.suggestion {
+        RemovalStrategy::Remove if t.intermediate_is_workspace_member => Category::RemoveUnused,
+        RemovalStrategy::AlreadyGated { .. } => Category::ChangeFeatures,
+        _ if !t.intermediate_is_workspace_member => Category::Upstream,
+        RemovalStrategy::RequiredBySibling { .. } => Category::NotActionable,
+        _ => Category::MakeOptional,
+    }
+}
+
+struct Section {
+    title: &'static str,
+    description: &'static str,
+    targets: Vec<(usize, &'static str)>, // (original index, upstream_badge)
+}
+
+fn categorize_targets(report: &AnalysisReport) -> Vec<Section> {
     let mut sections = vec![
         Section {
             title: "Remove unused dependencies",
@@ -353,9 +108,12 @@ fn build_targets_html(report: &AnalysisReport) -> String {
         sections[section_idx].targets.push((i, badge));
     }
 
-    // Render each non-empty section.
+    sections
+}
+
+fn render_action_sections(html: &mut String, report: &AnalysisReport, sections: &[Section]) {
     let mut any_rendered = false;
-    for section in &sections {
+    for section in sections {
         if section.targets.is_empty() {
             continue;
         }
@@ -393,8 +151,9 @@ fn build_targets_html(report: &AnalysisReport) -> String {
     if !any_rendered {
         html.push_str("<div class=\"action-summary\"><p style=\"color:#888\">No actionable suggestions found.</p></div>\n\n");
     }
+}
 
-    // --- Ranked targets table ---
+fn render_detail_table(html: &mut String, report: &AnalysisReport) {
     html.push_str(
         r#"<div style="margin-bottom:12px">
 <p style="font-size:14px;color:#444;margin-bottom:4px"><strong>Detailed breakdown</strong></p>
@@ -537,7 +296,6 @@ fn build_targets_html(report: &AnalysisReport) -> String {
     }
 
     html.push_str("</tbody>\n</table>\n");
-    html
 }
 
 /// Format a single suggestion action line.
@@ -705,20 +463,4 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
 
     d.push_str("</div>");
     d
-}
-
-fn html_escape(s: &str) -> String {
-    s.replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
-}
-
-/// Render a crate name as a link to crates.io.
-fn crate_link(name: &str) -> String {
-    let escaped = html_escape(name);
-    format!(
-        "<a href=\"https://crates.io/crates/{escaped}\" target=\"_blank\" \
-         style=\"color:inherit;text-decoration:underline dotted\">{escaped}</a>"
-    )
 }

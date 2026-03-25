@@ -1,270 +1,13 @@
-use crate::graph::DepGraph;
-use cargo_metadata::PackageId;
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use super::layout::{
+    layout, LayoutRect, CHART_WIDTH, CHAR_WIDTH, ROW_HEIGHT, ROW_TOTAL, TEXT_PAD,
+    HEADER_HEIGHT, FOOTER_HEIGHT,
+};
+use super::DepTreeData;
+use std::collections::HashSet;
 use std::io::Write;
 
 // ---------------------------------------------------------------------------
-// Layout constants
-// ---------------------------------------------------------------------------
-
-const CHART_WIDTH: f64 = 1200.0;
-const ROW_HEIGHT: f64 = 18.0;
-const ROW_GAP: f64 = 1.0;
-const ROW_TOTAL: f64 = ROW_HEIGHT + ROW_GAP;
-const MIN_RECT_WIDTH: f64 = 2.0;
-const MAX_DEPTH: usize = 40;
-const CHAR_WIDTH: f64 = 6.5;
-const TEXT_PAD: f64 = 4.0;
-const HEADER_HEIGHT: f64 = 40.0;
-const FOOTER_HEIGHT: f64 = 30.0;
-/// Safety limit on total frames to keep SVG size reasonable.
-const MAX_FRAMES: usize = 8000;
-
-// ---------------------------------------------------------------------------
-// Serializable dep-tree (embedded in JSON report so `report` subcommand can
-// re-render as SVG without re-running analysis).
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct DepTreeData {
-    pub nodes: Vec<DepTreeNode>,
-    pub root_indices: Vec<usize>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DepTreeNode {
-    pub name: String,
-    pub version: String,
-    /// Total transitive dep count (including self).
-    pub transitive_weight: usize,
-    pub is_workspace: bool,
-    /// Indices into `DepTreeData::nodes`.
-    pub children: Vec<usize>,
-}
-
-// ---------------------------------------------------------------------------
-// Build the serializable tree from the live DepGraph.
-// ---------------------------------------------------------------------------
-
-pub fn build_dep_tree(graph: &DepGraph) -> DepTreeData {
-    let mut nodes: Vec<DepTreeNode> = Vec::new();
-    let mut id_to_idx: HashMap<PackageId, usize> = HashMap::new();
-
-    // First pass: create all nodes.
-    for (id, node) in &graph.nodes {
-        let idx = nodes.len();
-        id_to_idx.insert(id.clone(), idx);
-        nodes.push(DepTreeNode {
-            name: node.name.clone(),
-            version: node.version.clone(),
-            transitive_weight: node.transitive_weight,
-            is_workspace: node.is_workspace_member,
-            children: Vec::new(),
-        });
-    }
-
-    // Second pass: wire up children (sorted by weight desc for determinism).
-    for (id, deps) in &graph.forward {
-        if let Some(&parent_idx) = id_to_idx.get(id) {
-            let mut child_indices: Vec<usize> = deps
-                .iter()
-                .filter_map(|dep_id| id_to_idx.get(dep_id).copied())
-                .collect();
-            child_indices
-                .sort_by(|&a, &b| nodes[b].transitive_weight.cmp(&nodes[a].transitive_weight));
-            nodes[parent_idx].children = child_indices;
-        }
-    }
-
-    let mut root_indices: Vec<usize> = graph
-        .workspace_members
-        .iter()
-        .filter_map(|id| id_to_idx.get(id).copied())
-        .collect();
-    root_indices.sort_by(|&a, &b| nodes[b].transitive_weight.cmp(&nodes[a].transitive_weight));
-
-    DepTreeData {
-        nodes,
-        root_indices,
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Internal layout representation.
-// ---------------------------------------------------------------------------
-
-struct LayoutRect {
-    x: f64,
-    y: f64,
-    w: f64,
-    name: String,
-    version: String,
-    weight: usize,
-    depth: usize,
-    is_shared: bool,
-    is_workspace: bool,
-    /// Name of the parent node (empty for roots).
-    parent_name: String,
-    ancestor_count: usize,
-    /// Number of children that were too small to render (collapsed).
-    collapsed_children: usize,
-}
-
-// ---------------------------------------------------------------------------
-// Layout algorithm.
-//
-// Handles the DAG (shared deps with multiple ancestors) using the same
-// strategy as flamegraphs handle merged call stacks:
-//
-// - Each node is expanded under EVERY parent that depends on it (not just
-//   the first one encountered).  This lets the user see the full "blame
-//   path" from every angle.
-// - To prevent exponential blowup on diamond dependencies, we use:
-//   (a) per-path cycle detection (a node is only skipped if it's an
-//       ancestor of itself on the CURRENT path — true cycles are rare in
-//       cargo but possible with dev-deps in metadata);
-//   (b) a global frame budget (MAX_FRAMES) — once hit, remaining children
-//       are collapsed into an "[N more]" placeholder.
-//   (c) minimum pixel-width cutoff — narrow slices are collapsed.
-// - Nodes with ancestor_count > 1 are marked `is_shared` and rendered in a
-//   distinct colour so the user can immediately spot diamond deps.
-// ---------------------------------------------------------------------------
-
-fn compute_ancestor_counts(tree: &DepTreeData) -> Vec<usize> {
-    let mut counts = vec![0usize; tree.nodes.len()];
-    for node in &tree.nodes {
-        for &child_idx in &node.children {
-            counts[child_idx] += 1;
-        }
-    }
-    counts
-}
-
-fn layout(tree: &DepTreeData) -> Vec<LayoutRect> {
-    let mut rects = Vec::new();
-    let ancestor_counts = compute_ancestor_counts(tree);
-
-    let total_weight: f64 = tree
-        .root_indices
-        .iter()
-        .map(|&idx| tree.nodes[idx].transitive_weight as f64)
-        .sum();
-
-    if total_weight == 0.0 {
-        return rects;
-    }
-
-    let mut x = 0.0;
-    let mut path = HashSet::new();
-    for &root_idx in &tree.root_indices {
-        let w = (tree.nodes[root_idx].transitive_weight as f64 / total_weight) * CHART_WIDTH;
-        layout_node(
-            tree,
-            root_idx,
-            x,
-            0,
-            w,
-            &mut rects,
-            &mut path,
-            &ancestor_counts,
-            "",
-        );
-        x += w;
-    }
-
-    rects
-}
-
-fn layout_node(
-    tree: &DepTreeData,
-    node_idx: usize,
-    x: f64,
-    depth: usize,
-    width: f64,
-    rects: &mut Vec<LayoutRect>,
-    path: &mut HashSet<usize>,
-    ancestor_counts: &[usize],
-    parent_name: &str,
-) {
-    if width < MIN_RECT_WIDTH || depth > MAX_DEPTH || rects.len() >= MAX_FRAMES {
-        return;
-    }
-
-    // Cycle detection on the current path only (not global).
-    if !path.insert(node_idx) {
-        return;
-    }
-
-    let node = &tree.nodes[node_idx];
-    let is_shared = ancestor_counts[node_idx] > 1;
-
-    let rect_idx = rects.len();
-    rects.push(LayoutRect {
-        x,
-        y: depth as f64 * ROW_TOTAL + HEADER_HEIGHT,
-        w: width,
-        name: node.name.clone(),
-        version: node.version.clone(),
-        weight: node.transitive_weight,
-        depth,
-        is_shared,
-        is_workspace: node.is_workspace,
-        parent_name: parent_name.to_string(),
-        ancestor_count: ancestor_counts[node_idx],
-        collapsed_children: 0,
-    });
-
-    if node.children.is_empty() {
-        path.remove(&node_idx);
-        return;
-    }
-
-    let child_total: f64 = node
-        .children
-        .iter()
-        .map(|&c| tree.nodes[c].transitive_weight as f64)
-        .sum();
-    if child_total == 0.0 {
-        path.remove(&node_idx);
-        return;
-    }
-
-    let mut cx = x;
-    let mut collapsed = 0usize;
-    for &child_idx in &node.children {
-        if rects.len() >= MAX_FRAMES {
-            collapsed += 1;
-            continue;
-        }
-        let cw = (tree.nodes[child_idx].transitive_weight as f64 / child_total) * width;
-        if cw < MIN_RECT_WIDTH {
-            collapsed += 1;
-            continue;
-        }
-        layout_node(
-            tree,
-            child_idx,
-            cx,
-            depth + 1,
-            cw,
-            rects,
-            path,
-            ancestor_counts,
-            &node.name,
-        );
-        cx += cw;
-    }
-
-    if collapsed > 0 {
-        rects[rect_idx].collapsed_children = collapsed;
-    }
-
-    path.remove(&node_idx);
-}
-
-// ---------------------------------------------------------------------------
-// SVG rendering.
+// SVG rendering helpers.
 // ---------------------------------------------------------------------------
 
 fn xml_escape(s: &str) -> String {
@@ -276,10 +19,10 @@ fn xml_escape(s: &str) -> String {
 }
 
 /// Map transitive weight to a fill colour.
-///   - workspace members → steel blue
-///   - shared deps → colour based on weight but with purple tint
-///   - leaf (weight=1) → cool green
-///   - heavy → warm red/orange
+///   - workspace members -> steel blue
+///   - shared deps -> colour based on weight but with purple tint
+///   - leaf (weight=1) -> cool green
+///   - heavy -> warm red/orange
 fn rect_fill(r: &LayoutRect, max_weight: usize, is_unused: bool) -> String {
     if is_unused {
         return "rgb(220,20,80)".to_string(); // bright magenta-red for unused deps
@@ -296,16 +39,16 @@ fn rect_fill(r: &LayoutRect, max_weight: usize, is_unused: bool) -> String {
 
     if r.is_shared {
         // Purple-shifted heat gradient for shared deps:
-        // cool violet → warm magenta
-        let hue = 280.0 - 40.0 * ratio; // 280 (violet) → 240 (blue-purple)
+        // cool violet -> warm magenta
+        let hue = 280.0 - 40.0 * ratio; // 280 (violet) -> 240 (blue-purple)
         let sat = 45.0 + 20.0 * ratio;
         let lit = 65.0 - 10.0 * ratio;
         return format!("hsl({hue:.0},{sat:.0}%,{lit:.0}%)");
     }
 
-    // Green → yellow → orange heat gradient based on transitive dep count.
+    // Green -> yellow -> orange heat gradient based on transitive dep count.
     // Green = leaf (1 dep), orange = many transitive deps.
-    let hue = 120.0 - 90.0 * ratio; // 120 (green) → 30 (orange)
+    let hue = 120.0 - 90.0 * ratio; // 120 (green) -> 30 (orange)
     let sat = 55.0 + 20.0 * ratio;
     let lit = 58.0 - 8.0 * ratio;
     format!("hsl({hue:.0},{sat:.0}%,{lit:.0}%)")
@@ -363,17 +106,11 @@ fn tooltip(r: &LayoutRect) -> String {
     )
 }
 
-pub fn render_flamegraph(
-    tree: &DepTreeData,
-    total_deps: usize,
-    writer: &mut dyn Write,
-) -> anyhow::Result<()> {
-    render_flamegraph_with_unused(tree, total_deps, &[], writer)
-}
+// ---------------------------------------------------------------------------
+// Main SVG rendering.
+// ---------------------------------------------------------------------------
 
-/// Render with unused edge highlighting. Each entry in `unused_edges` is
-/// a `(parent_name, dep_name)` pair where the parent doesn't reference the dep.
-pub fn render_flamegraph_with_unused(
+pub(super) fn render_svg(
     tree: &DepTreeData,
     total_deps: usize,
     unused_edges: &[(String, String)],
@@ -406,6 +143,33 @@ pub fn render_flamegraph_with_unused(
     let mut svg = String::with_capacity(128 * 1024);
 
     // -- SVG header + embedded styles + JS -----------------------------------
+    render_header(&mut svg, svg_height);
+
+    // -- Title + subtitle ----------------------------------------------------
+    svg.push_str(&format!(
+        r#"<text x="6" y="18" class="title">Dependency Tree — Icicle / Flamegraph</text>
+<text x="6" y="33" class="subtitle">{total_deps} deps total, {unique} unique crates shown, {shared_count} shared (dashed border = multiple parents) | click to zoom</text>
+"#,
+        unique = unique_nodes.len(),
+    ));
+
+    // -- Legend + controls ----------------------------------------------------
+    render_legend(&mut svg);
+
+    // -- Frames --------------------------------------------------------------
+    render_frames(&mut svg, &rects, max_weight, &unused_edge_set);
+
+    svg.push_str("</g>\n</svg>\n");
+
+    writer.write_all(svg.as_bytes())?;
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// SVG header with embedded CSS + JS.
+// ---------------------------------------------------------------------------
+
+fn render_header(svg: &mut String, svg_height: f64) {
     svg.push_str(&format!(
         r##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {CHART_WIDTH} {svg_height}"
      width="100%" font-family="Consolas,monospace" font-size="11">
@@ -526,21 +290,17 @@ pub fn render_flamegraph_with_unused(
 "##,
         cw = CHART_WIDTH
     ));
+}
 
-    // -- Header --------------------------------------------------------------
-    svg.push_str(&format!(
-        r#"<text x="6" y="18" class="title">Dependency Tree — Icicle / Flamegraph</text>
-<text x="6" y="33" class="subtitle">{total_deps} deps total, {unique} unique crates shown, {shared_count} shared (dashed border = multiple parents) | click to zoom</text>
-"#,
-        unique = unique_nodes.len(),
-    ));
+// ---------------------------------------------------------------------------
+// Legend + controls.
+// ---------------------------------------------------------------------------
 
-    // -- Legend + controls ----------------------------------------------------
-    // Build legend items right-aligned, flowing from right to left.
-    const LEGEND_FONT_WIDTH: f64 = 6.0; // approximate char width at font-size 10
-    const LEGEND_SWATCH: f64 = 12.0; // color swatch width
-    const LEGEND_GAP: f64 = 6.0; // gap between items
-    const SWATCH_TEXT_GAP: f64 = 3.0; // gap between swatch and its label
+fn render_legend(svg: &mut String) {
+    const LEGEND_FONT_WIDTH: f64 = 6.0;
+    const LEGEND_SWATCH: f64 = 12.0;
+    const LEGEND_GAP: f64 = 6.0;
+    const SWATCH_TEXT_GAP: f64 = 3.0;
 
     struct LegendItem {
         label: &'static str,
@@ -615,11 +375,21 @@ pub fn render_flamegraph_with_unused(
         r#"<text id="search-status" x="{ssx}" y="33" class="legend" fill="rgb(204,68,68)"></text>
 "#,
     ));
+}
 
-    // -- Frames --------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Frame rendering.
+// ---------------------------------------------------------------------------
+
+fn render_frames(
+    svg: &mut String,
+    rects: &[LayoutRect],
+    max_weight: usize,
+    unused_edge_set: &HashSet<(&str, &str)>,
+) {
     svg.push_str("<g id=\"frames\">\n");
 
-    for r in &rects {
+    for r in rects {
         let is_unused = !r.parent_name.is_empty()
             && unused_edge_set.contains(&(r.parent_name.as_str(), r.name.as_str()));
         let fill = rect_fill(r, max_weight, is_unused);
@@ -655,9 +425,4 @@ pub fn render_flamegraph_with_unused(
             elabel = xml_escape(&label),
         ));
     }
-
-    svg.push_str("</g>\n</svg>\n");
-
-    writer.write_all(svg.as_bytes())?;
-    Ok(())
 }

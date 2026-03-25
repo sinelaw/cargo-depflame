@@ -1,440 +1,32 @@
 use anyhow::{Context, Result};
-use cargo_upstream_triage::cargo_toml::CrateDepInfo;
 use cargo_upstream_triage::cli::{AnalyzeArgs, Cli, Command, FlameArgs, OutputFormat, ReportArgs};
-use cargo_upstream_triage::flamegraph;
 use cargo_upstream_triage::report::AnalysisReport;
-use cargo_upstream_triage::{graph, metrics, platform, registry, report, scanner};
+use cargo_upstream_triage::{analyze, flamegraph, report};
 use clap::Parser;
-use rayon::prelude::*;
-use std::collections::{HashMap, HashSet};
 use std::io::Write;
-use std::path::PathBuf;
-use std::sync::Mutex;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command.unwrap_or(Command::Flame(FlameArgs::default())) {
-        Command::Analyze(args) => run_analyze(args),
+        Command::Analyze(args) => run_analyze_command(args),
         Command::Report(args) => run_report(args),
         Command::Flame(args) => run_flame(args),
     }
 }
 
-fn run_analyze(args: AnalyzeArgs) -> Result<()> {
-    // Phase 1: Load metadata.
-    eprintln!("Loading workspace metadata...");
-    let metadata = cargo_metadata::MetadataCommand::new()
-        .manifest_path(&args.manifest_path)
-        .exec()
-        .context("failed to run cargo metadata")?;
+fn run_analyze_command(args: AnalyzeArgs) -> Result<()> {
+    let output = args.output.clone();
+    let format = args.format.clone();
+    let verbose = args.verbose;
 
-    let workspace_root = metadata.workspace_root.to_string();
+    let analysis = analyze::run_analyze(&args)?;
 
-    // Phase 2: Build dependency graph and find fat nodes.
-    eprintln!("Building dependency graph...");
-    let dep_graph = graph::DepGraph::from_metadata(&metadata)?;
-    let total_deps = dep_graph.total_dependency_count();
-    let fat_nodes = dep_graph.fat_nodes(args.fat_threshold);
-    eprintln!(
-        "Found {} fat nodes (W_transitive > {}) out of {} total dependencies",
-        fat_nodes.len(),
-        args.fat_threshold,
-        total_deps
-    );
-
-    if fat_nodes.is_empty() {
-        eprintln!("No fat nodes found. Your dependency tree is lean!");
-        return Ok(());
-    }
-
-    // Phase 2b: Find intermediate edges.
-    let edges = dep_graph.intermediate_edges(&fat_nodes);
-    eprintln!("Found {} intermediate edges to scan", edges.len());
-
-    if edges.is_empty() {
-        eprintln!("No intermediate dependency edges to analyze.");
-        return Ok(());
-    }
-
-    // Phase 2c: Resolve real platform deps to detect phantom deps.
-    eprintln!("Resolving platform-specific dependency tree...");
-    let real_deps = platform::resolve_real_deps(&args.manifest_path);
-    if real_deps.is_none() {
-        eprintln!("  [WARN] Could not resolve platform deps, phantom detection disabled");
-    }
-
-    // Phase 2d: Parse Cargo.toml for each intermediate crate (for renames + optional info).
-    eprintln!("Parsing Cargo.toml files for dependency metadata...");
-    let cargo_toml_cache: Mutex<HashMap<String, CrateDepInfo>> = Mutex::new(HashMap::new());
-
-    // Phase 3 & 4: Source retrieval + heuristic scanning (parallelized).
-    eprintln!("Scanning intermediate crate sources...");
-    let targets: Vec<metrics::UpstreamTarget> = edges
-        .par_iter()
-        .filter_map(|edge| {
-            // Phase 3: Locate source.
-            let src_dir =
-                registry::find_crate_source(&edge.intermediate_name, &edge.intermediate_version);
-
-            let src_dir: PathBuf = match src_dir {
-                Some(d) => d,
-                None => {
-                    // Workspace members — scan from metadata source path.
-                    if dep_graph.workspace_members.contains(&edge.intermediate_id) {
-                        if let Some(pkg) = metadata
-                            .packages
-                            .iter()
-                            .find(|p| p.id == edge.intermediate_id)
-                        {
-                            pkg.manifest_path.parent().map(|p| p.into())?
-                        } else {
-                            return None;
-                        }
-                    } else {
-                        eprintln!(
-                            "  [WARN] Source not found for {} v{}, skipping",
-                            edge.intermediate_name, edge.intermediate_version
-                        );
-                        return None;
-                    }
-                }
-            };
-
-            // Phase 3b: Parse Cargo.toml for rename/optional info.
-            let cache_key = format!("{}-{}", edge.intermediate_name, edge.intermediate_version);
-            let dep_info = {
-                let mut cache = cargo_toml_cache.lock().unwrap();
-                cache
-                    .entry(cache_key)
-                    .or_insert_with(|| {
-                        let manifest = src_dir.join("Cargo.toml");
-                        CrateDepInfo::from_manifest(&manifest)
-                    })
-                    .clone()
-            };
-
-            // Determine the local alias for the fat dependency.
-            let alias = dep_info.local_alias(&edge.fat_name);
-            let was_renamed = alias
-                .as_ref()
-                .is_some_and(|a| *a != edge.fat_name.replace('-', "_"));
-
-            let mut aliases: Vec<String> = Vec::new();
-            if let Some(ref a) = alias {
-                aliases.push(a.clone());
-            }
-
-            // Build enriched edge metadata.
-            let mut edge_meta = edge.edge_meta.clone();
-            if dep_info.is_optional(&edge.fat_name) {
-                edge_meta.already_optional = true;
-            }
-            if dep_info.is_platform_conditional(&edge.fat_name) {
-                edge_meta.platform_conditional = true;
-            }
-            if dep_info.is_build_dep(&edge.fat_name) {
-                edge_meta.build_only = true;
-            }
-
-            // Phase 4: Scan.
-            let rs_files = registry::collect_rs_files(&src_dir);
-            if rs_files.is_empty() {
-                return None;
-            }
-
-            let scan = scanner::scan_files_with_aliases(&rs_files, &edge.fat_name, &aliases);
-
-            // Phase 4b: Measure fat dep LOC and its own dep count.
-            let fat_dep_loc = registry::find_crate_source(&edge.fat_name, &edge.fat_version)
-                .map(|fat_dir| {
-                    let fat_rs = registry::collect_rs_files(&fat_dir);
-                    registry::count_loc(&fat_rs)
-                })
-                .unwrap_or(0);
-            let fat_dep_own_deps = dep_graph.direct_dep_count(&edge.fat_id);
-            let has_re_export_all = scan.has_re_export_all;
-
-            // Phase 4c: Compute unique subtree weight.
-            let w_unique = dep_graph.unique_subtree_weight(&edge.intermediate_id, &edge.fat_id);
-
-            // Phase 4d: Compute dependency chain.
-            let dep_chain = dep_graph.dependency_chain(&edge.fat_id);
-
-            // Phase 4e: Check if a sibling dep transitively requires the fat dep.
-            let required_by_sibling =
-                dep_graph.sibling_requires(&edge.intermediate_id, &edge.fat_id);
-
-            // Phase 4e: Check if the fat dep is a phantom (not on this platform).
-            let phantom = !platform::is_real_dep(&real_deps, &edge.fat_name, &edge.fat_version);
-
-            // Phase 4f: Check if intermediate is a workspace member.
-            let intermediate_is_ws = dep_graph.workspace_members.contains(&edge.intermediate_id);
-
-            // Phase 5: Compute metrics.
-            Some(metrics::compute_target(
-                &edge.intermediate_name,
-                &edge.intermediate_version,
-                &edge.fat_name,
-                &edge.fat_version,
-                edge.fat_transitive_weight,
-                w_unique,
-                scan,
-                edge_meta,
-                dep_chain,
-                was_renamed,
-                required_by_sibling,
-                phantom,
-                intermediate_is_ws,
-                fat_dep_loc,
-                fat_dep_own_deps,
-                has_re_export_all,
-            ))
-        })
-        .collect();
-
-    // Phase 5b: Rank.
-    let mut ranked = metrics::rank_targets(targets, args.threshold, args.top);
-
-    // Phase 5c: Enrich AlreadyGated suggestions with feature info.
-    //
-    // For each AlreadyGated target, find which features of the intermediate
-    // crate enable the optional fat dependency, by inspecting the intermediate
-    // package's feature map from cargo_metadata.
-    let pkg_map: HashMap<&str, &cargo_metadata::Package> = metadata
-        .packages
-        .iter()
-        .map(|p| (p.name.as_str(), p))
-        .collect();
-    for target in &mut ranked {
-        if let metrics::RemovalStrategy::AlreadyGated {
-            enabling_features,
-            recommended_defaults,
-            ..
-        } = &mut target.suggestion
-        {
-            if let Some(pkg) = pkg_map.get(target.intermediate.name.as_str()) {
-                let fat_name = &target.fat_dependency.name;
-                // Find which features of the intermediate crate enable the fat dep.
-                let mut found = Vec::new();
-                for (feat_name, feat_deps) in &pkg.features {
-                    // Skip "default" itself — we handle it separately below.
-                    if feat_name == "default" {
-                        continue;
-                    }
-                    for dep_entry in feat_deps {
-                        // Feature entries can be "dep:foo", "foo", or "foo/bar".
-                        let enables = dep_entry == fat_name
-                            || dep_entry == &format!("dep:{fat_name}")
-                            || dep_entry.starts_with(&format!("{fat_name}/"));
-                        if enables {
-                            found.push(feat_name.clone());
-                            break;
-                        }
-                    }
-                }
-                found.sort();
-
-                // Check if any enabling feature is part of "default".
-                // If so, compute recommended_defaults = default features minus
-                // the ones that pull in the fat dep.
-                if let Some(defaults) = pkg.features.get("default") {
-                    // A default entry enables the fat dep if:
-                    // (a) it's one of the features we already found, OR
-                    // (b) it directly references the fat dep name.
-                    let dominated: HashSet<&str> = found.iter().map(|s| s.as_str()).collect();
-                    let enables_fat = |d: &str| {
-                        dominated.contains(d)
-                            || d == fat_name
-                            || d == &format!("dep:{fat_name}")
-                    };
-                    let any_in_default = defaults.iter().any(|d| enables_fat(d));
-                    if any_in_default {
-                        let keep: Vec<String> = defaults
-                            .iter()
-                            .filter(|d| !enables_fat(d))
-                            .cloned()
-                            .collect();
-                        *recommended_defaults = Some(keep);
-                    }
-                }
-
-                *enabling_features = found;
-            }
-        }
-    }
-
-    // Phase 5d: Detect completely unused direct dependencies of workspace members.
-    eprintln!("Checking for unused direct dependencies...");
-    let mut unused_deps: Vec<metrics::UpstreamTarget> = Vec::new();
-    // Collect names already analyzed to avoid duplicates.
-    let already_analyzed: HashSet<(&str, &str)> = ranked
-        .iter()
-        .map(|t| (t.intermediate.name.as_str(), t.fat_dependency.name.as_str()))
-        .collect();
-
-    for ws_id in &dep_graph.workspace_members {
-        let ws_pkg = match metadata.packages.iter().find(|p| &p.id == ws_id) {
-            Some(p) => p,
-            None => continue,
-        };
-        let ws_dir: PathBuf = match ws_pkg.manifest_path.parent() {
-            Some(p) => p.into(),
-            None => continue,
-        };
-        let ws_rs_files = registry::collect_rs_files(&ws_dir);
-        if ws_rs_files.is_empty() {
-            continue;
-        }
-
-        let direct_deps = match dep_graph.forward.get(ws_id) {
-            Some(deps) => deps,
-            None => continue,
-        };
-
-        for dep_id in direct_deps {
-            let dep_node = match dep_graph.nodes.get(dep_id) {
-                Some(n) => n,
-                None => continue,
-            };
-            // Skip workspace members (internal deps) and already-analyzed pairs.
-            if dep_node.is_workspace_member {
-                continue;
-            }
-            if already_analyzed.contains(&(ws_pkg.name.as_str(), dep_node.name.as_str())) {
-                continue;
-            }
-            // Skip build-only deps — they won't appear in source.
-            if let Some(meta) = dep_graph.edge_meta.get(&(ws_id.clone(), dep_id.clone())) {
-                if meta.build_only {
-                    continue;
-                }
-            }
-
-            let scan = scanner::scan_files(&ws_rs_files, &dep_node.name);
-            if scan.ref_count == 0 && !scan.has_re_export_all {
-                let w_unique =
-                    dep_graph.unique_subtree_weight(ws_id, dep_id);
-                let dep_chain = vec![ws_pkg.name.clone(), dep_node.name.clone()];
-                let edge_meta = dep_graph
-                    .edge_meta
-                    .get(&(ws_id.clone(), dep_id.clone()))
-                    .cloned()
-                    .unwrap_or(graph::EdgeMeta {
-                        build_only: false,
-                        already_optional: false,
-                        platform_conditional: false,
-                    });
-
-                unused_deps.push(metrics::UpstreamTarget {
-                    intermediate: metrics::PackageInfo {
-                        name: ws_pkg.name.clone(),
-                        version: ws_pkg.version.to_string(),
-                    },
-                    fat_dependency: metrics::PackageInfo {
-                        name: dep_node.name.clone(),
-                        version: dep_node.version.clone(),
-                    },
-                    w_transitive: dep_node.transitive_weight,
-                    w_unique,
-                    c_ref: 0,
-                    hurrs: None,
-                    confidence: metrics::Confidence::High,
-                    scan_result: scan,
-                    suggestion: metrics::RemovalStrategy::Remove,
-                    edge_meta,
-                    dep_chain,
-                    required_by_sibling: None,
-                    phantom: !platform::is_real_dep(
-                        &real_deps,
-                        &dep_node.name,
-                        &dep_node.version,
-                    ),
-                    intermediate_is_workspace_member: true,
-                    fat_dep_loc: 0,
-                    fat_dep_own_deps: dep_graph.direct_dep_count(dep_id),
-                    has_re_export_all: false,
-                });
-            }
-        }
-    }
-
-    if !unused_deps.is_empty() {
-        eprintln!("  Found {} unused direct dependencies", unused_deps.len());
-        // Split into high-impact (actually saves deps) vs low-impact (also a
-        // transitive dep of something else, so removing from Cargo.toml won't
-        // shrink the build).
-        let (mut impactful, mut cosmetic): (Vec<_>, Vec<_>) =
-            unused_deps.into_iter().partition(|t| t.w_unique > 0);
-        impactful.sort_by(|a, b| b.w_unique.cmp(&a.w_unique));
-        cosmetic.sort_by(|a, b| b.w_transitive.cmp(&a.w_transitive));
-        // Deprioritize cosmetic removals: they clean up Cargo.toml but don't
-        // reduce the dependency count.
-        for t in &mut cosmetic {
-            t.confidence = metrics::Confidence::Low;
-        }
-        // Impactful unused deps go first, then existing ranked, then cosmetic.
-        impactful.append(&mut ranked);
-        impactful.append(&mut cosmetic);
-        ranked = impactful;
-    }
-
-    // Phase 6: Report.
-    let platform_deps = real_deps.as_ref().map(|s| s.len());
-    let phantom_deps = platform_deps
-        .map(|p| total_deps.saturating_sub(p))
-        .unwrap_or(0);
-
-    // Build serializable dep tree for flamegraph rendering.
-    eprintln!("Building dependency tree for visualization...");
-    let dep_tree = flamegraph::build_dep_tree(&dep_graph);
-
-    let unused_edges: Vec<(String, String)> = ranked
-        .iter()
-        .filter(|t| t.c_ref == 0)
-        .map(|t| (t.intermediate.name.clone(), t.fat_dependency.name.clone()))
-        .collect();
-
-    let analysis = AnalysisReport {
-        tool_version: env!("CARGO_PKG_VERSION").to_string(),
-        timestamp: chrono::Utc::now().to_rfc3339(),
-        workspace_root,
-        threshold: args.threshold,
-        total_dependencies: total_deps,
-        platform_dependencies: platform_deps,
-        phantom_dependencies: phantom_deps,
-        fat_nodes_found: fat_nodes.len(),
-        targets: ranked,
-        dep_tree: Some(dep_tree),
-        unused_edges,
-    };
-
-    let mut writer: Box<dyn Write> = match &args.output {
-        Some(path) => {
-            let file = std::fs::File::create(path)
-                .with_context(|| format!("failed to create output file: {}", path.display()))?;
-            Box::new(std::io::BufWriter::new(file))
-        }
-        None => Box::new(std::io::stdout().lock()),
-    };
-
-    match args.format {
-        OutputFormat::Json => report::render_json(&analysis, &mut writer)?,
-        OutputFormat::Text => report::render_text(&analysis, &mut writer, args.verbose)?,
-        OutputFormat::Svg => {
-            let tree = analysis
-                .dep_tree
-                .as_ref()
-                .expect("dep_tree should always be present during analyze");
-            flamegraph::render_flamegraph(tree, analysis.total_dependencies, &mut writer)?;
-        }
-        OutputFormat::Html => {
-            cargo_upstream_triage::html_report::render_html_report(&analysis, &mut writer)?;
-        }
-    }
+    let mut writer: Box<dyn Write> = open_writer(&output)?;
+    write_output(&analysis, &format, verbose, &mut writer)?;
 
     // If writing to file, also save JSON alongside for the report subcommand.
-    if let Some(path) = &args.output {
+    if let Some(path) = &output {
         let json_path = path.with_extension("json");
         if json_path != *path {
             let file = std::fs::File::create(&json_path)?;
@@ -458,27 +50,36 @@ fn run_flame(args: FlameArgs) -> Result<()> {
         verbose: args.verbose,
     };
 
-    // Create a named temp file for the SVG output.
+    // Create a named temp file for the HTML output.
     // Use keep() so the file persists for the browser to read.
     let tmp_file = tempfile::Builder::new()
         .prefix("upstream-triage-")
         .suffix(".html")
         .tempfile()
         .context("failed to create temp file")?;
-    let svg_path = tmp_file
+    let html_path = tmp_file
         .into_temp_path()
         .keep()
         .context("failed to persist temp file")?;
 
-    // Run the analyze pipeline, writing SVG to the temp file.
-    let analyze_args = AnalyzeArgs {
-        output: Some(svg_path.clone()),
-        ..analyze_args
-    };
-    run_analyze(analyze_args)?;
+    let analysis = analyze::run_analyze(&analyze_args)?;
 
-    // Open the SVG in the user's default browser.
-    let uri = format!("file://{}", svg_path.display());
+    let mut writer: Box<dyn Write> = {
+        let file = std::fs::File::create(&html_path)
+            .with_context(|| format!("failed to create output file: {}", html_path.display()))?;
+        Box::new(std::io::BufWriter::new(file))
+    };
+    write_output(&analysis, &OutputFormat::Html, false, &mut writer)?;
+
+    // Also save JSON alongside for convenience.
+    let json_path = html_path.with_extension("json");
+    let file = std::fs::File::create(&json_path)?;
+    let mut json_writer = std::io::BufWriter::new(file);
+    report::render_json(&analysis, &mut json_writer)?;
+    eprintln!("JSON report saved to: {}", json_path.display());
+
+    // Open the HTML in the user's default browser.
+    let uri = format!("file://{}", html_path.display());
     eprintln!("Opening report: {}", uri);
     open::that(&uri).with_context(|| format!("failed to open browser for {}", uri))?;
 
@@ -491,31 +92,46 @@ fn run_report(args: ReportArgs) -> Result<()> {
     let analysis: AnalysisReport =
         serde_json::from_str(&content).context("failed to parse JSON report")?;
 
-    let mut writer: Box<dyn Write> = match &args.output {
+    let mut writer: Box<dyn Write> = open_writer(&args.output)?;
+    write_output(&analysis, &args.format, args.verbose, &mut writer)?;
+
+    Ok(())
+}
+
+/// Open a writer: file if path is given, stdout otherwise.
+fn open_writer(output: &Option<std::path::PathBuf>) -> Result<Box<dyn Write>> {
+    match output {
         Some(path) => {
             let file = std::fs::File::create(path)
                 .with_context(|| format!("failed to create output file: {}", path.display()))?;
-            Box::new(std::io::BufWriter::new(file))
+            Ok(Box::new(std::io::BufWriter::new(file)))
         }
-        None => Box::new(std::io::stdout().lock()),
-    };
+        None => Ok(Box::new(std::io::stdout().lock())),
+    }
+}
 
-    match args.format {
-        OutputFormat::Json => report::render_json(&analysis, &mut writer)?,
-        OutputFormat::Text => report::render_text(&analysis, &mut writer, args.verbose)?,
+/// Dispatch output rendering based on the chosen format.
+fn write_output(
+    analysis: &AnalysisReport,
+    format: &OutputFormat,
+    verbose: bool,
+    writer: &mut dyn Write,
+) -> Result<()> {
+    match format {
+        OutputFormat::Json => report::render_json(analysis, writer)?,
+        OutputFormat::Text => report::render_text(analysis, writer, verbose)?,
         OutputFormat::Svg => {
             let tree = analysis.dep_tree.as_ref().ok_or_else(|| {
                 anyhow::anyhow!(
-                    "This JSON report has no dep_tree data. \
+                    "This report has no dep_tree data. \
                      Re-run `analyze` to generate a report with tree data for SVG rendering."
                 )
             })?;
-            flamegraph::render_flamegraph(tree, analysis.total_dependencies, &mut writer)?;
+            flamegraph::render_flamegraph(tree, analysis.total_dependencies, writer)?;
         }
         OutputFormat::Html => {
-            cargo_upstream_triage::html_report::render_html_report(&analysis, &mut writer)?;
+            cargo_upstream_triage::html_report::render_html_report(analysis, writer)?;
         }
     }
-
     Ok(())
 }
