@@ -197,19 +197,58 @@ pub fn display_path(path: &str) -> String {
 const MACRO_CRATES: &[(&str, &[&str])] = &[
     // Derive macros: #[derive(Serialize, Deserialize)]
     ("serde", &[r"#\[derive\([^)]*\b(Serialize|Deserialize)\b"]),
-    ("serde_json", &[r"\bserde_json!\b", r"\bjson!\b", r#"serde_json::from_"#, r#"serde_json::to_"#]),
-    ("clap", &[r"#\[derive\([^)]*\b(Parser|Args|Subcommand|ValueEnum)\b", r"#\[command\b", r"#\[arg\b"]),
+    (
+        "serde_json",
+        &[
+            r"\bserde_json!\b",
+            r"\bjson!\b",
+            r#"serde_json::from_"#,
+            r#"serde_json::to_"#,
+        ],
+    ),
+    (
+        "clap",
+        &[
+            r"#\[derive\([^)]*\b(Parser|Args|Subcommand|ValueEnum)\b",
+            r"#\[command\b",
+            r"#\[arg\b",
+        ],
+    ),
     ("thiserror", &[r"#\[derive\([^)]*\bError\b"]),
-    ("tokio", &[r"#\[tokio::", r"tokio::spawn\b", r"tokio::select!\b"]),
-    ("tracing", &[r"\btracing::(info|debug|warn|error|trace|instrument)\b",
-                   r"#\[instrument\b", r"#\[tracing::instrument\b",
-                   r"\b(info|debug|warn|error|trace)!\("]),
+    (
+        "tokio",
+        &[r"#\[tokio::", r"tokio::spawn\b", r"tokio::select!\b"],
+    ),
+    (
+        "tracing",
+        &[
+            r"\btracing::(info|debug|warn|error|trace|instrument)\b",
+            r"#\[instrument\b",
+            r"#\[tracing::instrument\b",
+            r"\b(info|debug|warn|error|trace)!\(",
+        ],
+    ),
     ("log", &[r"\b(info|debug|warn|error|trace)!\("]),
-    ("anyhow", &[r"\banyhow!\(", r"\bbail!\(", r"\bensure!\(",
-                  r"\bResult<", r"\banyhow::Result\b", r"\bContext\b"]),
+    (
+        "anyhow",
+        &[
+            r"\banyhow!\(",
+            r"\bbail!\(",
+            r"\bensure!\(",
+            r"\bResult<",
+            r"\banyhow::Result\b",
+            r"\bContext\b",
+        ],
+    ),
     ("async_trait", &[r"#\[async_trait\b"]),
-    ("strum", &[r"#\[derive\([^)]*\b(EnumString|Display|EnumIter|IntoStaticStr)\b"]),
-    ("derive_more", &[r"#\[derive\([^)]*\b(From|Into|Display|Deref|Constructor)\b"]),
+    (
+        "strum",
+        &[r"#\[derive\([^)]*\b(EnumString|Display|EnumIter|IntoStaticStr)\b"],
+    ),
+    (
+        "derive_more",
+        &[r"#\[derive\([^)]*\b(From|Into|Display|Deref|Constructor)\b"],
+    ),
 ];
 
 /// Crates that are typically activated via `#[global_allocator]` static declarations
