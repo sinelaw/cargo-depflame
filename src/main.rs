@@ -143,13 +143,15 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
 
             let scan = scanner::scan_files_with_aliases(&rs_files, &edge.fat_name, &aliases);
 
-            // Phase 4b: Measure fat dep LOC.
+            // Phase 4b: Measure fat dep LOC and its own dep count.
             let fat_dep_loc = registry::find_crate_source(&edge.fat_name, &edge.fat_version)
                 .map(|fat_dir| {
                     let fat_rs = registry::collect_rs_files(&fat_dir);
                     registry::count_loc(&fat_rs)
                 })
                 .unwrap_or(0);
+            let fat_dep_own_deps = dep_graph.direct_dep_count(&edge.fat_id);
+            let has_re_export_all = scan.has_re_export_all;
 
             // Phase 4c: Compute unique subtree weight.
             let w_unique =
@@ -189,6 +191,8 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 phantom,
                 intermediate_is_ws,
                 fat_dep_loc,
+                fat_dep_own_deps,
+                has_re_export_all,
             ))
         })
         .collect();

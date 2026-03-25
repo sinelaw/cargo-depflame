@@ -342,6 +342,11 @@ impl DepGraph {
         None
     }
 
+    /// Get the number of *direct* dependencies a node has (excluding itself).
+    pub fn direct_dep_count(&self, id: &PackageId) -> usize {
+        self.forward.get(id).map(|deps| deps.len()).unwrap_or(0)
+    }
+
     /// Find all non-workspace nodes with W_transitive > threshold.
     pub fn fat_nodes(&self, threshold: usize) -> Vec<FatNode> {
         self.nodes
