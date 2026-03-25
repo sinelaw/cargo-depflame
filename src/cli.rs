@@ -50,6 +50,10 @@ pub struct AnalyzeArgs {
     /// Write report to a file instead of stdout.
     #[arg(long)]
     pub output: Option<PathBuf>,
+
+    /// Show detailed analysis (file matches, dep chains, metrics).
+    #[arg(long, short)]
+    pub verbose: bool,
 }
 
 #[derive(Parser, Debug)]
@@ -65,6 +69,10 @@ pub struct ReportArgs {
     /// Write report to a file instead of stdout.
     #[arg(long)]
     pub output: Option<PathBuf>,
+
+    /// Show detailed analysis (file matches, dep chains, metrics).
+    #[arg(long, short)]
+    pub verbose: bool,
 }
 
 #[derive(Debug, Clone, clap::ValueEnum)]

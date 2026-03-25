@@ -214,7 +214,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
 
     match args.format {
         OutputFormat::Json => report::render_json(&analysis, &mut writer)?,
-        OutputFormat::Text => report::render_text(&analysis, &mut writer)?,
+        OutputFormat::Text => report::render_text(&analysis, &mut writer, args.verbose)?,
     }
 
     // If writing to file, also save JSON alongside for the report subcommand.
@@ -248,7 +248,7 @@ fn run_report(args: ReportArgs) -> Result<()> {
 
     match args.format {
         OutputFormat::Json => report::render_json(&analysis, &mut writer)?,
-        OutputFormat::Text => report::render_text(&analysis, &mut writer)?,
+        OutputFormat::Text => report::render_text(&analysis, &mut writer, args.verbose)?,
     }
 
     Ok(())

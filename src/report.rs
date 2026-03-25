@@ -31,56 +31,202 @@ pub fn render_json(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
     Ok(())
 }
 
-/// Render the report as human-readable text.
-pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::Result<()> {
+/// Render a concise actionable summary (default text mode).
+pub fn render_text(
+    report: &AnalysisReport,
+    writer: &mut dyn Write,
+    verbose: bool,
+) -> anyhow::Result<()> {
+    // Header.
     writeln!(writer)?;
     writeln!(
         writer,
         "{}",
-        "=== Upstream Dependency Triage Report ===".bold()
+        "Upstream Dependency Triage Report".bold()
     )?;
-    writeln!(writer, "Workspace:          {}", report.workspace_root)?;
-    writeln!(
-        writer,
-        "Total dependencies: {} (full resolve graph)",
-        report.total_dependencies
-    )?;
+
     if let Some(platform_deps) = report.platform_dependencies {
         writeln!(
             writer,
-            "Platform deps:      {} (actually compiled on this platform)",
-            platform_deps
+            "{} dependencies ({} compiled on this platform)",
+            report.total_dependencies, platform_deps
         )?;
-        writeln!(
-            writer,
-            "Phantom deps:       {} (resolved but not compiled here)",
-            report.phantom_dependencies
-        )?;
+    } else {
+        writeln!(writer, "{} dependencies", report.total_dependencies)?;
     }
-    writeln!(writer, "Fat nodes found:    {}", report.fat_nodes_found)?;
-    writeln!(
-        writer,
-        "hURRS threshold:    {:.1}",
-        report.threshold
-    )?;
-    writeln!(writer, "Targets found:      {}", report.targets.len())?;
     writeln!(writer)?;
 
     if report.targets.is_empty() {
         writeln!(
             writer,
             "{}",
-            "No high-ROI upstream targets found. Your dependency tree looks clean!"
+            "No actionable upstream targets found. Your dependency tree looks clean!"
                 .green()
                 .bold()
         )?;
         return Ok(());
     }
 
+    // Group targets by action type for the summary.
+    let upstream_feature_gate: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            matches!(t.confidence, Confidence::High | Confidence::Medium)
+                && matches!(t.suggestion, RemovalStrategy::FeatureGate)
+                && !t.intermediate_is_workspace_member
+        })
+        .collect();
+
+    let upstream_already_gated: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            matches!(t.confidence, Confidence::High | Confidence::Medium)
+                && matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. })
+                && !t.intermediate_is_workspace_member
+        })
+        .collect();
+
+    let upstream_remove: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            matches!(t.confidence, Confidence::High | Confidence::Medium)
+                && matches!(t.suggestion, RemovalStrategy::Remove)
+                && !t.intermediate_is_workspace_member
+        })
+        .collect();
+
+    let std_replacements: Vec<&UpstreamTarget> = report
+        .targets
+        .iter()
+        .filter(|t| {
+            matches!(t.confidence, Confidence::High | Confidence::Medium)
+                && matches!(t.suggestion, RemovalStrategy::ReplaceWithStd { .. })
+        })
+        .collect();
+
+    // Section 1: Upstream PRs to propose
+    if !upstream_feature_gate.is_empty() {
+        writeln!(
+            writer,
+            "{}",
+            "Propose feature-gating to upstream crates:".bold()
+        )?;
+        writeln!(writer)?;
+        for target in &upstream_feature_gate {
+            let chain = format_short_chain(&target.dep_chain, &target.intermediate.name);
+            writeln!(
+                writer,
+                "  {} Make `{}` optional in `{}`  {}",
+                format!("(-{} deps)", target.w_unique).green(),
+                target.fat_dependency.name.yellow(),
+                target.intermediate.name.cyan(),
+                chain.dimmed(),
+            )?;
+        }
+        writeln!(writer)?;
+    }
+
+    // Section 2: Already-gated upstream deps you might be enabling unnecessarily
+    if !upstream_already_gated.is_empty() {
+        writeln!(
+            writer,
+            "{}",
+            "Already optional in upstream — check if you need these features:".bold()
+        )?;
+        writeln!(writer)?;
+        for target in &upstream_already_gated {
+            let chain = format_short_chain(&target.dep_chain, &target.intermediate.name);
+            writeln!(
+                writer,
+                "  {} `{}` is optional in `{}`  {}",
+                format!("(-{} deps)", target.w_unique).green(),
+                target.fat_dependency.name.yellow(),
+                target.intermediate.name.cyan(),
+                chain.dimmed(),
+            )?;
+        }
+        writeln!(writer)?;
+    }
+
+    // Section 3: Unused deps in upstream
+    if !upstream_remove.is_empty() {
+        writeln!(
+            writer,
+            "{}",
+            "Possibly unused in upstream (propose removal):".bold()
+        )?;
+        writeln!(writer)?;
+        for target in &upstream_remove {
+            writeln!(
+                writer,
+                "  {} `{}` appears unused in `{}`",
+                format!("(-{} deps)", target.w_unique).green(),
+                target.fat_dependency.name.yellow(),
+                target.intermediate.name.cyan(),
+            )?;
+        }
+        writeln!(writer)?;
+    }
+
+    // Section 4: std replacements
+    if !std_replacements.is_empty() {
+        writeln!(
+            writer,
+            "{}",
+            "Replace with std equivalents:".bold()
+        )?;
+        writeln!(writer)?;
+        for target in &std_replacements {
+            if let RemovalStrategy::ReplaceWithStd { suggestion } = &target.suggestion {
+                writeln!(
+                    writer,
+                    "  {} Replace `{}` with {} in `{}`",
+                    format!("(-{} deps)", target.w_unique).green(),
+                    target.fat_dependency.name.yellow(),
+                    suggestion,
+                    target.intermediate.name.cyan(),
+                )?;
+            }
+        }
+        writeln!(writer)?;
+    }
+
+    // Verbose: full details
+    if verbose {
+        writeln!(writer)?;
+        writeln!(writer, "{}", "=== Detailed Analysis ===".bold())?;
+        writeln!(writer)?;
+        render_detailed(report, writer)?;
+    }
+
+    Ok(())
+}
+
+/// Format a short dependency chain showing how the workspace reaches this dep.
+fn format_short_chain(dep_chain: &[String], intermediate_name: &str) -> String {
+    if dep_chain.len() <= 2 {
+        return String::new();
+    }
+    // Show: workspace_crate -> ... -> intermediate
+    let first = &dep_chain[0];
+    if dep_chain.len() == 3 {
+        format!("(via {first} -> {intermediate_name})")
+    } else {
+        format!(
+            "(via {first} -> ... -> {intermediate_name})",
+        )
+    }
+}
+
+/// Render the full detailed analysis (--verbose mode).
+fn render_detailed(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::Result<()> {
     for (i, target) in report.targets.iter().enumerate() {
         let rank = i + 1;
         let hurrs_display = if target.hurrs.is_none() {
-            "INF (unused!)".to_string()
+            "INF".to_string()
         } else {
             format!("{:.1}", target.hurrs.unwrap_or(0.0))
         };
@@ -95,73 +241,59 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
         writeln!(
             writer,
             "{}",
-            format!(
-                "--- #{rank} (hURRS: {hurrs_display}) {}",
-                "-".repeat(50)
-            )
-            .yellow()
-            .bold()
+            format!("--- #{rank} ---").yellow().bold()
         )?;
 
         writeln!(
             writer,
-            "{}  {} v{}",
-            "Upstream Crate:".bold(),
+            "  {} {} v{}  ->  {} v{}",
+            "Edge:".bold(),
             target.intermediate.name.cyan(),
-            target.intermediate.version
+            target.intermediate.version,
+            target.fat_dependency.name.red(),
+            target.fat_dependency.version,
         )?;
         writeln!(
             writer,
-            "{}  {} (brings in {} transitive crates, {} unique)",
-            "Offending Dep:".bold(),
-            target.fat_dependency.name.red(),
+            "  {} W_trans={}, W_uniq={}, C_ref={}, hURRS={}",
+            "Metrics:".bold(),
             target.w_transitive,
             target.w_unique,
-        )?;
-        writeln!(
-            writer,
-            "{} {} across {} file(s)",
-            "References Found:".bold(),
             target.c_ref,
-            target.scan_result.files_with_matches
+            hurrs_display,
         )?;
         writeln!(
             writer,
-            "{}    {}",
-            "Confidence:".bold(),
-            confidence_colored
+            "  {} {} | {} {}",
+            "Status:".bold(),
+            confidence_colored,
+            "Action:".bold(),
+            format!("{}", target.suggestion).green(),
         )?;
 
-        // Edge metadata badges.
+        // Badges.
         let mut badges = Vec::new();
         if target.phantom {
-            badges.push("PHANTOM (not compiled on this platform)".dimmed().to_string());
+            badges.push("PHANTOM");
+        }
+        if target.intermediate_is_workspace_member {
+            badges.push("YOUR-CRATE");
         }
         if target.edge_meta.build_only {
-            badges.push("BUILD-ONLY".dimmed().to_string());
+            badges.push("BUILD-ONLY");
         }
         if target.edge_meta.already_optional {
-            badges.push("ALREADY-OPTIONAL".dimmed().to_string());
+            badges.push("ALREADY-OPTIONAL");
         }
         if target.edge_meta.platform_conditional {
-            badges.push("PLATFORM-CONDITIONAL".dimmed().to_string());
-        }
-        if target.scan_result.generated_file_refs > 0 {
-            badges.push(
-                format!(
-                    "{} refs in generated files",
-                    target.scan_result.generated_file_refs
-                )
-                .dimmed()
-                .to_string(),
-            );
+            badges.push("PLATFORM-CONDITIONAL");
         }
         if !badges.is_empty() {
             writeln!(
                 writer,
-                "{}       [{}]",
+                "  {} [{}]",
                 "Flags:".bold(),
-                badges.join(", ")
+                badges.join(", ").dimmed()
             )?;
         }
 
@@ -169,42 +301,25 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
         if !target.dep_chain.is_empty() {
             writeln!(
                 writer,
-                "{}    {}",
-                "Dep Chain:".bold(),
-                target
-                    .dep_chain
-                    .iter()
-                    .map(|s| s.as_str())
-                    .collect::<Vec<_>>()
-                    .join(" -> ")
-                    .dimmed()
+                "  {} {}",
+                "Chain:".bold(),
+                target.dep_chain.join(" -> ").dimmed()
             )?;
         }
 
-        // Searched names (if aliases were used).
-        if target.scan_result.searched_names.len() > 1 {
-            writeln!(
-                writer,
-                "{}  {}",
-                "Searched Names:".bold(),
-                target.scan_result.searched_names.join(", ").dimmed()
-            )?;
-        }
-
-        writeln!(writer)?;
-
+        // File matches.
         if !target.scan_result.file_matches.is_empty() {
-            writeln!(writer, "{}", "  Files:".bold())?;
+            writeln!(writer, "  {}:", "Refs".bold())?;
             let mut current_file = String::new();
             for m in &target.scan_result.file_matches {
                 let display = display_path(&m.path);
                 if display != current_file {
                     let label = if m.in_generated_file {
-                        format!("{} {}", display, "(generated)".dimmed())
+                        format!("    {} (generated)", display)
                     } else {
-                        display.clone()
+                        format!("    {display}")
                     };
-                    writeln!(writer, "    {}", label.dimmed())?;
+                    writeln!(writer, "{}", label.dimmed())?;
                     current_file = display;
                 }
                 writeln!(
@@ -214,57 +329,27 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
                     m.line_content.bright_white()
                 )?;
             }
-            writeln!(writer)?;
         }
-
-        writeln!(
-            writer,
-            "  {} {}",
-            "Suggested Action:".bold(),
-            format!("{}", target.suggestion).green().bold()
-        )?;
-        render_action_detail(writer, target)?;
         writeln!(writer)?;
     }
 
     // Summary table.
-    writeln!(writer, "{}", "=== Summary ===".bold())?;
+    writeln!(writer, "{}", "=== Summary Table ===".bold())?;
     let mut table = Table::new();
     table
         .load_preset(UTF8_FULL)
         .apply_modifier(UTF8_ROUND_CORNERS)
         .set_header(vec![
-            "#",
-            "Upstream Crate",
-            "Fat Dep",
-            "W_trans",
-            "W_uniq",
-            "C_ref",
-            "hURRS",
-            "Confidence",
-            "Action",
+            "#", "Intermediate", "Fat Dep", "W_uniq", "C_ref", "Confidence", "Action",
         ]);
 
     for (i, target) in report.targets.iter().enumerate() {
-        let hurrs_display = if target.hurrs.is_none() {
-            "INF".to_string()
-        } else {
-            format!("{:.1}", target.hurrs.unwrap_or(0.0))
-        };
         table.add_row(vec![
             format!("{}", i + 1),
-            format!(
-                "{} v{}",
-                target.intermediate.name, target.intermediate.version
-            ),
-            format!(
-                "{} v{}",
-                target.fat_dependency.name, target.fat_dependency.version
-            ),
-            format!("{}", target.w_transitive),
+            target.intermediate.name.clone(),
+            target.fat_dependency.name.clone(),
             format!("{}", target.w_unique),
             format!("{}", target.c_ref),
-            hurrs_display,
             format!("{}", target.confidence),
             format!("{}", target.suggestion),
         ]);
@@ -273,121 +358,5 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
     writeln!(writer, "{table}")?;
     writeln!(writer)?;
 
-    // Legend.
-    writeln!(writer, "{}", "Legend:".bold())?;
-    writeln!(writer, "  W_trans  = total transitive dependencies of the fat dep")?;
-    writeln!(writer, "  W_uniq   = deps that would actually disappear if this edge were cut")?;
-    writeln!(writer, "  C_ref    = source code references found")?;
-    writeln!(writer, "  hURRS    = W_transitive / C_ref (higher = more bloat per use)")?;
-    writeln!(
-        writer,
-        "  Confidence: {} = actionable, {} = check manually, {} = likely false positive, {} = skip",
-        "HIGH".green(),
-        "MEDIUM".yellow(),
-        "LOW".red(),
-        "NOISE".dimmed()
-    )?;
-    writeln!(writer)?;
-
-    Ok(())
-}
-
-fn render_action_detail(writer: &mut dyn Write, target: &UpstreamTarget) -> anyhow::Result<()> {
-    match &target.suggestion {
-        RemovalStrategy::Remove => {
-            writeln!(
-                writer,
-                "    The dependency `{}` appears to be unused in `{}`'s source code.",
-                target.fat_dependency.name, target.intermediate.name
-            )?;
-            writeln!(
-                writer,
-                "    It may be safe to remove it from {}'s Cargo.toml entirely.",
-                target.intermediate.name
-            )?;
-            writeln!(
-                writer,
-                "    This would drop ~{} crates from builds ({} shared with other deps).",
-                target.w_unique,
-                target.w_transitive.saturating_sub(target.w_unique),
-            )?;
-        }
-        RemovalStrategy::FeatureGate => {
-            writeln!(
-                writer,
-                "    Put `{}` behind a feature flag in `{}`'s Cargo.toml:",
-                target.fat_dependency.name, target.intermediate.name
-            )?;
-            writeln!(writer, "      [features]")?;
-            writeln!(
-                writer,
-                "      {name} = [\"dep:{name}\"]",
-                name = target.fat_dependency.name.replace('-', "-")
-            )?;
-            writeln!(writer, "      [dependencies]")?;
-            writeln!(
-                writer,
-                "      {} = {{ version = \"{}\", optional = true }}",
-                target.fat_dependency.name, target.fat_dependency.version
-            )?;
-            writeln!(writer)?;
-            writeln!(
-                writer,
-                "    This would drop ~{} crates for users who don't need",
-                target.w_unique
-            )?;
-            writeln!(
-                writer,
-                "    the `{}` functionality.",
-                target.fat_dependency.name
-            )?;
-        }
-        RemovalStrategy::ReplaceWithStd { suggestion } => {
-            writeln!(
-                writer,
-                "    Replace `{}` with: {}",
-                target.fat_dependency.name, suggestion
-            )?;
-            writeln!(
-                writer,
-                "    This would drop ~{} crates.",
-                target.w_unique
-            )?;
-        }
-        RemovalStrategy::ReplaceWithLighter { alternative } => {
-            writeln!(
-                writer,
-                "    Replace `{}` with the lighter alternative: `{}`",
-                target.fat_dependency.name, alternative
-            )?;
-            writeln!(
-                writer,
-                "    This would drop ~{} crates.",
-                target.w_unique
-            )?;
-        }
-        RemovalStrategy::AlreadyGated { detail } => {
-            writeln!(
-                writer,
-                "    The dependency `{}` is {} in `{}`.",
-                target.fat_dependency.name, detail, target.intermediate.name
-            )?;
-            writeln!(
-                writer,
-                "    Check if your Cargo.toml enables this feature unnecessarily."
-            )?;
-        }
-        RemovalStrategy::RequiredBySibling { sibling } => {
-            writeln!(
-                writer,
-                "    `{}` is not directly used in `{}`'s source, but sibling",
-                target.fat_dependency.name, target.intermediate.name
-            )?;
-            writeln!(
-                writer,
-                "    dependency `{sibling}` transitively requires it. Cannot remove."
-            )?;
-        }
-    }
     Ok(())
 }
