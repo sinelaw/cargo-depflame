@@ -464,17 +464,17 @@ pub fn rank_targets(
 ) -> Vec<UpstreamTarget> {
     targets.retain(|t| hurrs_value(t.hurrs) >= threshold);
     targets.sort_by(|a, b| {
-        // Primary: confidence descending (High first).
+        // Primary: whether this actually saves deps (w_unique > 0 first).
+        let a_saves = a.w_unique > 0;
+        let b_saves = b.w_unique > 0;
+        let saves_cmp = b_saves.cmp(&a_saves);
+        if saves_cmp != std::cmp::Ordering::Equal {
+            return saves_cmp;
+        }
+        // Secondary: confidence descending (High first).
         let conf_cmp = b.confidence.cmp(&a.confidence);
         if conf_cmp != std::cmp::Ordering::Equal {
             return conf_cmp;
-        }
-        // Secondary: prefer upstream (non-workspace) targets over workspace members.
-        let upstream_a = !a.intermediate_is_workspace_member;
-        let upstream_b = !b.intermediate_is_workspace_member;
-        let upstream_cmp = upstream_b.cmp(&upstream_a);
-        if upstream_cmp != std::cmp::Ordering::Equal {
-            return upstream_cmp;
         }
         // Tertiary: W_uniq descending (actual savings).
         let uniq_cmp = b.w_unique.cmp(&a.w_unique);

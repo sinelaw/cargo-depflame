@@ -389,14 +389,10 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
     eprintln!("Building dependency tree for visualization...");
     let dep_tree = flamegraph::build_dep_tree(&dep_graph);
 
-    let unused_dep_names: Vec<String> = ranked
+    let unused_edges: Vec<(String, String)> = ranked
         .iter()
-        .filter(|t| {
-            matches!(t.suggestion, metrics::RemovalStrategy::Remove)
-                && t.intermediate_is_workspace_member
-                && t.c_ref == 0
-        })
-        .map(|t| t.fat_dependency.name.clone())
+        .filter(|t| t.c_ref == 0)
+        .map(|t| (t.intermediate.name.clone(), t.fat_dependency.name.clone()))
         .collect();
 
     let analysis = AnalysisReport {
@@ -410,7 +406,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
         fat_nodes_found: fat_nodes.len(),
         targets: ranked,
         dep_tree: Some(dep_tree),
-        unused_direct_deps: unused_dep_names,
+        unused_edges,
     };
 
     let mut writer: Box<dyn Write> = match &args.output {

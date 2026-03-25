@@ -104,6 +104,8 @@ struct LayoutRect {
     depth: usize,
     is_shared: bool,
     is_workspace: bool,
+    /// Name of the parent node (empty for roots).
+    parent_name: String,
     ancestor_count: usize,
     /// Number of children that were too small to render (collapsed).
     collapsed_children: usize,
@@ -166,6 +168,7 @@ fn layout(tree: &DepTreeData) -> Vec<LayoutRect> {
             &mut rects,
             &mut path,
             &ancestor_counts,
+            "",
         );
         x += w;
     }
@@ -182,6 +185,7 @@ fn layout_node(
     rects: &mut Vec<LayoutRect>,
     path: &mut HashSet<usize>,
     ancestor_counts: &[usize],
+    parent_name: &str,
 ) {
     if width < MIN_RECT_WIDTH || depth > MAX_DEPTH || rects.len() >= MAX_FRAMES {
         return;
@@ -206,6 +210,7 @@ fn layout_node(
         depth,
         is_shared,
         is_workspace: node.is_workspace,
+        parent_name: parent_name.to_string(),
         ancestor_count: ancestor_counts[node_idx],
         collapsed_children: 0,
     });
@@ -246,6 +251,7 @@ fn layout_node(
             rects,
             path,
             ancestor_counts,
+            &node.name,
         );
         cx += cw;
     }
@@ -365,10 +371,12 @@ pub fn render_flamegraph(
     render_flamegraph_with_unused(tree, total_deps, &[], writer)
 }
 
+/// Render with unused edge highlighting. Each entry in `unused_edges` is
+/// a `(parent_name, dep_name)` pair where the parent doesn't reference the dep.
 pub fn render_flamegraph_with_unused(
     tree: &DepTreeData,
     total_deps: usize,
-    unused_deps: &[String],
+    unused_edges: &[(String, String)],
     writer: &mut dyn Write,
 ) -> anyhow::Result<()> {
     let rects = layout(tree);
@@ -377,7 +385,10 @@ pub fn render_flamegraph_with_unused(
         return Ok(());
     }
 
-    let unused_set: HashSet<&str> = unused_deps.iter().map(|s| s.as_str()).collect();
+    let unused_edge_set: HashSet<(&str, &str)> = unused_edges
+        .iter()
+        .map(|(p, c)| (p.as_str(), c.as_str()))
+        .collect();
 
     let max_depth = rects.iter().map(|r| r.depth).max().unwrap_or(0);
     let max_weight = tree
@@ -609,7 +620,8 @@ pub fn render_flamegraph_with_unused(
     svg.push_str("<g id=\"frames\">\n");
 
     for r in &rects {
-        let is_unused = unused_set.contains(r.name.as_str());
+        let is_unused = !r.parent_name.is_empty()
+            && unused_edge_set.contains(&(r.parent_name.as_str(), r.name.as_str()));
         let fill = rect_fill(r, max_weight, is_unused);
         let tc = if is_unused { "#fff" } else { text_color(r) };
         let cls = if is_unused {

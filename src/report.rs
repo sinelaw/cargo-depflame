@@ -27,9 +27,10 @@ pub struct AnalysisReport {
     /// Populated during `analyze`; allows `report --format svg` to work from saved JSON.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dep_tree: Option<DepTreeData>,
-    /// Names of direct dependencies that appear completely unused in source code.
+    /// Edges where the parent crate doesn't reference the child in its source.
+    /// Each entry is `(parent_name, child_name)`.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub unused_direct_deps: Vec<String>,
+    pub unused_edges: Vec<(String, String)>,
 }
 
 /// Render the report as JSON.

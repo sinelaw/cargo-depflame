@@ -14,7 +14,7 @@ pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> an
         flamegraph::render_flamegraph_with_unused(
             tree,
             report.total_dependencies,
-            &report.unused_direct_deps,
+            &report.unused_edges,
             &mut buf,
         )?;
         String::from_utf8(buf)?
@@ -274,105 +274,125 @@ fn build_targets_html(report: &AnalysisReport) -> String {
          </div>\n",
     );
 
-    // --- Action summary ---
-    html.push_str("<div class=\"action-summary\">\n");
-    html.push_str("<h3>What you can do</h3>\n<p style=\"font-size:13px;color:#666;margin-bottom:8px\">Each suggestion below can reduce your dependency count. Items are ranked by impact (most deps saved first). Some changes are in your own crates; others require <strong>contributing a PR to an upstream library</strong> (marked with \u{1f4e4}).</p>\n<ul>\n");
+    // --- Categorize targets into sections ---
+    enum Category {
+        RemoveUnused,
+        ChangeFeatures,
+        MakeOptional,
+        Upstream,
+        NotActionable,
+    }
 
-    let mut has_items = false;
+    fn categorize(t: &crate::metrics::UpstreamTarget) -> Category {
+        match &t.suggestion {
+            RemovalStrategy::Remove if t.intermediate_is_workspace_member => Category::RemoveUnused,
+            RemovalStrategy::AlreadyGated { .. } => Category::ChangeFeatures,
+            _ if !t.intermediate_is_workspace_member => Category::Upstream,
+            RemovalStrategy::RequiredBySibling { .. } => Category::NotActionable,
+            _ => Category::MakeOptional,
+        }
+    }
+
+    struct Section {
+        title: &'static str,
+        description: &'static str,
+        targets: Vec<(usize, &'static str)>, // (original index, upstream_badge)
+    }
+
+    let mut sections = vec![
+        Section {
+            title: "Remove unused dependencies",
+            description: "These dependencies are in your <code>Cargo.toml</code> but no references were found in your source code. \
+                          You can remove them by deleting the line from <code>[dependencies]</code>. \
+                          If a dependency has 0 deps saved, it's also pulled in transitively by something else, \
+                          so removing it only cleans up your manifest without shrinking the build.",
+            targets: Vec::new(),
+        },
+        Section {
+            title: "Disable unnecessary features",
+            description: "These dependencies are already <em>optional</em> in their upstream crate, \
+                          but are being pulled in by a feature you have enabled (often the <code>default</code> features). \
+                          You can reduce your dependency count by changing the feature flags in your <code>Cargo.toml</code> &mdash; \
+                          for example, adding <code>default-features = false</code> and listing only the features you actually need.",
+            targets: Vec::new(),
+        },
+        Section {
+            title: "Make dependencies optional",
+            description: "These dependencies are always compiled but could be made optional by adding <code>optional = true</code> \
+                          in your <code>Cargo.toml</code> and defining a feature flag in <code>[features]</code>. \
+                          This lets downstream users (or your own binary crate) opt out of them when they're not needed.",
+            targets: Vec::new(),
+        },
+        Section {
+            title: "Proposals for upstream libraries",
+            description: "These changes would need to happen in an external library's repository, not your own code. \
+                          You would need to open an issue or submit a pull request to the upstream maintainer. \
+                          The impact listed is the savings <em>you</em> would see if the change were accepted.",
+            targets: Vec::new(),
+        },
+        Section {
+            title: "Not actionable",
+            description: "These dependencies can't be easily removed because they're required by sibling dependencies.",
+            targets: Vec::new(),
+        },
+    ];
+
     for (i, t) in report.targets.iter().enumerate() {
+        let section_idx = match categorize(t) {
+            Category::RemoveUnused => 0,
+            Category::ChangeFeatures => 1,
+            Category::MakeOptional => 2,
+            Category::Upstream => 3,
+            Category::NotActionable => 4,
+        };
         let is_local_action = t.intermediate_is_workspace_member
             || matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. });
-        let upstream_badge = if is_local_action {
-            ""
-        } else {
+        let badge = if is_local_action { "" } else {
             " <span title=\"This change would be a PR to an upstream library, not your own code\" style=\"cursor:help\">\u{1f4e4}</span>"
         };
-        let prefix = format!("(-{} deps)", t.w_unique);
-        let fat_link = crate_link(&t.fat_dependency.name);
-        let int_link = crate_link(&t.intermediate.name);
-        let action_line = match &t.suggestion {
-            RemovalStrategy::Remove => {
-                format!("{prefix} Remove {fat_link} from {int_link} &mdash; it appears unused")
-            }
-            RemovalStrategy::InlineUpstream {
-                fat_loc,
-                api_items_used,
-            } => {
-                format!(
-                    "{prefix} Copy the code you need from {fat_link} directly into {int_link} \
-                     &mdash; only {api_items_used} API items used from a {fat_loc}-line crate"
-                )
-            }
-            RemovalStrategy::ReplaceWithStd { suggestion } => {
-                format!(
-                    "{prefix} Replace {fat_link} with <code>{}</code> in {int_link} \
-                     &mdash; the standard library now covers this",
-                    html_escape(suggestion),
-                )
-            }
-            RemovalStrategy::AlreadyGated { detail, enabling_features, recommended_defaults } => {
-                let feat_hint = if !enabling_features.is_empty() {
-                    let feats = enabling_features.iter().map(|f| format!("<code>{}</code>", html_escape(f))).collect::<Vec<_>>().join(", ");
-                    if recommended_defaults.is_some() {
-                        format!(" &mdash; default feature(s) {feats} pull it in; disable defaults and keep only what you need")
-                    } else {
-                        format!(" &mdash; enabled by feature(s) {feats}")
-                    }
-                } else {
-                    String::new()
-                };
-                format!(
-                    "{prefix} Check your <code>Cargo.toml</code> &mdash; {fat_link} is already \
-                     optional in {int_link} ({detail}){feat_hint}"
-                )
-            }
-            RemovalStrategy::FeatureGate => {
-                if t.intermediate_is_workspace_member {
-                    format!(
-                        "{prefix} Make {fat_link} optional in {int_link} \
-                         &mdash; put it behind a Cargo feature flag"
-                    )
-                } else {
-                    format!(
-                        "{prefix} Propose making {fat_link} optional in {int_link} \
-                         &mdash; submit a PR to put it behind a feature flag"
-                    )
-                }
-            }
-            RemovalStrategy::ReplaceWithLighter { alternative } => {
-                format!(
-                    "{prefix} Switch from {fat_link} to <code>{}</code> in {int_link} \
-                     &mdash; a lighter alternative",
-                    html_escape(alternative),
-                )
-            }
-            RemovalStrategy::RequiredBySibling { sibling } => {
-                format!(
-                    "{prefix} {fat_link} can't be removed &mdash; \
-                     it's also required by sibling dep {}", crate_link(sibling)
-                )
-            }
-        };
+        sections[section_idx].targets.push((i, badge));
+    }
 
-        let diff_block = if is_local_action { build_cargo_diff(t) } else { String::new() };
-        if diff_block.is_empty() {
-            html.push_str(&format!(
-                "<li>#{} {action_line}{upstream_badge}</li>\n",
-                i + 1
-            ));
-        } else {
-            html.push_str(&format!(
-                "<li>#{idx} {action_line}{upstream_badge} \
-                 <span class=\"show-diff-btn\" onclick=\"toggleDiff(this.parentElement)\">show diff</span>\n{diff_block}</li>\n",
-                idx = i + 1
-            ));
+    // Render each non-empty section.
+    let mut any_rendered = false;
+    for section in &sections {
+        if section.targets.is_empty() {
+            continue;
         }
-        has_items = true;
+        any_rendered = true;
+        html.push_str(&format!(
+            "<div class=\"action-summary\">\n\
+             <h3>{}</h3>\n\
+             <p style=\"font-size:13px;color:#666;margin-bottom:8px\">{}</p>\n<ul>\n",
+            section.title, section.description,
+        ));
+
+        for &(i, upstream_badge) in &section.targets {
+            let t = &report.targets[i];
+            let prefix = format!("(-{} deps)", t.w_unique);
+            let fat_link = crate_link(&t.fat_dependency.name);
+            let int_link = crate_link(&t.intermediate.name);
+            let action_line = format_action_line(t, &prefix, &fat_link, &int_link);
+            let is_local = t.intermediate_is_workspace_member
+                || matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. });
+            let diff_block = if is_local { build_cargo_diff(t) } else { String::new() };
+
+            if diff_block.is_empty() {
+                html.push_str(&format!(
+                    "<li>{action_line}{upstream_badge}</li>\n",
+                ));
+            } else {
+                html.push_str(&format!(
+                    "<li>{action_line}{upstream_badge} \
+                     <span class=\"show-diff-btn\" onclick=\"toggleDiff(this.parentElement)\">show diff</span>\n{diff_block}</li>\n",
+                ));
+            }
+        }
+        html.push_str("</ul>\n</div>\n\n");
     }
-    if !has_items {
-        html.push_str("<li style=\"color:#888\">No actionable targets found.</li>\n");
+    if !any_rendered {
+        html.push_str("<div class=\"action-summary\"><p style=\"color:#888\">No actionable suggestions found.</p></div>\n\n");
     }
-    html.push_str("</ul>\n</div>\n\n");
 
     // --- Ranked targets table ---
     html.push_str(
@@ -518,6 +538,86 @@ fn build_targets_html(report: &AnalysisReport) -> String {
 
     html.push_str("</tbody>\n</table>\n");
     html
+}
+
+/// Format a single suggestion action line.
+fn format_action_line(
+    t: &crate::metrics::UpstreamTarget,
+    prefix: &str,
+    fat_link: &str,
+    int_link: &str,
+) -> String {
+    match &t.suggestion {
+        RemovalStrategy::Remove => {
+            format!("{prefix} Remove {fat_link} from {int_link} &mdash; it appears unused")
+        }
+        RemovalStrategy::InlineUpstream {
+            fat_loc,
+            api_items_used,
+        } => {
+            format!(
+                "{prefix} Copy the code you need from {fat_link} directly into {int_link} \
+                 &mdash; only {api_items_used} API items used from a {fat_loc}-line crate"
+            )
+        }
+        RemovalStrategy::ReplaceWithStd { suggestion } => {
+            format!(
+                "{prefix} Replace {fat_link} with <code>{}</code> in {int_link} \
+                 &mdash; the standard library now covers this",
+                html_escape(suggestion),
+            )
+        }
+        RemovalStrategy::AlreadyGated {
+            detail,
+            enabling_features,
+            recommended_defaults,
+        } => {
+            let feat_hint = if !enabling_features.is_empty() {
+                let feats = enabling_features
+                    .iter()
+                    .map(|f| format!("<code>{}</code>", html_escape(f)))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                if recommended_defaults.is_some() {
+                    format!(" &mdash; default feature(s) {feats} pull it in; disable defaults and keep only what you need")
+                } else {
+                    format!(" &mdash; enabled by feature(s) {feats}")
+                }
+            } else {
+                String::new()
+            };
+            format!(
+                "{prefix} {fat_link} is already optional in {int_link} ({detail}){feat_hint}"
+            )
+        }
+        RemovalStrategy::FeatureGate => {
+            if t.intermediate_is_workspace_member {
+                format!(
+                    "{prefix} Make {fat_link} optional in {int_link} \
+                     &mdash; put it behind a Cargo feature flag"
+                )
+            } else {
+                format!(
+                    "{prefix} Propose making {fat_link} optional in {int_link} \
+                     &mdash; submit a PR to put it behind a feature flag"
+                )
+            }
+        }
+        RemovalStrategy::ReplaceWithLighter { alternative } => {
+            format!(
+                "{prefix} Switch from {fat_link} to <code>{}</code> in {int_link} \
+                 &mdash; a lighter alternative",
+                html_escape(alternative),
+            )
+        }
+        RemovalStrategy::RequiredBySibling { sibling } => {
+            format!(
+                "{prefix} {fat_link} can't be removed &mdash; \
+                 it's also required by sibling dep {}",
+                crate_link(sibling)
+            )
+        }
+    }
 }
 
 /// Build a colored diff block showing the Cargo.toml change for a suggestion.
