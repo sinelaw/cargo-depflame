@@ -277,7 +277,11 @@ pub fn compute_target(input: ComputeTargetInput) -> UpstreamTarget {
 /// Max LOC for a leaf dep to be considered inlinable.
 const SMALL_CRATE_LOC: usize = 500;
 
-fn compute_suggestion(input: &ComputeTargetInput, c_ref: usize, api_items_used: usize) -> RemovalStrategy {
+fn compute_suggestion(
+    input: &ComputeTargetInput,
+    c_ref: usize,
+    api_items_used: usize,
+) -> RemovalStrategy {
     let fat_name = &input.fat_name;
     let intermediate_name = &input.intermediate_name;
     let edge_meta = &input.edge_meta;
@@ -582,7 +586,10 @@ mod tests {
         let mut input = base_input();
         input.required_by_sibling = Some("other".into());
         let t = compute_target(input);
-        assert!(matches!(t.suggestion, RemovalStrategy::RequiredBySibling { .. }));
+        assert!(matches!(
+            t.suggestion,
+            RemovalStrategy::RequiredBySibling { .. }
+        ));
     }
 
     #[test]
@@ -600,7 +607,10 @@ mod tests {
         input.fat_name = "lazy_static".into();
         input.scan_result.ref_count = 2;
         let t = compute_target(input);
-        assert!(matches!(t.suggestion, RemovalStrategy::ReplaceWithStd { .. }));
+        assert!(matches!(
+            t.suggestion,
+            RemovalStrategy::ReplaceWithStd { .. }
+        ));
     }
 
     #[test]
@@ -610,7 +620,10 @@ mod tests {
         input.fat_dep_loc = 100;
         input.fat_dep_own_deps = 0; // leaf
         let t = compute_target(input);
-        assert!(matches!(t.suggestion, RemovalStrategy::InlineUpstream { .. }));
+        assert!(matches!(
+            t.suggestion,
+            RemovalStrategy::InlineUpstream { .. }
+        ));
     }
 
     #[test]
@@ -662,11 +675,7 @@ mod tests {
         b.w_unique = 5; // real savings
         b.scan_result.ref_count = 0;
 
-        let ranked = rank_targets(
-            vec![compute_target(a), compute_target(b)],
-            0.0,
-            10,
-        );
+        let ranked = rank_targets(vec![compute_target(a), compute_target(b)], 0.0, 10);
         assert!(ranked[0].w_unique > 0);
     }
 

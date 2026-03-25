@@ -196,11 +196,7 @@ pub fn render_text(
 
     // Section 3: Unused deps in upstream
     if !upstream_remove.is_empty() {
-        writeln!(
-            writer,
-            "{}",
-            "Possibly unused (propose removal):".bold()
-        )?;
+        writeln!(writer, "{}", "Possibly unused (propose removal):".bold())?;
         writeln!(writer)?;
         for target in &upstream_remove {
             writeln!(

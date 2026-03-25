@@ -7,7 +7,9 @@ use crate::cli::AnalyzeArgs;
 use crate::crate_fetch;
 use crate::flamegraph;
 use crate::graph::{DepGraph, EdgeMeta, IntermediateEdge};
-use crate::metrics::{self, ComputeTargetInput, Confidence, PackageInfo, RemovalStrategy, UpstreamTarget};
+use crate::metrics::{
+    self, ComputeTargetInput, Confidence, PackageInfo, RemovalStrategy, UpstreamTarget,
+};
 use crate::report::AnalysisReport;
 use crate::{platform, registry, scanner};
 
@@ -52,7 +54,11 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
 
     if fat_nodes.is_empty() {
         eprintln!("No fat nodes found. Your dependency tree is lean!");
-        return Ok(empty_report(workspace_root, args.common.threshold, total_deps));
+        return Ok(empty_report(
+            workspace_root,
+            args.common.threshold,
+            total_deps,
+        ));
     }
 
     // Phase 2b: Find intermediate edges.
@@ -61,7 +67,11 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
 
     if edges.is_empty() {
         eprintln!("No intermediate dependency edges to analyze.");
-        return Ok(empty_report(workspace_root, args.common.threshold, total_deps));
+        return Ok(empty_report(
+            workspace_root,
+            args.common.threshold,
+            total_deps,
+        ));
     }
 
     // Phase 2c: Resolve real platform deps to detect phantom deps.
@@ -75,9 +85,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
     eprintln!("Scanning intermediate crate sources...");
     let targets: Vec<UpstreamTarget> = edges
         .par_iter()
-        .filter_map(|edge| {
-            scan_edge(edge, &dep_graph, &metadata, &real_deps)
-        })
+        .filter_map(|edge| scan_edge(edge, &dep_graph, &metadata, &real_deps))
         .collect();
 
     // Phase 5b: Rank.
@@ -161,9 +169,8 @@ fn scan_edge(
     };
 
     // Phase 3b: Look up dependency info from cargo_metadata.
-    let dep_meta = intermediate_pkg.and_then(|pkg| {
-        pkg.dependencies.iter().find(|d| d.name == edge.fat_name)
-    });
+    let dep_meta =
+        intermediate_pkg.and_then(|pkg| pkg.dependencies.iter().find(|d| d.name == edge.fat_name));
 
     // Determine the local alias for the fat dependency.
     let alias = dep_meta.and_then(|d| d.rename.clone()).or_else(|| {
@@ -218,8 +225,7 @@ fn scan_edge(
     let dep_chain = dep_graph.dependency_chain(&edge.fat_id);
 
     // Phase 4e: Check if a sibling dep transitively requires the fat dep.
-    let required_by_sibling =
-        dep_graph.sibling_requires(&edge.intermediate_id, &edge.fat_id);
+    let required_by_sibling = dep_graph.sibling_requires(&edge.intermediate_id, &edge.fat_id);
 
     // Phase 4e: Check if the fat dep is a phantom (not on this platform).
     let phantom = !platform::is_real_dep(real_deps, &edge.fat_name, &edge.fat_version);
@@ -288,11 +294,8 @@ fn enrich_features(ranked: &mut [UpstreamTarget], metadata: &cargo_metadata::Met
                 if let Some(defaults) = pkg.features.get("default") {
                     let dominated: HashSet<&str> = found.iter().map(|s| s.as_str()).collect();
                     let dep_prefix = format!("dep:{fat_name}");
-                    let enables_fat = |d: &str| {
-                        dominated.contains(d)
-                            || d == fat_name
-                            || d == dep_prefix
-                    };
+                    let enables_fat =
+                        |d: &str| dominated.contains(d) || d == fat_name || d == dep_prefix;
                     let any_in_default = defaults.iter().any(|d| enables_fat(d));
                     if any_in_default {
                         let keep: Vec<String> = defaults

@@ -1,6 +1,6 @@
 use super::layout::{
-    layout, LayoutRect, CHART_WIDTH, CHAR_WIDTH, ROW_HEIGHT, ROW_TOTAL, TEXT_PAD,
-    HEADER_HEIGHT, FOOTER_HEIGHT,
+    layout, LayoutRect, CHART_WIDTH, CHAR_WIDTH, FOOTER_HEIGHT, HEADER_HEIGHT, ROW_HEIGHT,
+    ROW_TOTAL, TEXT_PAD,
 };
 use super::DepTreeData;
 use crate::html_report::html_escape;
@@ -299,24 +299,56 @@ fn render_legend(svg: &mut String) {
         dash: bool,
     }
     let legend_items = [
-        LegendItem { label: "workspace", fill: "rgb(70,130,180)", dash: false },
-        LegendItem { label: "leaf (0 deps)", fill: "hsl(120,55%,58%)", dash: false },
-        LegendItem { label: "some deps", fill: "hsl(75,65%,54%)", dash: false },
-        LegendItem { label: "many deps", fill: "hsl(30,75%,50%)", dash: false },
-        LegendItem { label: "shared", fill: "hsl(270,50%,65%)", dash: true },
-        LegendItem { label: "unused", fill: "rgb(220,20,80)", dash: false },
+        LegendItem {
+            label: "workspace",
+            fill: "rgb(70,130,180)",
+            dash: false,
+        },
+        LegendItem {
+            label: "leaf (0 deps)",
+            fill: "hsl(120,55%,58%)",
+            dash: false,
+        },
+        LegendItem {
+            label: "some deps",
+            fill: "hsl(75,65%,54%)",
+            dash: false,
+        },
+        LegendItem {
+            label: "many deps",
+            fill: "hsl(30,75%,50%)",
+            dash: false,
+        },
+        LegendItem {
+            label: "shared",
+            fill: "hsl(270,50%,65%)",
+            dash: true,
+        },
+        LegendItem {
+            label: "unused",
+            fill: "rgb(220,20,80)",
+            dash: false,
+        },
     ];
 
     // Compute total legend width so we can right-align it.
-    let legend_total_width: f64 = legend_items.iter().enumerate().map(|(i, item)| {
-        let text_w = item.label.len() as f64 * LEGEND_FONT_WIDTH;
-        let item_w = LEGEND_SWATCH + SWATCH_TEXT_GAP + text_w;
-        item_w + if i > 0 { LEGEND_GAP } else { 0.0 }
-    }).sum();
+    let legend_total_width: f64 = legend_items
+        .iter()
+        .enumerate()
+        .map(|(i, item)| {
+            let text_w = item.label.len() as f64 * LEGEND_FONT_WIDTH;
+            let item_w = LEGEND_SWATCH + SWATCH_TEXT_GAP + text_w;
+            item_w + if i > 0 { LEGEND_GAP } else { 0.0 }
+        })
+        .sum();
 
     let mut lx = CHART_WIDTH - legend_total_width - 6.0; // 6px right margin
     for item in &legend_items {
-        let dash_attr = if item.dash { r#" stroke-dasharray="4,2""# } else { "" };
+        let dash_attr = if item.dash {
+            r#" stroke-dasharray="4,2""#
+        } else {
+            ""
+        };
         let text_x = lx + LEGEND_SWATCH + SWATCH_TEXT_GAP;
         let text_w = item.label.len() as f64 * LEGEND_FONT_WIDTH;
         svg.push_str(&format!(
@@ -338,14 +370,27 @@ fn render_legend(svg: &mut String) {
         onclick: &'static str,
     }
     let controls = [
-        ControlItem { label: "[search]", onclick: "search()" },
-        ControlItem { label: "[clear]", onclick: "clearSearch()" },
-        ControlItem { label: "[reset zoom]", onclick: "resetZoom()" },
+        ControlItem {
+            label: "[search]",
+            onclick: "search()",
+        },
+        ControlItem {
+            label: "[clear]",
+            onclick: "clearSearch()",
+        },
+        ControlItem {
+            label: "[reset zoom]",
+            onclick: "resetZoom()",
+        },
     ];
 
-    let ctrl_total_width: f64 = controls.iter().enumerate().map(|(i, c)| {
-        c.label.len() as f64 * LEGEND_FONT_WIDTH + if i > 0 { LEGEND_GAP } else { 0.0 }
-    }).sum();
+    let ctrl_total_width: f64 = controls
+        .iter()
+        .enumerate()
+        .map(|(i, c)| {
+            c.label.len() as f64 * LEGEND_FONT_WIDTH + if i > 0 { LEGEND_GAP } else { 0.0 }
+        })
+        .sum();
 
     let mut cx = CHART_WIDTH - ctrl_total_width - 6.0;
     for ctrl in &controls {

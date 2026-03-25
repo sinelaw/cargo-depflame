@@ -321,9 +321,7 @@ impl DepGraph {
     pub fn fat_nodes(&self, threshold: usize) -> Vec<FatNode> {
         self.nodes
             .iter()
-            .filter(|(_, node)| {
-                !node.is_workspace_member && node.transitive_weight > threshold
-            })
+            .filter(|(_, node)| !node.is_workspace_member && node.transitive_weight > threshold)
             .map(|(id, node)| FatNode {
                 id: id.clone(),
                 name: node.name.clone(),

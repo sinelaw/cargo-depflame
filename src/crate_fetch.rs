@@ -18,7 +18,9 @@ pub fn parse_crate_spec(input: &str) -> Result<CrateSpec> {
     let input = input.trim().trim_end_matches('/');
 
     // Handle crates.io URLs.
-    if input.starts_with("https://crates.io/crates/") || input.starts_with("http://crates.io/crates/") {
+    if input.starts_with("https://crates.io/crates/")
+        || input.starts_with("http://crates.io/crates/")
+    {
         let path = input
             .split("/crates/")
             .nth(1)
@@ -28,7 +30,10 @@ pub fn parse_crate_spec(input: &str) -> Result<CrateSpec> {
         if name.is_empty() {
             bail!("empty crate name in URL");
         }
-        let version = parts.get(1).filter(|v| !v.is_empty()).map(|v| v.to_string());
+        let version = parts
+            .get(1)
+            .filter(|v| !v.is_empty())
+            .map(|v| v.to_string());
         return Ok(CrateSpec { name, version });
     }
 
@@ -62,10 +67,15 @@ pub fn parse_crate_spec(input: &str) -> Result<CrateSpec> {
 fn resolve_latest_version(name: &str) -> Result<String> {
     let url = format!("https://crates.io/api/v1/crates/{name}");
     let resp = ureq::get(&url)
-        .set("User-Agent", "cargo-depflame (https://github.com/sinelaw/cargo-depflame)")
+        .set(
+            "User-Agent",
+            "cargo-depflame (https://github.com/sinelaw/cargo-depflame)",
+        )
         .call()
         .with_context(|| format!("failed to fetch crate info for '{name}' from crates.io"))?;
-    let body = resp.into_string().context("failed to read crates.io API response")?;
+    let body = resp
+        .into_string()
+        .context("failed to read crates.io API response")?;
     let response: serde_json::Value =
         serde_json::from_str(&body).context("failed to parse crates.io API response")?;
 
@@ -97,7 +107,10 @@ pub fn fetch_and_extract(spec: &CrateSpec, dest_dir: &Path) -> Result<PathBuf> {
     );
 
     let response = ureq::get(&download_url)
-        .set("User-Agent", "cargo-depflame (https://github.com/sinelaw/cargo-depflame)")
+        .set(
+            "User-Agent",
+            "cargo-depflame (https://github.com/sinelaw/cargo-depflame)",
+        )
         .call()
         .with_context(|| format!("failed to download {} v{}", spec.name, version))?;
 
