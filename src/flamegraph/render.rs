@@ -147,7 +147,7 @@ pub(super) fn render_svg(
 
     // -- Title + subtitle ----------------------------------------------------
     svg.push_str(&format!(
-        r#"<text x="6" y="18" class="title">Dependency Tree — Icicle / Flamegraph</text>
+        r#"<text x="6" y="18" class="title">depflame — Dependency Tree</text>
 <text x="6" y="33" class="subtitle">{total_deps} deps total, {unique} unique crates shown, {shared_count} shared (dashed border = multiple parents) | click to zoom</text>
 "#,
         unique = unique_nodes.len(),

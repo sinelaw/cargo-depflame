@@ -47,7 +47,7 @@ pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> an
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Upstream Dependency Triage Report</title>
+<title>depflame — Dependency Analysis Report</title>
 <style>
 {css}
 </style>
@@ -55,7 +55,7 @@ pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> an
 <body>
 
 <div class="header">
-  <h1>Upstream Dependency Triage Report</h1>
+  <h1>depflame — Dependency Analysis Report</h1>
   <div class="stats">
     <span title="Total number of crate dependencies in the full cross-platform resolve graph (includes all targets/platforms).">{total_deps} total deps</span>
     {platform_html}

@@ -48,7 +48,7 @@ pub fn render_text(
 ) -> anyhow::Result<()> {
     // Header.
     writeln!(writer)?;
-    writeln!(writer, "{}", "Upstream Dependency Triage Report".bold())?;
+    writeln!(writer, "{}", "depflame — Dependency Analysis Report".bold())?;
 
     if let Some(platform_deps) = report.platform_dependencies {
         writeln!(
@@ -65,7 +65,7 @@ pub fn render_text(
         writeln!(
             writer,
             "{}",
-            "No actionable upstream targets found. Your dependency tree looks clean!"
+            "No actionable targets found. Your dependency tree looks clean!"
                 .green()
                 .bold()
         )?;
@@ -127,7 +127,7 @@ pub fn render_text(
         writeln!(
             writer,
             "{}",
-            "Consider inlining into upstream (small dep or light usage):".bold()
+            "Consider inlining (small dep or light usage):".bold()
         )?;
         writeln!(writer)?;
         for target in &inline_candidates {
@@ -155,7 +155,7 @@ pub fn render_text(
         writeln!(
             writer,
             "{}",
-            "Propose feature-gating to upstream crates:".bold()
+            "Propose feature-gating in upstream crates:".bold()
         )?;
         writeln!(writer)?;
         for target in &upstream_feature_gate {
@@ -177,7 +177,7 @@ pub fn render_text(
         writeln!(
             writer,
             "{}",
-            "Already optional in upstream — check if you need these features:".bold()
+            "Already optional — check if you need these features enabled:".bold()
         )?;
         writeln!(writer)?;
         for target in &upstream_already_gated {
@@ -199,7 +199,7 @@ pub fn render_text(
         writeln!(
             writer,
             "{}",
-            "Possibly unused in upstream (propose removal):".bold()
+            "Possibly unused (propose removal):".bold()
         )?;
         writeln!(writer)?;
         for target in &upstream_remove {

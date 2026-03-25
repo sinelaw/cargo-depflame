@@ -4,7 +4,7 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(
     name = "cargo-depflame",
-    about = "Find high-ROI upstream dependency reduction opportunities",
+    about = "Visualize and optimize your Cargo dependency tree",
     version
 )]
 pub struct Cli {
