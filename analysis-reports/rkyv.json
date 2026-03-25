@@ -1,0 +1,1025 @@
+{
+  "tool_version": "0.1.0",
+  "timestamp": "2026-03-25T21:28:09.860162022+00:00",
+  "workspace_root": "/tmp/rust-projects/rkyv",
+  "threshold": 3.0,
+  "total_dependencies": 69,
+  "platform_dependencies": 16,
+  "phantom_dependencies": 53,
+  "fat_nodes_found": 9,
+  "targets": [
+    {
+      "intermediate": {
+        "name": "rkyv",
+        "version": "0.8.15"
+      },
+      "fat_dependency": {
+        "name": "indexmap",
+        "version": "2.13.0"
+      },
+      "w_transitive": 3,
+      "w_unique": 2,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "indexmap",
+        "searched_names": [
+          "indexmap"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "rkyv",
+        "indexmap"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rkyv",
+        "version": "0.8.15"
+      },
+      "fat_dependency": {
+        "name": "tinyvec",
+        "version": "1.11.0"
+      },
+      "w_transitive": 2,
+      "w_unique": 2,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "tinyvec",
+        "searched_names": [
+          "tinyvec"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "rkyv",
+        "tinyvec"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 1,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rkyv",
+        "version": "0.8.15"
+      },
+      "fat_dependency": {
+        "name": "bytes",
+        "version": "1.11.1"
+      },
+      "w_transitive": 1,
+      "w_unique": 1,
+      "c_ref": 0,
+      "hurrs": null,
+      "confidence": "High",
+      "scan_result": {
+        "fat_crate_name": "bytes",
+        "searched_names": [
+          "bytes"
+        ],
+        "ref_count": 0,
+        "file_matches": [],
+        "files_with_matches": 0,
+        "generated_file_refs": 0,
+        "distinct_items": [],
+        "has_re_export_all": false
+      },
+      "suggestion": "Remove",
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": false,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "rkyv",
+        "bytes"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 0,
+      "fat_dep_own_deps": 0,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "rkyv",
+        "version": "0.8.15"
+      },
+      "fat_dependency": {
+        "name": "uuid",
+        "version": "1.22.0"
+      },
+      "w_transitive": 14,
+      "w_unique": 9,
+      "c_ref": 2,
+      "hurrs": 7.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "uuid",
+        "searched_names": [
+          "uuid",
+          "uuid_1"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rkyv-0.8.15/src/impls/ext/uuid_1.rs",
+            "line_number": 2,
+            "line_content": "use uuid_1::Uuid;",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rkyv-0.8.15/src/impls/ext/uuid_1.rs",
+            "line_number": 10,
+            "line_content": "unsafe impl Portable for Uuid where uuid_1::Bytes: Portable {}",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Bytes",
+          "Uuid"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "already optional",
+          "enabling_features": []
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": false
+      },
+      "dep_chain": [
+        "rkyv",
+        "uuid"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": true,
+      "fat_dep_loc": 4607,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "uuid",
+        "version": "1.22.0"
+      },
+      "fat_dependency": {
+        "name": "js-sys",
+        "version": "0.3.91"
+      },
+      "w_transitive": 13,
+      "w_unique": 1,
+      "c_ref": 2,
+      "hurrs": 6.5,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "js-sys",
+        "searched_names": [
+          "js_sys"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.22.0/src/rng.rs",
+            "line_number": 273,
+            "line_content": "let buf = js_sys::Uint8Array::new_with_length(buf_len_u32);",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.22.0/src/rng.rs",
+            "line_number": 305,
+            "line_content": "fn get_random_values(buf: &js_sys::Uint8Array) -> Result<(), JsValue>;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 1,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "Uint8Array"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "AlreadyGated": {
+          "detail": "optional + platform-conditional",
+          "enabling_features": [
+            "js"
+          ]
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "rkyv",
+        "uuid",
+        "js-sys"
+      ],
+      "required_by_sibling": null,
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 8218,
+      "fat_dep_own_deps": 2,
+      "has_re_export_all": false
+    },
+    {
+      "intermediate": {
+        "name": "uuid",
+        "version": "1.22.0"
+      },
+      "fat_dependency": {
+        "name": "wasm-bindgen",
+        "version": "0.2.114"
+      },
+      "w_transitive": 12,
+      "w_unique": 0,
+      "c_ref": 2,
+      "hurrs": 6.0,
+      "confidence": "Noise",
+      "scan_result": {
+        "fat_crate_name": "wasm-bindgen",
+        "searched_names": [
+          "wasm_bindgen"
+        ],
+        "ref_count": 2,
+        "file_matches": [
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.22.0/src/rng.rs",
+            "line_number": 247,
+            "line_content": "use wasm_bindgen::{prelude::wasm_bindgen, JsValue};",
+            "in_generated_file": false
+          },
+          {
+            "path": "/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.22.0/src/timestamp.rs",
+            "line_number": 347,
+            "line_content": "use wasm_bindgen::prelude::*;",
+            "in_generated_file": false
+          }
+        ],
+        "files_with_matches": 2,
+        "generated_file_refs": 0,
+        "distinct_items": [
+          "JsValue",
+          "prelude"
+        ],
+        "has_re_export_all": false
+      },
+      "suggestion": {
+        "RequiredBySibling": {
+          "sibling": "js-sys"
+        }
+      },
+      "edge_meta": {
+        "build_only": false,
+        "already_optional": true,
+        "platform_conditional": true
+      },
+      "dep_chain": [
+        "rkyv",
+        "uuid",
+        "wasm-bindgen"
+      ],
+      "required_by_sibling": "js-sys",
+      "phantom": true,
+      "intermediate_is_workspace_member": false,
+      "fat_dep_loc": 4401,
+      "fat_dep_own_deps": 5,
+      "has_re_export_all": false
+    }
+  ],
+  "dep_tree": {
+    "nodes": [
+      {
+        "name": "wasip2",
+        "version": "1.0.2+wasi-0.2.9",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          44
+        ]
+      },
+      {
+        "name": "ptr_meta",
+        "version": "0.3.1",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          29
+        ]
+      },
+      {
+        "name": "bumpalo",
+        "version": "3.20.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "windows-link",
+        "version": "0.2.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.16.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "equivalent",
+        "version": "1.0.2",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "munge",
+        "version": "0.4.7",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          15
+        ]
+      },
+      {
+        "name": "clap_builder",
+        "version": "4.6.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          69,
+          58
+        ]
+      },
+      {
+        "name": "version_check",
+        "version": "0.9.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "uuid",
+        "version": "1.22.0",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          49,
+          43
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.61.2",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          3
+        ]
+      },
+      {
+        "name": "termcolor",
+        "version": "1.4.1",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          28
+        ]
+      },
+      {
+        "name": "rancor",
+        "version": "0.1.1",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          1
+        ]
+      },
+      {
+        "name": "serde",
+        "version": "1.0.228",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          47
+        ]
+      },
+      {
+        "name": "bytecheck_derive",
+        "version": "0.8.2",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        "name": "munge_macro",
+        "version": "0.4.7",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        "name": "simdutf8",
+        "version": "0.1.5",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rkyv_derive",
+        "version": "0.8.15",
+        "transitive_weight": 5,
+        "is_workspace": true,
+        "children": [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        "name": "serde_json",
+        "version": "1.0.149",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          13,
+          47,
+          20,
+          52,
+          53
+        ]
+      },
+      {
+        "name": "wasm-bindgen-shared",
+        "version": "0.2.114",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          70
+        ]
+      },
+      {
+        "name": "itoa",
+        "version": "1.0.18",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "proc-macro2",
+        "version": "1.0.106",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          70
+        ]
+      },
+      {
+        "name": "quote",
+        "version": "1.0.45",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          21
+        ]
+      },
+      {
+        "name": "divan-macros",
+        "version": "0.1.21",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        "name": "bytecheck",
+        "version": "0.8.2",
+        "transitive_weight": 10,
+        "is_workspace": false,
+        "children": [
+          12,
+          1,
+          14,
+          16
+        ]
+      },
+      {
+        "name": "zerocopy-derive",
+        "version": "0.8.47",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        "name": "benchlib",
+        "version": "0.8.15",
+        "transitive_weight": 18,
+        "is_workspace": true,
+        "children": [
+          41,
+          35,
+          39
+        ]
+      },
+      {
+        "name": "tinyvec_macros",
+        "version": "0.1.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "winapi-util",
+        "version": "0.1.11",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          10
+        ]
+      },
+      {
+        "name": "ptr_meta_derive",
+        "version": "0.3.1",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        "name": "rend",
+        "version": "0.5.3",
+        "transitive_weight": 11,
+        "is_workspace": false,
+        "children": [
+          24
+        ]
+      },
+      {
+        "name": "condtype",
+        "version": "1.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "libc",
+        "version": "0.2.183",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "once_cell",
+        "version": "1.21.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "serde_spanned",
+        "version": "1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          47
+        ]
+      },
+      {
+        "name": "rand",
+        "version": "0.8.5",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          42
+        ]
+      },
+      {
+        "name": "toml_datetime",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          47
+        ]
+      },
+      {
+        "name": "tinyvec",
+        "version": "1.11.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          27
+        ]
+      },
+      {
+        "name": "trybuild",
+        "version": "1.0.116",
+        "transitive_weight": 27,
+        "is_workspace": false,
+        "children": [
+          64,
+          18,
+          13,
+          55,
+          11,
+          63,
+          71
+        ]
+      },
+      {
+        "name": "rand_pcg",
+        "version": "0.3.1",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          42
+        ]
+      },
+      {
+        "name": "rkyv",
+        "version": "0.8.15",
+        "transitive_weight": 31,
+        "is_workspace": true,
+        "children": [
+          9,
+          30,
+          24,
+          12,
+          6,
+          1,
+          17,
+          46,
+          37,
+          66,
+          4
+        ]
+      },
+      {
+        "name": "divan",
+        "version": "0.1.21",
+        "transitive_weight": 14,
+        "is_workspace": false,
+        "children": [
+          23,
+          54,
+          67,
+          31,
+          32,
+          50
+        ]
+      },
+      {
+        "name": "rand_core",
+        "version": "0.6.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen",
+        "version": "0.2.114",
+        "transitive_weight": 12,
+        "is_workspace": false,
+        "children": [
+          59,
+          19,
+          67,
+          33,
+          68
+        ]
+      },
+      {
+        "name": "wit-bindgen",
+        "version": "0.51.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "ahash",
+        "version": "0.8.12",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          62,
+          61,
+          67,
+          33,
+          8
+        ]
+      },
+      {
+        "name": "indexmap",
+        "version": "2.13.0",
+        "transitive_weight": 3,
+        "is_workspace": false,
+        "children": [
+          5,
+          4
+        ]
+      },
+      {
+        "name": "serde_core",
+        "version": "1.0.228",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          55
+        ]
+      },
+      {
+        "name": "toml_writer",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "js-sys",
+        "version": "0.3.91",
+        "transitive_weight": 13,
+        "is_workspace": false,
+        "children": [
+          43,
+          33
+        ]
+      },
+      {
+        "name": "regex-lite",
+        "version": "0.1.9",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "syn",
+        "version": "2.0.117",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          22,
+          21,
+          70
+        ]
+      },
+      {
+        "name": "memchr",
+        "version": "2.8.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zmij",
+        "version": "1.0.21",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap",
+        "version": "4.6.0",
+        "transitive_weight": 4,
+        "is_workspace": false,
+        "children": [
+          7
+        ]
+      },
+      {
+        "name": "serde_derive",
+        "version": "1.0.228",
+        "transitive_weight": 5,
+        "is_workspace": false,
+        "children": [
+          51,
+          22,
+          21
+        ]
+      },
+      {
+        "name": "wasm-bindgen-macro-support",
+        "version": "0.2.114",
+        "transitive_weight": 7,
+        "is_workspace": false,
+        "children": [
+          51,
+          22,
+          21,
+          19,
+          2
+        ]
+      },
+      {
+        "name": "r-efi",
+        "version": "5.3.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "clap_lex",
+        "version": "1.1.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "wasm-bindgen-macro",
+        "version": "0.2.114",
+        "transitive_weight": 8,
+        "is_workspace": false,
+        "children": [
+          56,
+          22
+        ]
+      },
+      {
+        "name": "winnow",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "zerocopy",
+        "version": "0.8.47",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          25
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.3.4",
+        "transitive_weight": 6,
+        "is_workspace": false,
+        "children": [
+          0,
+          67,
+          32,
+          57
+        ]
+      },
+      {
+        "name": "glob",
+        "version": "0.3.3",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "toml",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 15,
+        "is_workspace": false,
+        "children": [
+          34,
+          36,
+          47,
+          46,
+          65,
+          48,
+          60
+        ]
+      },
+      {
+        "name": "toml_parser",
+        "version": "1.1.0+spec-1.1.0",
+        "transitive_weight": 2,
+        "is_workspace": false,
+        "children": [
+          60
+        ]
+      },
+      {
+        "name": "bytes",
+        "version": "1.11.1",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "cfg-if",
+        "version": "1.0.4",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "rustversion",
+        "version": "1.0.22",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "anstyle",
+        "version": "1.0.14",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "unicode-ident",
+        "version": "1.0.24",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      },
+      {
+        "name": "target-triple",
+        "version": "1.0.0",
+        "transitive_weight": 1,
+        "is_workspace": false,
+        "children": []
+      }
+    ],
+    "root_indices": [
+      40,
+      26,
+      17
+    ]
+  },
+  "unused_edges": [
+    [
+      "rkyv",
+      "indexmap"
+    ],
+    [
+      "rkyv",
+      "tinyvec"
+    ],
+    [
+      "rkyv",
+      "bytes"
+    ]
+  ]
+}
