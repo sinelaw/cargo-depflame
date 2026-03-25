@@ -6,7 +6,7 @@ use cargo_upstream_triage::report::AnalysisReport;
 use cargo_upstream_triage::{graph, metrics, platform, registry, report, scanner};
 use clap::Parser;
 use rayon::prelude::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -194,7 +194,75 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
         .collect();
 
     // Phase 5b: Rank.
-    let ranked = metrics::rank_targets(targets, args.threshold, args.top);
+    let mut ranked = metrics::rank_targets(targets, args.threshold, args.top);
+
+    // Phase 5c: Enrich AlreadyGated suggestions with feature info.
+    //
+    // For each AlreadyGated target, find which features of the intermediate
+    // crate enable the optional fat dependency, by inspecting the intermediate
+    // package's feature map from cargo_metadata.
+    let pkg_map: HashMap<&str, &cargo_metadata::Package> = metadata
+        .packages
+        .iter()
+        .map(|p| (p.name.as_str(), p))
+        .collect();
+    for target in &mut ranked {
+        if let metrics::RemovalStrategy::AlreadyGated {
+            enabling_features,
+            recommended_defaults,
+            ..
+        } = &mut target.suggestion
+        {
+            if let Some(pkg) = pkg_map.get(target.intermediate.name.as_str()) {
+                let fat_name = &target.fat_dependency.name;
+                // Find which features of the intermediate crate enable the fat dep.
+                let mut found = Vec::new();
+                for (feat_name, feat_deps) in &pkg.features {
+                    // Skip "default" itself — we handle it separately below.
+                    if feat_name == "default" {
+                        continue;
+                    }
+                    for dep_entry in feat_deps {
+                        // Feature entries can be "dep:foo", "foo", or "foo/bar".
+                        let enables = dep_entry == fat_name
+                            || dep_entry == &format!("dep:{fat_name}")
+                            || dep_entry.starts_with(&format!("{fat_name}/"));
+                        if enables {
+                            found.push(feat_name.clone());
+                            break;
+                        }
+                    }
+                }
+                found.sort();
+
+                // Check if any enabling feature is part of "default".
+                // If so, compute recommended_defaults = default features minus
+                // the ones that pull in the fat dep.
+                if let Some(defaults) = pkg.features.get("default") {
+                    // A default entry enables the fat dep if:
+                    // (a) it's one of the features we already found, OR
+                    // (b) it directly references the fat dep name.
+                    let dominated: HashSet<&str> = found.iter().map(|s| s.as_str()).collect();
+                    let enables_fat = |d: &str| {
+                        dominated.contains(d)
+                            || d == fat_name
+                            || d == &format!("dep:{fat_name}")
+                    };
+                    let any_in_default = defaults.iter().any(|d| enables_fat(d));
+                    if any_in_default {
+                        let keep: Vec<String> = defaults
+                            .iter()
+                            .filter(|d| !enables_fat(d))
+                            .cloned()
+                            .collect();
+                        *recommended_defaults = Some(keep);
+                    }
+                }
+
+                *enabling_features = found;
+            }
+        }
+    }
 
     // Phase 6: Report.
     let platform_deps = real_deps.as_ref().map(|s| s.len());

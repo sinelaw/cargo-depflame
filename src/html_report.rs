@@ -78,7 +78,25 @@ body {{
 }}
 .action-summary h3 {{ font-size: 14px; margin-bottom: 8px; color: #444; }}
 .action-summary ul {{ list-style: none; padding: 0; }}
-.action-summary li {{ font-size: 13px; padding: 3px 0; font-family: "Consolas", monospace; }}
+.action-summary li {{ font-size: 13px; padding: 3px 0; }}
+.cargo-diff {{
+  background: #1e1e1e; border-radius: 4px; padding: 8px 12px;
+  margin: 6px 0 10px 20px; font-family: "Consolas", "Fira Code", monospace;
+  font-size: 12px; line-height: 1.6; overflow-x: auto;
+  display: none;
+}}
+.action-summary li.clickable {{ cursor: pointer; }}
+.action-summary li.clickable:hover {{ background: #f0f0f0; border-radius: 4px; }}
+.show-diff-btn {{
+  display: inline-block; font-size: 11px; color: #0066cc;
+  border: 1px solid #0066cc; border-radius: 3px; padding: 1px 6px;
+  margin-left: 6px; cursor: pointer; vertical-align: middle;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}}
+.cargo-diff .diff-file {{ color: #888; }}
+.cargo-diff .diff-rm {{ color: #f44; }}
+.cargo-diff .diff-add {{ color: #4c4; }}
+.cargo-diff .diff-comment {{ color: #888; font-style: italic; }}
 .targets-table {{
   width: 100%; border-collapse: collapse; background: #fff;
   border: 1px solid #ddd; border-radius: 6px; overflow: hidden;
@@ -196,6 +214,15 @@ function toggleDetail(n) {{
   var row = document.getElementById('detail-' + n);
   if (row) row.classList.toggle('open');
 }}
+function toggleDiff(li) {{
+  var diff = li.querySelector('.cargo-diff');
+  var btn = li.querySelector('.show-diff-btn');
+  if (diff) {{
+    var show = diff.style.display !== 'block';
+    diff.style.display = show ? 'block' : 'none';
+    if (btn) btn.textContent = show ? 'hide diff' : 'show diff';
+  }}
+}}
 function copyJson() {{
   var text = document.querySelector('#tab-json pre code').textContent;
   navigator.clipboard.writeText(text).then(function() {{
@@ -250,7 +277,9 @@ fn build_targets_html(report: &AnalysisReport) -> String {
 
     let mut has_items = false;
     for (i, t) in report.targets.iter().enumerate() {
-        let upstream_badge = if t.intermediate_is_workspace_member {
+        let is_local_action = t.intermediate_is_workspace_member
+            || matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. });
+        let upstream_badge = if is_local_action {
             ""
         } else {
             " <span title=\"This change would be a PR to an upstream library, not your own code\" style=\"cursor:help\">\u{1f4e4}</span>"
@@ -278,10 +307,20 @@ fn build_targets_html(report: &AnalysisReport) -> String {
                     html_escape(suggestion),
                 )
             }
-            RemovalStrategy::AlreadyGated { detail } => {
+            RemovalStrategy::AlreadyGated { detail, enabling_features, recommended_defaults } => {
+                let feat_hint = if !enabling_features.is_empty() {
+                    let feats = enabling_features.iter().map(|f| format!("<code>{}</code>", html_escape(f))).collect::<Vec<_>>().join(", ");
+                    if recommended_defaults.is_some() {
+                        format!(" &mdash; default feature(s) {feats} pull it in; disable defaults and keep only what you need")
+                    } else {
+                        format!(" &mdash; enabled by feature(s) {feats}")
+                    }
+                } else {
+                    String::new()
+                };
                 format!(
-                    "{prefix} Check whether you actually need {fat_link} enabled in {int_link} \
-                     &mdash; it's already optional ({detail})"
+                    "{prefix} Check your <code>Cargo.toml</code> &mdash; {fat_link} is already \
+                     optional in {int_link} ({detail}){feat_hint}"
                 )
             }
             RemovalStrategy::FeatureGate => {
@@ -304,7 +343,20 @@ fn build_targets_html(report: &AnalysisReport) -> String {
                 )
             }
         };
-        html.push_str(&format!("<li>#{} {action_line}{upstream_badge}</li>\n", i + 1));
+
+        let diff_block = if is_local_action { build_cargo_diff(t) } else { String::new() };
+        if diff_block.is_empty() {
+            html.push_str(&format!(
+                "<li>#{} {action_line}{upstream_badge}</li>\n",
+                i + 1
+            ));
+        } else {
+            html.push_str(&format!(
+                "<li class=\"clickable\" onclick=\"toggleDiff(this)\">#{idx} {action_line}{upstream_badge} \
+                 <span class=\"show-diff-btn\">show diff</span>\n{diff_block}</li>\n",
+                idx = i + 1
+            ));
+        }
         has_items = true;
     }
     if !has_items {
@@ -348,7 +400,9 @@ fn build_targets_html(report: &AnalysisReport) -> String {
             None => "\u{221e}".to_string(), // infinity
         };
 
-        let upstream_indicator = if t.intermediate_is_workspace_member {
+        let is_local = t.intermediate_is_workspace_member
+            || matches!(t.suggestion, RemovalStrategy::AlreadyGated { .. } | RemovalStrategy::RequiredBySibling { .. });
+        let upstream_indicator = if is_local {
             ""
         } else {
             " <span title=\"Requires a PR to this upstream library\">\u{1f4e4}</span>"
@@ -454,6 +508,93 @@ fn build_targets_html(report: &AnalysisReport) -> String {
 
     html.push_str("</tbody>\n</table>\n");
     html
+}
+
+/// Build a colored diff block showing the Cargo.toml change for a suggestion.
+fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
+    let fat = html_escape(&t.fat_dependency.name);
+    let fat_ver = html_escape(&t.fat_dependency.version);
+    let int = html_escape(&t.intermediate.name);
+    let toml_path = if t.intermediate_is_workspace_member {
+        "Cargo.toml".to_string()
+    } else {
+        format!("{int}/Cargo.toml")
+    };
+
+    let mut d = String::from("<div class=\"cargo-diff\">");
+
+    macro_rules! line {
+        ($cls:expr, $($arg:tt)*) => {
+            d.push_str(&format!("<div class=\"{}\">{}</div>", $cls, format!($($arg)*)));
+        };
+    }
+
+    match &t.suggestion {
+        RemovalStrategy::Remove => {
+            line!("diff-file", "# {toml_path}");
+            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+        }
+        RemovalStrategy::FeatureGate => {
+            let feat_name = format!("use-{fat}");
+            line!("diff-file", "# {toml_path} — [dependencies]");
+            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-add", "+ {fat} = {{ version = \"{fat_ver}\", optional = true }}");
+            line!("diff-comment", "");
+            line!("diff-comment", "# add a feature flag so users can opt in to this dependency:");
+            line!("diff-file", "# {toml_path} — [features]");
+            line!("diff-add", "+ {feat_name} = [\"dep:{fat}\"]  # pick a name that makes sense for your crate");
+        }
+        RemovalStrategy::AlreadyGated { enabling_features, recommended_defaults, .. } => {
+            line!("diff-file", "# Cargo.toml");
+            if enabling_features.is_empty() {
+                line!("diff-comment", "# check your [{int}] dependency — a feature is pulling in {fat}");
+                line!("diff-rm", "- {int} = {{ version = \"...\", features = [\"...\"] }}");
+                line!("diff-add", "+ {int} = {{ version = \"...\" }}  # try removing features that pull in {fat}");
+            } else if let Some(keep) = recommended_defaults {
+                // The enabling feature is part of "default" — suggest disabling defaults.
+                let bad_feats = enabling_features.iter().map(|f| html_escape(f)).collect::<Vec<_>>();
+                let bad_str = bad_feats.iter().map(|f| format!("\"{f}\"")).collect::<Vec<_>>().join(", ");
+                line!("diff-comment", "# default feature(s) {bad_str} of {int} pull in {fat}");
+                line!("diff-rm", "- {int} = \"...\"");
+                if keep.is_empty() {
+                    line!("diff-add", "+ {int} = {{ version = \"...\", default-features = false }}");
+                } else {
+                    let keep_str = keep.iter().map(|f| format!("\"{}\"", html_escape(f))).collect::<Vec<_>>().join(", ");
+                    line!("diff-add", "+ {int} = {{ version = \"...\", default-features = false, features = [{keep_str}] }}");
+                }
+            } else {
+                let feats = enabling_features.iter().map(|f| html_escape(f)).collect::<Vec<_>>();
+                let feats_str = feats.iter().map(|f| format!("\"{f}\"")).collect::<Vec<_>>().join(", ");
+                line!("diff-comment", "# feature(s) {feats_str} of {int} pull in {fat}");
+                line!("diff-rm", "- {int} = {{ version = \"...\", features = [{feats_str}] }}");
+                line!("diff-add", "+ {int} = {{ version = \"...\" }}  # without {feats_str}");
+            }
+        }
+        RemovalStrategy::ReplaceWithStd { suggestion } => {
+            let sug = html_escape(suggestion);
+            line!("diff-file", "# {toml_path}");
+            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-comment", "# replace usage with {sug}");
+        }
+        RemovalStrategy::ReplaceWithLighter { alternative } => {
+            let alt = html_escape(alternative);
+            line!("diff-file", "# {toml_path}");
+            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-add", "+ {alt} = \"...\"");
+        }
+        RemovalStrategy::InlineUpstream { .. } => {
+            let n = t.scan_result.distinct_items.len();
+            line!("diff-file", "# {toml_path}");
+            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-comment", "# copy the {n} item(s) you use directly into your code");
+        }
+        RemovalStrategy::RequiredBySibling { .. } => {
+            return String::new();
+        }
+    }
+
+    d.push_str("</div>");
+    d
 }
 
 fn html_escape(s: &str) -> String {

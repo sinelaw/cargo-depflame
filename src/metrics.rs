@@ -14,7 +14,18 @@ pub enum RemovalStrategy {
     /// A lighter alternative crate exists.
     ReplaceWithLighter { alternative: String },
     /// The dependency is already optional/gated in an upstream crate.
-    AlreadyGated { detail: String },
+    AlreadyGated {
+        detail: String,
+        /// Feature names of the intermediate crate that enable this optional dep.
+        /// Empty if we couldn't determine them.
+        #[serde(default)]
+        enabling_features: Vec<String>,
+        /// If the enabling feature is part of default, these are the default
+        /// features the user should keep (i.e. defaults minus the one pulling
+        /// in the fat dep). None if not enabled via defaults.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        recommended_defaults: Option<Vec<String>>,
+    },
     /// The dependency is required by a sibling dep — cannot be removed.
     RequiredBySibling { sibling: String },
     /// The dependency is small or lightly used — propose inlining the used code
@@ -38,8 +49,20 @@ impl std::fmt::Display for RemovalStrategy {
             Self::ReplaceWithLighter { alternative } => {
                 write!(f, "REPLACE WITH LIGHTER CRATE ({alternative})")
             }
-            Self::AlreadyGated { detail } => {
-                write!(f, "ALREADY GATED ({detail})")
+            Self::AlreadyGated {
+                detail,
+                enabling_features,
+                ..
+            } => {
+                if enabling_features.is_empty() {
+                    write!(f, "ALREADY GATED ({detail})")
+                } else {
+                    write!(
+                        f,
+                        "ALREADY GATED ({detail}, enabled by: {})",
+                        enabling_features.join(", ")
+                    )
+                }
             }
             Self::RequiredBySibling { sibling } => {
                 write!(f, "REQUIRED BY {sibling}")
@@ -281,11 +304,15 @@ fn compute_suggestion(
     if edge_meta.already_optional && edge_meta.platform_conditional {
         return RemovalStrategy::AlreadyGated {
             detail: "optional + platform-conditional".to_string(),
+            enabling_features: Vec::new(),
+            recommended_defaults: None,
         };
     }
     if edge_meta.already_optional {
         return RemovalStrategy::AlreadyGated {
             detail: "already optional".to_string(),
+            enabling_features: Vec::new(),
+            recommended_defaults: None,
         };
     }
 
