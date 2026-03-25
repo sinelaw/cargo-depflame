@@ -12,7 +12,14 @@ pub struct AnalysisReport {
     pub timestamp: String,
     pub workspace_root: String,
     pub threshold: f64,
+    /// Total deps in the full cross-platform resolve graph.
     pub total_dependencies: usize,
+    /// Deps actually resolved for the current platform (None if detection failed).
+    #[serde(default)]
+    pub platform_dependencies: Option<usize>,
+    /// Number of phantom deps (in metadata but not on this platform).
+    #[serde(default)]
+    pub phantom_dependencies: usize,
     pub fat_nodes_found: usize,
     pub targets: Vec<UpstreamTarget>,
 }
@@ -33,7 +40,23 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
         "=== Upstream Dependency Triage Report ===".bold()
     )?;
     writeln!(writer, "Workspace:          {}", report.workspace_root)?;
-    writeln!(writer, "Total dependencies: {}", report.total_dependencies)?;
+    writeln!(
+        writer,
+        "Total dependencies: {} (full resolve graph)",
+        report.total_dependencies
+    )?;
+    if let Some(platform_deps) = report.platform_dependencies {
+        writeln!(
+            writer,
+            "Platform deps:      {} (actually compiled on this platform)",
+            platform_deps
+        )?;
+        writeln!(
+            writer,
+            "Phantom deps:       {} (resolved but not compiled here)",
+            report.phantom_dependencies
+        )?;
+    }
     writeln!(writer, "Fat nodes found:    {}", report.fat_nodes_found)?;
     writeln!(
         writer,
@@ -111,6 +134,9 @@ pub fn render_text(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
 
         // Edge metadata badges.
         let mut badges = Vec::new();
+        if target.phantom {
+            badges.push("PHANTOM (not compiled on this platform)".dimmed().to_string());
+        }
         if target.edge_meta.build_only {
             badges.push("BUILD-ONLY".dimmed().to_string());
         }

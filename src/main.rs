@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use cargo_upstream_triage::cargo_toml::CrateDepInfo;
 use cargo_upstream_triage::cli::{AnalyzeArgs, Cli, Command, OutputFormat, ReportArgs};
 use cargo_upstream_triage::report::AnalysisReport;
-use cargo_upstream_triage::{graph, metrics, registry, report, scanner};
+use cargo_upstream_triage::{graph, metrics, platform, registry, report, scanner};
 use clap::Parser;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -55,8 +55,14 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
         return Ok(());
     }
 
-    // Phase 2c: Parse Cargo.toml for each intermediate crate (for renames + optional info).
-    // Cache: crate source dir -> CrateDepInfo.
+    // Phase 2c: Resolve real platform deps to detect phantom deps.
+    eprintln!("Resolving platform-specific dependency tree...");
+    let real_deps = platform::resolve_real_deps(&args.manifest_path);
+    if real_deps.is_none() {
+        eprintln!("  [WARN] Could not resolve platform deps, phantom detection disabled");
+    }
+
+    // Phase 2d: Parse Cargo.toml for each intermediate crate (for renames + optional info).
     eprintln!("Parsing Cargo.toml files for dependency metadata...");
     let cargo_toml_cache: Mutex<HashMap<String, CrateDepInfo>> = Mutex::new(HashMap::new());
 
@@ -148,6 +154,13 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
             let required_by_sibling =
                 dep_graph.sibling_requires(&edge.intermediate_id, &edge.fat_id);
 
+            // Phase 4e: Check if the fat dep is a phantom (not on this platform).
+            let phantom = !platform::is_real_dep(
+                &real_deps,
+                &edge.fat_name,
+                &edge.fat_version,
+            );
+
             // Phase 5: Compute metrics.
             Some(metrics::compute_target(
                 &edge.intermediate_name,
@@ -161,6 +174,7 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
                 dep_chain,
                 was_renamed,
                 required_by_sibling,
+                phantom,
             ))
         })
         .collect();
@@ -169,12 +183,17 @@ fn run_analyze(args: AnalyzeArgs) -> Result<()> {
     let ranked = metrics::rank_targets(targets, args.threshold, args.top);
 
     // Phase 6: Report.
+    let platform_deps = real_deps.as_ref().map(|s| s.len());
+    let phantom_deps = platform_deps.map(|p| total_deps.saturating_sub(p)).unwrap_or(0);
+
     let analysis = AnalysisReport {
         tool_version: env!("CARGO_PKG_VERSION").to_string(),
         timestamp: chrono::Utc::now().to_rfc3339(),
         workspace_root,
         threshold: args.threshold,
         total_dependencies: total_deps,
+        platform_dependencies: platform_deps,
+        phantom_dependencies: phantom_deps,
         fat_nodes_found: fat_nodes.len(),
         targets: ranked,
     };

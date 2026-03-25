@@ -93,6 +93,10 @@ pub struct UpstreamTarget {
     /// requires the fat dep — so removing it would break the build.
     #[serde(default)]
     pub required_by_sibling: Option<String>,
+    /// True if the fat dependency is not in the real platform-resolved tree
+    /// (i.e., it only appears in the full cross-platform metadata).
+    #[serde(default)]
+    pub phantom: bool,
 }
 
 /// Known crate -> std replacement mappings.
@@ -118,6 +122,7 @@ pub fn compute_target(
     dep_chain: Vec<String>,
     was_renamed: bool,
     required_by_sibling: Option<String>,
+    phantom: bool,
 ) -> UpstreamTarget {
     let c_ref = scan_result.ref_count;
 
@@ -135,6 +140,7 @@ pub fn compute_target(
         fat_name,
         was_renamed,
         &required_by_sibling,
+        phantom,
     );
 
     // Determine suggestion.
@@ -159,6 +165,7 @@ pub fn compute_target(
         edge_meta,
         dep_chain,
         required_by_sibling,
+        phantom,
     }
 }
 
@@ -207,7 +214,13 @@ fn compute_confidence(
     fat_name: &str,
     was_renamed: bool,
     required_by_sibling: &Option<String>,
+    phantom: bool,
 ) -> Confidence {
+    // Phantom deps aren't compiled on this platform — noise.
+    if phantom {
+        return Confidence::Noise;
+    }
+
     // If a sibling dep transitively requires this, it's not removable — noise.
     if required_by_sibling.is_some() {
         return Confidence::Noise;
@@ -261,7 +274,7 @@ fn hurrs_value(h: Option<f64>) -> f64 {
     h.unwrap_or(f64::INFINITY)
 }
 
-/// Filter by threshold and sort by hURRS descending.
+/// Filter by threshold and sort by actionability.
 pub fn rank_targets(
     mut targets: Vec<UpstreamTarget>,
     threshold: f64,
@@ -274,7 +287,12 @@ pub fn rank_targets(
         if conf_cmp != std::cmp::Ordering::Equal {
             return conf_cmp;
         }
-        // Secondary: hURRS descending.
+        // Secondary: W_uniq descending (actual savings).
+        let uniq_cmp = b.w_unique.cmp(&a.w_unique);
+        if uniq_cmp != std::cmp::Ordering::Equal {
+            return uniq_cmp;
+        }
+        // Tertiary: hURRS descending.
         hurrs_value(b.hurrs)
             .partial_cmp(&hurrs_value(a.hurrs))
             .unwrap_or(std::cmp::Ordering::Equal)
