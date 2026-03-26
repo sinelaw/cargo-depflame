@@ -317,6 +317,25 @@ impl DepGraph {
         self.forward.get(id).map(|deps| deps.len()).unwrap_or(0)
     }
 
+    /// Check if a workspace member is a standalone integration crate:
+    /// no other workspace member depends on it. This means it's already
+    /// effectively opt-in — users only get it if they explicitly add it.
+    pub fn is_standalone_workspace_member(&self, id: &PackageId) -> bool {
+        if !self.workspace_members.contains(id) {
+            return false;
+        }
+        // Check if any other workspace member depends on this crate.
+        match self.reverse.get(id) {
+            None => true, // No reverse deps at all.
+            Some(dependents) => {
+                // If the only dependents are non-workspace members, it's standalone.
+                !dependents
+                    .iter()
+                    .any(|dep_id| self.workspace_members.contains(dep_id))
+            }
+        }
+    }
+
     /// Find all non-workspace nodes with W_transitive > threshold.
     pub fn fat_nodes(&self, threshold: usize) -> Vec<FatNode> {
         self.nodes

@@ -387,6 +387,12 @@ fn format_action_line(
                 crate_link(sibling)
             )
         }
+        RemovalStrategy::MoveToDevDeps => {
+            format!(
+                "{prefix} Move {fat_link} to <code>[dev-dependencies]</code> in {int_link} \
+                 &mdash; only used in test code"
+            )
+        }
     }
 }
 
@@ -528,6 +534,17 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
         }
         RemovalStrategy::RequiredBySibling { .. } => {
             return String::new();
+        }
+        RemovalStrategy::MoveToDevDeps => {
+            line!(
+                "diff-file",
+                "# {toml_path} — move from [dependencies] to [dev-dependencies]"
+            );
+            line!("diff-rm", "- {fat} = \"{fat_ver}\"  # under [dependencies]");
+            line!(
+                "diff-add",
+                "+ {fat} = \"{fat_ver}\"  # under [dev-dependencies]"
+            );
         }
     }
 

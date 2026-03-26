@@ -13,6 +13,8 @@ pub enum RemovalStrategy {
     ReplaceWithStd { suggestion: String },
     /// A lighter alternative crate exists.
     ReplaceWithLighter { alternative: String },
+    /// The dependency is only used in test code — move to [dev-dependencies].
+    MoveToDevDeps,
     /// The dependency is already optional/gated in an upstream crate.
     AlreadyGated {
         detail: String,
@@ -42,6 +44,7 @@ impl std::fmt::Display for RemovalStrategy {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Remove => write!(f, "REMOVE (appears unused)"),
+            Self::MoveToDevDeps => write!(f, "MOVE TO [dev-dependencies] (only used in tests)"),
             Self::FeatureGate => write!(f, "FEATURE GATE"),
             Self::ReplaceWithStd { suggestion } => {
                 write!(f, "REPLACE WITH STD ({suggestion})")
@@ -153,6 +156,10 @@ pub struct UpstreamTarget {
     /// True if the intermediate crate is a workspace member (user's own crate).
     #[serde(default)]
     pub intermediate_is_workspace_member: bool,
+    /// True if the intermediate is a standalone workspace member not depended
+    /// on by any other workspace member — already effectively opt-in.
+    #[serde(default)]
+    pub is_standalone_integration: bool,
     /// Lines of code in the fat dependency crate (0 if unknown).
     #[serde(default)]
     pub fat_dep_loc: usize,
@@ -227,6 +234,9 @@ pub struct ComputeTargetInput {
     pub required_by_sibling: Option<String>,
     pub phantom: bool,
     pub intermediate_is_workspace_member: bool,
+    /// True if the intermediate is a workspace member that no other workspace
+    /// member depends on — it's already an opt-in integration crate.
+    pub is_standalone_integration: bool,
     pub fat_dep_loc: usize,
     pub fat_dep_own_deps: usize,
     pub has_re_export_all: bool,
@@ -268,6 +278,7 @@ pub fn compute_target(input: ComputeTargetInput) -> UpstreamTarget {
         required_by_sibling: input.required_by_sibling,
         phantom: input.phantom,
         intermediate_is_workspace_member: input.intermediate_is_workspace_member,
+        is_standalone_integration: input.is_standalone_integration,
         fat_dep_loc: input.fat_dep_loc,
         fat_dep_own_deps: input.fat_dep_own_deps,
         has_re_export_all: input.has_re_export_all,
@@ -319,6 +330,12 @@ fn compute_suggestion(
 
     if c_ref == 0 {
         return RemovalStrategy::Remove;
+    }
+
+    // If ALL references are inside #[cfg(test)] or test files, this dep
+    // belongs in [dev-dependencies], not [dependencies].
+    if input.scan_result.test_only_refs == c_ref && c_ref > 0 {
+        return RemovalStrategy::MoveToDevDeps;
     }
 
     if let Some((_, replacement)) = STD_REPLACEMENTS.iter().find(|(name, _)| *name == fat_name) {
@@ -406,6 +423,12 @@ fn compute_confidence(input: &ComputeTargetInput, c_ref: usize) -> Confidence {
 
     // Deeply integrated dep in a workspace member: high C_ref means it's core.
     if intermediate_is_workspace_member && c_ref >= DEEPLY_INTEGRATED_THRESHOLD {
+        return Confidence::Low;
+    }
+
+    // Standalone integration crate: no other workspace member depends on it,
+    // so it's already effectively opt-in. Suggesting changes within it is low-value.
+    if input.is_standalone_integration {
         return Confidence::Low;
     }
 
@@ -504,6 +527,7 @@ mod tests {
                 file_matches: vec![],
                 files_with_matches: 0,
                 generated_file_refs: 0,
+                test_only_refs: 0,
                 distinct_items: vec![],
                 has_re_export_all: false,
             },
@@ -517,6 +541,7 @@ mod tests {
             required_by_sibling: None,
             phantom: false,
             intermediate_is_workspace_member: false,
+            is_standalone_integration: false,
             fat_dep_loc: 0,
             fat_dep_own_deps: 5,
             has_re_export_all: false,
@@ -687,5 +712,33 @@ mod tests {
 
         let ranked = rank_targets(vec![compute_target(input)], 3.0, 10);
         assert!(ranked.is_empty());
+    }
+
+    #[test]
+    fn test_only_refs_suggests_move_to_dev_deps() {
+        let mut input = base_input();
+        input.scan_result.ref_count = 3;
+        input.scan_result.test_only_refs = 3; // ALL refs are in test code
+        let t = compute_target(input);
+        assert!(matches!(t.suggestion, RemovalStrategy::MoveToDevDeps));
+    }
+
+    #[test]
+    fn mixed_test_and_prod_refs_does_not_suggest_dev_deps() {
+        let mut input = base_input();
+        input.scan_result.ref_count = 5;
+        input.scan_result.test_only_refs = 2; // Only 2 of 5 are test
+        let t = compute_target(input);
+        assert!(!matches!(t.suggestion, RemovalStrategy::MoveToDevDeps));
+    }
+
+    #[test]
+    fn standalone_integration_crate_is_low_confidence() {
+        let mut input = base_input();
+        input.scan_result.ref_count = 3;
+        input.intermediate_is_workspace_member = true;
+        input.is_standalone_integration = true;
+        let t = compute_target(input);
+        assert_eq!(t.confidence, Confidence::Low);
     }
 }

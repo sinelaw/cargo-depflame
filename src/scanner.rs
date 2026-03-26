@@ -10,6 +10,9 @@ pub struct FileMatch {
     /// Whether this match is in a file detected as auto-generated.
     #[serde(default)]
     pub in_generated_file: bool,
+    /// Whether this match is inside a `#[cfg(test)]` module.
+    #[serde(default)]
+    pub in_test_code: bool,
 }
 
 /// Result of scanning an intermediate crate for references to a fat dependency.
@@ -25,12 +28,29 @@ pub struct ScanResult {
     /// Number of matches found in auto-generated files.
     #[serde(default)]
     pub generated_file_refs: usize,
+    /// Number of matches found inside `#[cfg(test)]` modules.
+    #[serde(default)]
+    pub test_only_refs: usize,
     /// Distinct API items used (e.g., "Regex::new", "from_u8").
     #[serde(default)]
     pub distinct_items: Vec<String>,
     /// True if the intermediate crate has `pub use <fat_dep>::*`.
     #[serde(default)]
     pub has_re_export_all: bool,
+}
+
+/// Detect test-only files by path convention (tests/, *_test.rs, test_*.rs).
+fn is_test_file(path: &std::path::Path) -> bool {
+    let path_str = path.to_string_lossy();
+    if path_str.contains("/tests/") || path_str.contains("\\tests\\") {
+        return true;
+    }
+    if let Some(name) = path.file_stem().and_then(|s| s.to_str()) {
+        if name.ends_with("_test") || name.starts_with("test_") {
+            return true;
+        }
+    }
+    false
 }
 
 /// Heuristics to detect auto-generated source files.
@@ -116,6 +136,7 @@ pub fn scan_files_with_aliases(
     let mut file_matches = Vec::new();
     let mut files_with_matches = 0;
     let mut generated_file_refs = 0;
+    let mut test_only_refs = 0;
     let mut has_re_export_all = false;
 
     for path in rs_files {
@@ -125,10 +146,48 @@ pub fn scan_files_with_aliases(
         };
 
         let generated = is_generated_file(&content);
+        let in_test_file = is_test_file(path);
         let mut found_in_file = false;
+        // Track whether we're inside a `#[cfg(test)]` module by watching
+        // for the attribute and then tracking brace depth.
+        let mut in_test_mod = in_test_file;
+        let mut test_brace_depth: Option<usize> = if in_test_file { Some(0) } else { None };
+        let mut brace_depth: usize = 0;
 
         for (line_idx, line) in content.lines().enumerate() {
             let trimmed = line.trim_start();
+
+            // Track #[cfg(test)] module entry.
+            if trimmed.starts_with("#[cfg(test)]") {
+                // The next `mod` block or the following braced block is test code.
+                test_brace_depth = Some(brace_depth);
+            }
+
+            // Update brace depth.
+            for ch in line.chars() {
+                match ch {
+                    '{' => brace_depth += 1,
+                    '}' => {
+                        brace_depth = brace_depth.saturating_sub(1);
+                        // If we close back to the depth where #[cfg(test)] started,
+                        // we've exited the test module.
+                        if let Some(test_depth) = test_brace_depth {
+                            if brace_depth <= test_depth && !in_test_file {
+                                in_test_mod = false;
+                                test_brace_depth = None;
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+
+            // If we just entered a block after #[cfg(test)], mark as in test.
+            if let Some(test_depth) = test_brace_depth {
+                if brace_depth > test_depth {
+                    in_test_mod = true;
+                }
+            }
 
             // Skip single-line comments.
             if trimmed.starts_with("//") {
@@ -145,11 +204,15 @@ pub fn scan_files_with_aliases(
                 if generated {
                     generated_file_refs += 1;
                 }
+                if in_test_mod {
+                    test_only_refs += 1;
+                }
                 file_matches.push(FileMatch {
                     path: path.display().to_string(),
                     line_number: line_idx + 1,
                     line_content: line.trim().to_string(),
                     in_generated_file: generated,
+                    in_test_code: in_test_mod,
                 });
             }
         }
@@ -168,6 +231,7 @@ pub fn scan_files_with_aliases(
         file_matches,
         files_with_matches,
         generated_file_refs,
+        test_only_refs,
         distinct_items,
         has_re_export_all,
     }

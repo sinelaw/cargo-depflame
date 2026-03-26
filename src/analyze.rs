@@ -164,6 +164,27 @@ fn is_test_or_example_crate_name(name: &str) -> bool {
     patterns.iter().any(|p| lower.contains(p))
 }
 
+/// Look up the lib target name for a package from cargo_metadata.
+///
+/// When a crate sets `[lib] name = "foo"` in its Cargo.toml, Rust code imports
+/// it as `foo`, not the package name. `cargo_metadata` exposes this via the
+/// `targets` array on each `Package`. Returns `None` if the package has no lib
+/// target or if the lib target name matches the normalized package name.
+fn lib_target_name(metadata: &cargo_metadata::Metadata, pkg_name: &str) -> Option<String> {
+    let pkg = metadata.packages.iter().find(|p| p.name == pkg_name)?;
+    let lib_target = pkg.targets.iter().find(|t| {
+        t.kind
+            .iter()
+            .any(|k| k == "lib" || k == "rlib" || k == "proc-macro")
+    })?;
+    let normalized_pkg = pkg_name.replace('-', "_");
+    if lib_target.name == normalized_pkg {
+        None // No mismatch — the default name matches.
+    } else {
+        Some(lib_target.name.clone())
+    }
+}
+
 /// Scan a single intermediate edge: locate source, run heuristic scanner,
 /// and compute metrics.
 fn scan_edge(
@@ -214,6 +235,16 @@ fn scan_edge(
         aliases.push(a.clone());
     }
 
+    // Also add the lib target name if it differs from the package name.
+    // Crates like `natord-plus-plus` set `[lib] name = "natord"`, so Rust code
+    // imports them under that name, not the package name.
+    if let Some(lib_name) = lib_target_name(metadata, &edge.fat_name) {
+        let lib_norm = lib_name.replace('-', "_");
+        if !aliases.contains(&lib_norm) {
+            aliases.push(lib_norm);
+        }
+    }
+
     // Build enriched edge metadata from cargo_metadata.
     let mut edge_meta = edge.edge_meta.clone();
     if let Some(d) = dep_meta {
@@ -261,6 +292,13 @@ fn scan_edge(
     // Phase 4f: Check if intermediate is a workspace member.
     let intermediate_is_ws = dep_graph.workspace_members.contains(&edge.intermediate_id);
 
+    // Phase 4g: Check if the intermediate is a standalone integration crate
+    // (not depended on by any other workspace member). In that case, the crate
+    // is already effectively opt-in — suggesting "feature-gate" its primary dep
+    // is misleading since users only pull it in explicitly.
+    let is_standalone_integration =
+        intermediate_is_ws && dep_graph.is_standalone_workspace_member(&edge.intermediate_id);
+
     // Phase 5: Compute metrics.
     Some(metrics::compute_target(ComputeTargetInput {
         intermediate_name: edge.intermediate_name.clone(),
@@ -276,6 +314,7 @@ fn scan_edge(
         required_by_sibling,
         phantom,
         intermediate_is_workspace_member: intermediate_is_ws,
+        is_standalone_integration,
         fat_dep_loc,
         fat_dep_own_deps,
         has_re_export_all,
@@ -386,7 +425,24 @@ fn find_unused_deps(
                 }
             }
 
-            let scan = scanner::scan_files(&ws_rs_files, &dep_node.name);
+            // Build aliases: include Cargo.toml rename and lib target name.
+            let mut dep_aliases: Vec<String> = Vec::new();
+            if let Some(dep_meta) = ws_pkg.dependencies.iter().find(|d| d.name == dep_node.name) {
+                if let Some(ref rename) = dep_meta.rename {
+                    let rename_norm = rename.replace('-', "_");
+                    if !dep_aliases.contains(&rename_norm) {
+                        dep_aliases.push(rename_norm);
+                    }
+                }
+            }
+            if let Some(lib_name) = lib_target_name(metadata, &dep_node.name) {
+                let lib_norm = lib_name.replace('-', "_");
+                if !dep_aliases.contains(&lib_norm) {
+                    dep_aliases.push(lib_norm);
+                }
+            }
+
+            let scan = scanner::scan_files_with_aliases(&ws_rs_files, &dep_node.name, &dep_aliases);
             if scan.ref_count == 0 && !scan.has_re_export_all {
                 let w_unique = dep_graph.unique_subtree_weight(ws_id, dep_id);
                 let dep_chain = vec![ws_pkg.name.clone(), dep_node.name.clone()];
@@ -421,6 +477,7 @@ fn find_unused_deps(
                     required_by_sibling: None,
                     phantom: !platform::is_real_dep(real_deps, &dep_node.name, &dep_node.version),
                     intermediate_is_workspace_member: true,
+                    is_standalone_integration: dep_graph.is_standalone_workspace_member(ws_id),
                     fat_dep_loc: 0,
                     fat_dep_own_deps: dep_graph.direct_dep_count(dep_id),
                     has_re_export_all: false,
