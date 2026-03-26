@@ -19,11 +19,19 @@ use crate::{platform, registry, scanner};
 /// is responsible for rendering/writing the returned `AnalysisReport`.
 pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
     // If --crate is specified, fetch from crates.io and analyze the extracted crate.
-    let _temp_dir; // keep tempdir alive for the duration of analysis
+    let _temp_dir; // keep tempdir path for cleanup
     let manifest_path = if let Some(ref spec_str) = args.common.crate_spec {
         let spec = crate_fetch::parse_crate_spec(spec_str)?;
-        let tmp = tempfile::tempdir().context("failed to create temp directory")?;
-        let crate_dir = crate_fetch::fetch_and_extract(&spec, tmp.path())?;
+        let tmp = std::env::temp_dir().join(format!(
+            "depflame-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_millis()
+        ));
+        std::fs::create_dir_all(&tmp).context("failed to create temp directory")?;
+        let crate_dir = crate_fetch::fetch_and_extract(&spec, &tmp)?;
         _temp_dir = Some(tmp);
         crate_dir.join("Cargo.toml")
     } else {
@@ -141,7 +149,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
 
     Ok(AnalysisReport {
         tool_version: env!("CARGO_PKG_VERSION").to_string(),
-        timestamp: chrono::Utc::now().to_rfc3339(),
+        timestamp: now_timestamp(),
         workspace_root,
         threshold: args.common.threshold,
         total_dependencies: total_deps,
@@ -567,11 +575,19 @@ fn build_direct_dep_summary(
     entries
 }
 
+fn now_timestamp() -> String {
+    let secs = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    format!("epoch:{secs}")
+}
+
 /// Build an empty report (used when there are no heavy nodes or edges to analyze).
 fn empty_report(workspace_root: String, threshold: f64, total_deps: usize) -> AnalysisReport {
     AnalysisReport {
         tool_version: env!("CARGO_PKG_VERSION").to_string(),
-        timestamp: chrono::Utc::now().to_rfc3339(),
+        timestamp: now_timestamp(),
         workspace_root,
         threshold,
         total_dependencies: total_deps,

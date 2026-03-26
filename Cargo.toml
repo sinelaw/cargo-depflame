@@ -18,11 +18,11 @@ regex = "1"
 comfy-table = "7"
 colored = "2"
 anyhow = "1"
-semver = "1"
 rayon = "1"
-chrono = { version = "0.4", features = ["serde"] }
 open = "5"
-tempfile = "3"
 ureq = "2"
 flate2 = "1"
 tar = "0.4"
+
+[dev-dependencies]
+tempfile = "3"

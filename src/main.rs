@@ -44,17 +44,15 @@ fn run_flame(args: FlameArgs) -> Result<()> {
         output: None,
     };
 
-    // Create a named temp file for the HTML output.
-    // Use keep() so the file persists for the browser to read.
-    let tmp_file = tempfile::Builder::new()
-        .prefix("depflame-")
-        .suffix(".html")
-        .tempfile()
-        .context("failed to create temp file")?;
-    let html_path = tmp_file
-        .into_temp_path()
-        .keep()
-        .context("failed to persist temp file")?;
+    // Create a temp file path for the HTML output.
+    let html_path = std::env::temp_dir().join(format!(
+        "depflame-{}-{}.html",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis()
+    ));
 
     let analysis = analyze::run_analyze(&analyze_args)?;
 
