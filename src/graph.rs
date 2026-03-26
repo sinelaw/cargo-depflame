@@ -25,10 +25,10 @@ pub struct EdgeMeta {
     pub platform_conditional: bool,
 }
 
-/// A fat node: a non-workspace dependency with large transitive weight.
+/// A heavy node: a non-workspace dependency with large transitive weight.
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
-pub struct FatNode {
+pub struct HeavyNode {
     pub id: PackageId,
     pub name: String,
     pub version: String,
@@ -36,17 +36,17 @@ pub struct FatNode {
 }
 
 /// A candidate pair for heuristic scanning: an intermediate crate I depends
-/// on a fat dependency F.
+/// on a heavy dependency F.
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub struct IntermediateEdge {
     pub intermediate_id: PackageId,
     pub intermediate_name: String,
     pub intermediate_version: String,
-    pub fat_id: PackageId,
-    pub fat_name: String,
-    pub fat_version: String,
-    pub fat_transitive_weight: usize,
+    pub heavy_id: PackageId,
+    pub heavy_name: String,
+    pub heavy_version: String,
+    pub heavy_transitive_weight: usize,
     pub edge_meta: EdgeMeta,
 }
 
@@ -200,17 +200,17 @@ impl DepGraph {
         visited
     }
 
-    /// Compute the "unique subtree weight" for an edge (intermediate -> fat):
-    /// How many transitive deps of `fat` would be removed from the entire workspace
+    /// Compute the "unique subtree weight" for an edge (intermediate -> heavy):
+    /// How many transitive deps of the heavy dep would be removed from the entire workspace
     /// if this single edge were cut?
-    pub fn unique_subtree_weight(&self, intermediate_id: &PackageId, fat_id: &PackageId) -> usize {
-        let fat_set = match self.nodes.get(fat_id) {
+    pub fn unique_subtree_weight(&self, intermediate_id: &PackageId, heavy_id: &PackageId) -> usize {
+        let heavy_set = match self.nodes.get(heavy_id) {
             Some(n) => &n.transitive_set,
             None => return 0,
         };
 
         // Build the set of all deps reachable from workspace WITHOUT
-        // traversing the (intermediate -> fat) edge.
+        // traversing the (intermediate -> heavy) edge.
         let mut reachable_without = HashSet::new();
         let mut queue = VecDeque::new();
 
@@ -224,7 +224,7 @@ impl DepGraph {
             if let Some(deps) = self.forward.get(&current) {
                 for dep in deps {
                     // Skip the specific edge we're "cutting".
-                    if &current == intermediate_id && dep == fat_id {
+                    if &current == intermediate_id && dep == heavy_id {
                         continue;
                     }
                     if reachable_without.insert(dep.clone()) {
@@ -234,8 +234,8 @@ impl DepGraph {
             }
         }
 
-        // Count how many of fat's transitive deps are NOT reachable without this edge.
-        fat_set
+        // Count how many of heavy's transitive deps are NOT reachable without this edge.
+        heavy_set
             .iter()
             .filter(|dep| !reachable_without.contains(*dep))
             .count()
@@ -289,22 +289,22 @@ impl DepGraph {
     }
 
     /// Check if any sibling dependency of `intermediate_id` transitively
-    /// depends on `fat_id`. If so, the fat dep is required even if intermediate
+    /// depends on `heavy_id`. If so, the heavy dep is required even if intermediate
     /// doesn't reference it in source code.
     /// Returns the name of the sibling that requires it, if any.
     pub fn sibling_requires(
         &self,
         intermediate_id: &PackageId,
-        fat_id: &PackageId,
+        heavy_id: &PackageId,
     ) -> Option<String> {
         let siblings = self.forward.get(intermediate_id)?;
 
         for sibling_id in siblings {
-            if sibling_id == fat_id {
+            if sibling_id == heavy_id {
                 continue;
             }
             if let Some(sibling_node) = self.nodes.get(sibling_id) {
-                if sibling_node.transitive_set.contains(fat_id) {
+                if sibling_node.transitive_set.contains(heavy_id) {
                     return Some(sibling_node.name.clone());
                 }
             }
@@ -337,11 +337,11 @@ impl DepGraph {
     }
 
     /// Find all non-workspace nodes with W_transitive > threshold.
-    pub fn fat_nodes(&self, threshold: usize) -> Vec<FatNode> {
+    pub fn heavy_nodes(&self, threshold: usize) -> Vec<HeavyNode> {
         self.nodes
             .iter()
             .filter(|(_, node)| !node.is_workspace_member && node.transitive_weight > threshold)
-            .map(|(id, node)| FatNode {
+            .map(|(id, node)| HeavyNode {
                 id: id.clone(),
                 name: node.name.clone(),
                 version: node.version.clone(),
@@ -350,11 +350,11 @@ impl DepGraph {
             .collect()
     }
 
-    /// For each fat node F, find crates I such that:
+    /// For each heavy node F, find crates I such that:
     /// - I depends on F directly
     /// - I is reachable from a workspace member (including workspace members themselves)
-    pub fn intermediate_edges(&self, fat_nodes: &[FatNode]) -> Vec<IntermediateEdge> {
-        let fat_ids: HashSet<&PackageId> = fat_nodes.iter().map(|f| &f.id).collect();
+    pub fn intermediate_edges(&self, heavy_nodes: &[HeavyNode]) -> Vec<IntermediateEdge> {
+        let heavy_ids: HashSet<&PackageId> = heavy_nodes.iter().map(|f| &f.id).collect();
         let mut edges = Vec::new();
 
         let default_meta = EdgeMeta {
@@ -375,8 +375,8 @@ impl DepGraph {
             }
 
             for dep_id in deps {
-                if fat_ids.contains(dep_id) {
-                    if let Some(fat_node) = self.nodes.get(dep_id) {
+                if heavy_ids.contains(dep_id) {
+                    if let Some(heavy_node) = self.nodes.get(dep_id) {
                         let meta = self
                             .edge_meta
                             .get(&(id.clone(), dep_id.clone()))
@@ -387,10 +387,10 @@ impl DepGraph {
                             intermediate_id: id.clone(),
                             intermediate_name: node.name.clone(),
                             intermediate_version: node.version.clone(),
-                            fat_id: dep_id.clone(),
-                            fat_name: fat_node.name.clone(),
-                            fat_version: fat_node.version.clone(),
-                            fat_transitive_weight: fat_node.transitive_weight,
+                            heavy_id: dep_id.clone(),
+                            heavy_name: heavy_node.name.clone(),
+                            heavy_version: heavy_node.version.clone(),
+                            heavy_transitive_weight: heavy_node.transitive_weight,
                             edge_meta: meta,
                         });
                     }

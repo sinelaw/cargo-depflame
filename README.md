@@ -27,8 +27,8 @@ cargo depflame analyze --format json  # machine-readable output
 ## What it does
 
 1. Builds your full dependency graph from `cargo metadata`
-2. Finds "fat" crates with large transitive dep trees
-3. Scans source code to see how heavily each fat dep is actually used
+2. Finds "heavy" crates with large transitive dep trees
+3. Scans source code to see how heavily each heavy dep is actually used
 4. Computes W_unique: how many deps *actually disappear* if an edge is cut (accounts for diamond deps)
 5. Suggests concrete actions: remove unused deps, disable default features, feature-gate, propose upstream PRs
 

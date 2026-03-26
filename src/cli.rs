@@ -48,9 +48,9 @@ pub struct CommonArgs {
     #[arg(long, default_value_t = 10)]
     pub top: usize,
 
-    /// Minimum transitive weight for a node to be considered "fat".
+    /// Minimum transitive weight for a node to be considered "heavy".
     #[arg(long, default_value_t = 10)]
-    pub fat_threshold: usize,
+    pub heavy_threshold: usize,
 
     /// Show detailed analysis (file matches, dep chains, metrics).
     #[arg(long, short)]
@@ -64,7 +64,7 @@ impl Default for CommonArgs {
             crate_spec: None,
             threshold: 3.0,
             top: 10,
-            fat_threshold: 10,
+            heavy_threshold: 10,
             verbose: false,
         }
     }

@@ -5,11 +5,11 @@ use serde::{Deserialize, Serialize};
 /// The recommended action for an upstream target.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RemovalStrategy {
-    /// The fat dependency appears entirely unused (C_ref = 0).
+    /// The heavy dependency appears entirely unused (C_ref = 0).
     Remove,
-    /// Put the fat dependency behind a Cargo feature flag.
+    /// Put the heavy dependency behind a Cargo feature flag.
     FeatureGate,
-    /// The fat dependency can be replaced with std functionality.
+    /// The heavy dependency can be replaced with std functionality.
     ReplaceWithStd { suggestion: String },
     /// A lighter alternative crate exists.
     ReplaceWithLighter { alternative: String },
@@ -24,7 +24,7 @@ pub enum RemovalStrategy {
         enabling_features: Vec<String>,
         /// If the enabling feature is part of default, these are the default
         /// features the user should keep (i.e. defaults minus the one pulling
-        /// in the fat dep). None if not enabled via defaults.
+        /// in the heavy dep). None if not enabled via defaults.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         recommended_defaults: Option<Vec<String>>,
     },
@@ -33,8 +33,8 @@ pub enum RemovalStrategy {
     /// The dependency is small or lightly used — propose inlining the used code
     /// into the intermediate crate to eliminate the dep entirely.
     InlineUpstream {
-        /// LOC of the fat dependency crate.
-        fat_loc: usize,
+        /// LOC of the heavy dependency crate.
+        heavy_loc: usize,
         /// Number of distinct API items used.
         api_items_used: usize,
     },
@@ -71,12 +71,12 @@ impl std::fmt::Display for RemovalStrategy {
                 write!(f, "REQUIRED BY {sibling}")
             }
             Self::InlineUpstream {
-                fat_loc,
+                heavy_loc,
                 api_items_used,
             } => {
                 write!(
                     f,
-                    "INLINE ({fat_loc} LOC crate, {api_items_used} items used)"
+                    "INLINE ({heavy_loc} LOC crate, {api_items_used} items used)"
                 )
             }
         }
@@ -117,17 +117,17 @@ pub struct PackageInfo {
 /// A scored upstream target for reporting.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UpstreamTarget {
-    /// The crate that directly depends on the fat dependency (the "middle" crate
+    /// The crate that directly depends on the heavy dependency (the "middle" crate
     /// between your workspace and the bloated transitive dep).
     pub intermediate: PackageInfo,
     /// The heavy/bloated transitive dependency we're proposing to remove or gate.
-    pub fat_dependency: PackageInfo,
-    /// W_transitive: total number of transitive dependencies the fat dep pulls in
+    pub heavy_dependency: PackageInfo,
+    /// W_transitive: total number of transitive dependencies the heavy dep pulls in
     /// (i.e., the "weight" of keeping it in the tree).
     pub w_transitive: usize,
     /// How many deps would actually disappear if this edge were cut.
     pub w_unique: usize,
-    /// C_ref (Code Reference count): number of times the fat dependency's symbols
+    /// C_ref (Code Reference count): number of times the heavy dependency's symbols
     /// appear in the intermediate crate's source code. Zero means the dep appears
     /// entirely unused by the intermediate.
     pub c_ref: usize,
@@ -137,20 +137,20 @@ pub struct UpstreamTarget {
     pub hurrs: Option<f64>,
     pub confidence: Confidence,
     /// Results from scanning the intermediate crate's source for references to
-    /// the fat dependency (ref counts, file matches, distinct API items used).
+    /// the heavy dependency (ref counts, file matches, distinct API items used).
     pub scan_result: ScanResult,
     pub suggestion: RemovalStrategy,
-    /// Metadata about the dependency edge between intermediate and fat dep
+    /// Metadata about the dependency edge between intermediate and heavy dep
     /// (e.g., whether it's optional, build-only, or platform-conditional).
     pub edge_meta: EdgeMeta,
-    /// Shortest dependency chain from workspace to the fat dependency.
+    /// Shortest dependency chain from workspace to the heavy dependency.
     #[serde(default)]
     pub dep_chain: Vec<String>,
     /// If set, a sibling dependency of the intermediate crate transitively
-    /// requires the fat dep — so removing it would break the build.
+    /// requires the heavy dep — so removing it would break the build.
     #[serde(default)]
     pub required_by_sibling: Option<String>,
-    /// True if the fat dependency is not in the real platform-resolved tree.
+    /// True if the heavy dependency is not in the real platform-resolved tree.
     #[serde(default)]
     pub phantom: bool,
     /// True if the intermediate crate is a workspace member (user's own crate).
@@ -160,14 +160,14 @@ pub struct UpstreamTarget {
     /// on by any other workspace member — already effectively opt-in.
     #[serde(default)]
     pub is_standalone_integration: bool,
-    /// Lines of code in the fat dependency crate (0 if unknown).
+    /// Lines of code in the heavy dependency crate (0 if unknown).
     #[serde(default)]
-    pub fat_dep_loc: usize,
-    /// Number of direct dependencies the fat dep itself has.
-    /// A fat dep with 0 own deps is a leaf — potentially inlinable.
+    pub heavy_dep_loc: usize,
+    /// Number of direct dependencies the heavy dep itself has.
+    /// A heavy dep with 0 own deps is a leaf — potentially inlinable.
     #[serde(default)]
-    pub fat_dep_own_deps: usize,
-    /// True if the intermediate crate has `pub use <fat_dep>::*` (full re-export).
+    pub heavy_dep_own_deps: usize,
+    /// True if the intermediate crate has `pub use <heavy_dep>::*` (full re-export).
     #[serde(default)]
     pub has_re_export_all: bool,
     // TODO: Future — deep usage analysis via reachable LOC
@@ -176,7 +176,7 @@ pub struct UpstreamTarget {
     // referenced at call sites (e.g., "uses Adapter, from_u8"). This is a
     // rough proxy — one symbol might fan out to thousands of LOC internally.
     //
-    // The ideal approach: measure how much code inside the fat dep is actually
+    // The ideal approach: measure how much code inside the heavy dep is actually
     // *reachable* from the entry points the intermediate crate uses. This
     // requires intra-crate call graph analysis:
     //   1. Extract fn/method definitions and their line spans
@@ -223,8 +223,8 @@ const DEEPLY_INTEGRATED_THRESHOLD: usize = 15;
 pub struct ComputeTargetInput {
     pub intermediate_name: String,
     pub intermediate_version: String,
-    pub fat_name: String,
-    pub fat_version: String,
+    pub heavy_name: String,
+    pub heavy_version: String,
     pub w_transitive: usize,
     pub w_unique: usize,
     pub scan_result: ScanResult,
@@ -237,8 +237,8 @@ pub struct ComputeTargetInput {
     /// True if the intermediate is a workspace member that no other workspace
     /// member depends on — it's already an opt-in integration crate.
     pub is_standalone_integration: bool,
-    pub fat_dep_loc: usize,
-    pub fat_dep_own_deps: usize,
+    pub heavy_dep_loc: usize,
+    pub heavy_dep_own_deps: usize,
     pub has_re_export_all: bool,
 }
 
@@ -262,9 +262,9 @@ pub fn compute_target(input: ComputeTargetInput) -> UpstreamTarget {
             name: input.intermediate_name,
             version: input.intermediate_version,
         },
-        fat_dependency: PackageInfo {
-            name: input.fat_name,
-            version: input.fat_version,
+        heavy_dependency: PackageInfo {
+            name: input.heavy_name,
+            version: input.heavy_version,
         },
         w_transitive: input.w_transitive,
         w_unique: input.w_unique,
@@ -279,8 +279,8 @@ pub fn compute_target(input: ComputeTargetInput) -> UpstreamTarget {
         phantom: input.phantom,
         intermediate_is_workspace_member: input.intermediate_is_workspace_member,
         is_standalone_integration: input.is_standalone_integration,
-        fat_dep_loc: input.fat_dep_loc,
-        fat_dep_own_deps: input.fat_dep_own_deps,
+        heavy_dep_loc: input.heavy_dep_loc,
+        heavy_dep_own_deps: input.heavy_dep_own_deps,
         has_re_export_all: input.has_re_export_all,
     }
 }
@@ -293,12 +293,12 @@ fn compute_suggestion(
     c_ref: usize,
     api_items_used: usize,
 ) -> RemovalStrategy {
-    let fat_name = &input.fat_name;
+    let heavy_name = &input.heavy_name;
     let intermediate_name = &input.intermediate_name;
     let edge_meta = &input.edge_meta;
     let required_by_sibling = &input.required_by_sibling;
-    let fat_dep_loc = input.fat_dep_loc;
-    let fat_dep_own_deps = input.fat_dep_own_deps;
+    let heavy_dep_loc = input.heavy_dep_loc;
+    let heavy_dep_own_deps = input.heavy_dep_own_deps;
     let has_re_export_all = input.has_re_export_all;
     // If a sibling dep transitively requires this, it can't be removed.
     if let Some(sibling) = required_by_sibling {
@@ -324,7 +324,7 @@ fn compute_suggestion(
 
     // Fix I: Detect foo-core -> foo-sys wrapper pattern.
     // An FFI wrapper always needs its -sys crate — never suggest gating it.
-    if is_ffi_wrapper_pair(intermediate_name, fat_name) || has_re_export_all {
+    if is_ffi_wrapper_pair(intermediate_name, heavy_name) || has_re_export_all {
         return RemovalStrategy::FeatureGate;
     }
 
@@ -338,7 +338,7 @@ fn compute_suggestion(
         return RemovalStrategy::MoveToDevDeps;
     }
 
-    if let Some((_, replacement)) = STD_REPLACEMENTS.iter().find(|(name, _)| *name == fat_name) {
+    if let Some((_, replacement)) = STD_REPLACEMENTS.iter().find(|(name, _)| *name == heavy_name) {
         return RemovalStrategy::ReplaceWithStd {
             suggestion: replacement.to_string(),
         };
@@ -347,12 +347,12 @@ fn compute_suggestion(
     // Fix A+D: Only suggest inlining for leaf deps (0 own transitive deps).
     // Crates with their own dep trees are too complex to inline — they pull
     // in data, FFI bindings, or other infrastructure.
-    let is_leaf = fat_dep_own_deps == 0;
+    let is_leaf = heavy_dep_own_deps == 0;
     if is_leaf {
-        let is_small = fat_dep_loc > 0 && fat_dep_loc <= SMALL_CRATE_LOC;
+        let is_small = heavy_dep_loc > 0 && heavy_dep_loc <= SMALL_CRATE_LOC;
         if is_small {
             return RemovalStrategy::InlineUpstream {
-                fat_loc: fat_dep_loc,
+                heavy_loc: heavy_dep_loc,
                 api_items_used,
             };
         }
@@ -362,18 +362,18 @@ fn compute_suggestion(
 }
 
 /// Fix I: Detect FFI wrapper pairs like "foo-core" -> "foo-sys" or "foo" -> "foo-sys".
-fn is_ffi_wrapper_pair(intermediate: &str, fat: &str) -> bool {
-    if !fat.ends_with("-sys") {
+fn is_ffi_wrapper_pair(intermediate: &str, heavy: &str) -> bool {
+    if !heavy.ends_with("-sys") {
         return false;
     }
-    let fat_base = fat.strip_suffix("-sys").unwrap_or(fat);
+    let heavy_base = heavy.strip_suffix("-sys").unwrap_or(heavy);
     // foo -> foo-sys
-    if intermediate == fat_base {
+    if intermediate == heavy_base {
         return true;
     }
     // foo-core -> foo-sys
     if let Some(int_base) = intermediate.strip_suffix("-core") {
-        if int_base == fat_base {
+        if int_base == heavy_base {
             return true;
         }
     }
@@ -383,7 +383,7 @@ fn is_ffi_wrapper_pair(intermediate: &str, fat: &str) -> bool {
 fn compute_confidence(input: &ComputeTargetInput, c_ref: usize) -> Confidence {
     let scan_result = &input.scan_result;
     let edge_meta = &input.edge_meta;
-    let fat_name = &input.fat_name;
+    let heavy_name = &input.heavy_name;
     let intermediate_name = &input.intermediate_name;
     let was_renamed = input.was_renamed;
     let required_by_sibling = &input.required_by_sibling;
@@ -406,11 +406,11 @@ fn compute_confidence(input: &ComputeTargetInput, c_ref: usize) -> Confidence {
     }
 
     // Fix I: FFI wrapper pairs (foo-core -> foo-sys) are structural — noise.
-    if is_ffi_wrapper_pair(intermediate_name, fat_name) {
+    if is_ffi_wrapper_pair(intermediate_name, heavy_name) {
         return Confidence::Noise;
     }
 
-    // Fix J: If the intermediate re-exports the entire fat dep API, they're
+    // Fix J: If the intermediate re-exports the entire heavy dep API, they're
     // structurally coupled — demote to low.
     if has_re_export_all {
         return Confidence::Low;
@@ -452,7 +452,7 @@ fn compute_confidence(input: &ComputeTargetInput, c_ref: usize) -> Confidence {
         return Confidence::Low;
     }
 
-    if fat_name.ends_with("-sys") {
+    if heavy_name.ends_with("-sys") {
         return Confidence::Low;
     }
 
@@ -516,13 +516,13 @@ mod tests {
         ComputeTargetInput {
             intermediate_name: "some-crate".into(),
             intermediate_version: "1.0.0".into(),
-            fat_name: "fat-dep".into(),
-            fat_version: "2.0.0".into(),
+            heavy_name: "heavy-dep".into(),
+            heavy_version: "2.0.0".into(),
             w_transitive: 20,
             w_unique: 10,
             scan_result: ScanResult {
-                fat_crate_name: "fat-dep".into(),
-                searched_names: vec!["fat_dep".into()],
+                heavy_crate_name: "heavy-dep".into(),
+                searched_names: vec!["heavy_dep".into()],
                 ref_count: 0,
                 file_matches: vec![],
                 files_with_matches: 0,
@@ -542,8 +542,8 @@ mod tests {
             phantom: false,
             intermediate_is_workspace_member: false,
             is_standalone_integration: false,
-            fat_dep_loc: 0,
-            fat_dep_own_deps: 5,
+            heavy_dep_loc: 0,
+            heavy_dep_own_deps: 5,
             has_re_export_all: false,
         }
     }
@@ -584,7 +584,7 @@ mod tests {
     #[test]
     fn sys_crate_with_zero_refs_is_low() {
         let mut input = base_input();
-        input.fat_name = "openssl-sys".into();
+        input.heavy_name = "openssl-sys".into();
         let t = compute_target(input);
         assert_eq!(t.confidence, Confidence::Low);
     }
@@ -629,7 +629,7 @@ mod tests {
     #[test]
     fn known_std_replacement_suggests_replace() {
         let mut input = base_input();
-        input.fat_name = "lazy_static".into();
+        input.heavy_name = "lazy_static".into();
         input.scan_result.ref_count = 2;
         let t = compute_target(input);
         assert!(matches!(
@@ -642,8 +642,8 @@ mod tests {
     fn small_leaf_dep_suggests_inline() {
         let mut input = base_input();
         input.scan_result.ref_count = 1;
-        input.fat_dep_loc = 100;
-        input.fat_dep_own_deps = 0; // leaf
+        input.heavy_dep_loc = 100;
+        input.heavy_dep_own_deps = 0; // leaf
         let t = compute_target(input);
         assert!(matches!(
             t.suggestion,
@@ -655,8 +655,8 @@ mod tests {
     fn non_leaf_dep_does_not_suggest_inline() {
         let mut input = base_input();
         input.scan_result.ref_count = 1;
-        input.fat_dep_loc = 100;
-        input.fat_dep_own_deps = 3; // not a leaf
+        input.heavy_dep_loc = 100;
+        input.heavy_dep_own_deps = 3; // not a leaf
         let t = compute_target(input);
         assert!(matches!(t.suggestion, RemovalStrategy::FeatureGate));
     }
@@ -665,7 +665,7 @@ mod tests {
     fn ffi_wrapper_pair_is_noise() {
         let mut input = base_input();
         input.intermediate_name = "openssl".into();
-        input.fat_name = "openssl-sys".into();
+        input.heavy_name = "openssl-sys".into();
         let t = compute_target(input);
         assert_eq!(t.confidence, Confidence::Noise);
     }

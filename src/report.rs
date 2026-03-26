@@ -21,7 +21,7 @@ pub struct AnalysisReport {
     /// Number of phantom deps (in metadata but not on this platform).
     #[serde(default)]
     pub phantom_dependencies: usize,
-    pub fat_nodes_found: usize,
+    pub heavy_nodes_found: usize,
     pub targets: Vec<UpstreamTarget>,
     /// Serialized dependency tree for flamegraph rendering.
     /// Populated during `analyze`; allows `report --format svg` to work from saved JSON.
@@ -208,7 +208,7 @@ pub fn render_text(
                 writer,
                 "  {} Remove `{}` from `{}`  (0 code references found){}",
                 format!("(-{} deps)", target.w_unique).green(),
-                target.fat_dependency.name.yellow(),
+                target.heavy_dependency.name.yellow(),
                 target.intermediate.name.cyan(),
                 test_badge,
             )?;
@@ -225,7 +225,7 @@ pub fn render_text(
                 writer,
                 "  {} Make `{}` optional in `{}`  ({} refs){}",
                 format!("(-{} deps)", target.w_unique).green(),
-                target.fat_dependency.name.yellow(),
+                target.heavy_dependency.name.yellow(),
                 target.intermediate.name.cyan(),
                 target.c_ref,
                 test_badge,
@@ -238,7 +238,7 @@ pub fn render_text(
                 writer,
                 "  {} `{}` is optional in `{}` — check if you need it",
                 format!("(-{} deps)", target.w_unique).green(),
-                target.fat_dependency.name.yellow(),
+                target.heavy_dependency.name.yellow(),
                 target.intermediate.name.cyan(),
             )?;
         }
@@ -250,7 +250,7 @@ pub fn render_text(
                     writer,
                     "  {} Replace `{}` with {} in `{}`",
                     format!("(-{} deps)", target.w_unique).green(),
-                    target.fat_dependency.name.yellow(),
+                    target.heavy_dependency.name.yellow(),
                     suggestion,
                     target.intermediate.name.cyan(),
                 )?;
@@ -321,8 +321,8 @@ pub fn render_text(
         writeln!(writer)?;
         for target in &inline_candidates {
             let chain = format_short_chain(&target.dep_chain, &target.intermediate.name);
-            let usage_str = if target.fat_dep_loc > 0 {
-                format!(" ({} LOC)", target.fat_dep_loc)
+            let usage_str = if target.heavy_dep_loc > 0 {
+                format!(" ({} LOC)", target.heavy_dep_loc)
             } else {
                 String::new()
             };
@@ -330,7 +330,7 @@ pub fn render_text(
                 writer,
                 "  {} Inline `{}`{} into `{}`  {}",
                 format!("(-{} deps)", target.w_unique).green(),
-                target.fat_dependency.name.yellow(),
+                target.heavy_dependency.name.yellow(),
                 usage_str.dimmed(),
                 target.intermediate.name.cyan(),
                 chain.dimmed(),
@@ -353,7 +353,7 @@ pub fn render_text(
                 writer,
                 "  {} Make `{}` optional in `{}`  {}",
                 format!("(-{} deps)", target.w_unique).green(),
-                target.fat_dependency.name.yellow(),
+                target.heavy_dependency.name.yellow(),
                 target.intermediate.name.cyan(),
                 chain.dimmed(),
             )?;
@@ -375,7 +375,7 @@ pub fn render_text(
                 writer,
                 "  {} `{}` is optional in `{}`  {}",
                 format!("(-{} deps)", target.w_unique).green(),
-                target.fat_dependency.name.yellow(),
+                target.heavy_dependency.name.yellow(),
                 target.intermediate.name.cyan(),
                 chain.dimmed(),
             )?;
@@ -396,7 +396,7 @@ pub fn render_text(
                 writer,
                 "  {} `{}` appears unused in `{}`",
                 format!("(-{} deps)", target.w_unique).green(),
-                target.fat_dependency.name.yellow(),
+                target.heavy_dependency.name.yellow(),
                 target.intermediate.name.cyan(),
             )?;
         }
@@ -413,7 +413,7 @@ pub fn render_text(
                     writer,
                     "  {} Replace `{}` with {} in `{}`",
                     format!("(-{} deps)", target.w_unique).green(),
-                    target.fat_dependency.name.yellow(),
+                    target.heavy_dependency.name.yellow(),
                     suggestion,
                     target.intermediate.name.cyan(),
                 )?;
@@ -507,8 +507,8 @@ fn render_detailed(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
             "Edge:".bold(),
             target.intermediate.name.cyan(),
             target.intermediate.version,
-            target.fat_dependency.name.red(),
-            target.fat_dependency.version,
+            target.heavy_dependency.name.red(),
+            target.heavy_dependency.version,
         )?;
         writeln!(
             writer,
@@ -603,7 +603,7 @@ fn render_detailed(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
         .set_header(vec![
             "#",
             "Intermediate",
-            "Fat Dep",
+            "Heavy Dep",
             "W_uniq",
             "C_ref",
             "Confidence",
@@ -614,7 +614,7 @@ fn render_detailed(report: &AnalysisReport, writer: &mut dyn Write) -> anyhow::R
         table.add_row(vec![
             format!("{}", i + 1),
             target.intermediate.name.clone(),
-            target.fat_dependency.name.clone(),
+            target.heavy_dependency.name.clone(),
             format!("{}", target.w_unique),
             format!("{}", target.c_ref),
             format!("{}", target.confidence),

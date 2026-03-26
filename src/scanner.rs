@@ -15,10 +15,10 @@ pub struct FileMatch {
     pub in_test_code: bool,
 }
 
-/// Result of scanning an intermediate crate for references to a fat dependency.
+/// Result of scanning an intermediate crate for references to a heavy dependency.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ScanResult {
-    pub fat_crate_name: String,
+    pub heavy_crate_name: String,
     /// All names that were searched for (original + aliases).
     #[serde(default)]
     pub searched_names: Vec<String>,
@@ -34,7 +34,7 @@ pub struct ScanResult {
     /// Distinct API items used (e.g., "Regex::new", "from_u8").
     #[serde(default)]
     pub distinct_items: Vec<String>,
-    /// True if the intermediate crate has `pub use <fat_dep>::*`.
+    /// True if the intermediate crate has `pub use <heavy_dep>::*`.
     #[serde(default)]
     pub has_re_export_all: bool,
 }
@@ -73,7 +73,7 @@ fn is_generated_file(content: &str) -> bool {
     false
 }
 
-/// Scan the given `.rs` files for references to `fat_crate_name`.
+/// Scan the given `.rs` files for references to `heavy_crate_name`.
 ///
 /// Uses lexical scanning with regex. Searches for:
 /// - `use <crate>::...`
@@ -83,17 +83,17 @@ fn is_generated_file(content: &str) -> bool {
 /// Also searches for any additional `aliases` (from Cargo.toml package renaming).
 ///
 /// Skips single-line comments. Not perfect, but fast and good enough.
-pub fn scan_files(rs_files: &[PathBuf], fat_crate_name: &str) -> ScanResult {
-    scan_files_with_aliases(rs_files, fat_crate_name, &[])
+pub fn scan_files(rs_files: &[PathBuf], heavy_crate_name: &str) -> ScanResult {
+    scan_files_with_aliases(rs_files, heavy_crate_name, &[])
 }
 
 pub fn scan_files_with_aliases(
     rs_files: &[PathBuf],
-    fat_crate_name: &str,
+    heavy_crate_name: &str,
     aliases: &[String],
 ) -> ScanResult {
     // Cargo normalizes hyphens to underscores in Rust code.
-    let normalized = fat_crate_name.replace('-', "_");
+    let normalized = heavy_crate_name.replace('-', "_");
 
     // Collect all names to search for.
     let mut names: Vec<String> = vec![normalized.clone()];
@@ -116,7 +116,7 @@ pub fn scan_files_with_aliases(
     // Add macro/attribute patterns for crates commonly used via proc-macros,
     // derive macros, or attribute macros rather than explicit `use` imports.
     // Without these, the scanner reports 0 refs for macro-heavy crates.
-    add_macro_patterns(&mut pattern_parts, fat_crate_name, &names);
+    add_macro_patterns(&mut pattern_parts, heavy_crate_name, &names);
 
     let combined = pattern_parts
         .iter()
@@ -225,7 +225,7 @@ pub fn scan_files_with_aliases(
     let ref_count = file_matches.len();
     let distinct_items = extract_distinct_items(&file_matches, &names);
     ScanResult {
-        fat_crate_name: fat_crate_name.to_string(),
+        heavy_crate_name: heavy_crate_name.to_string(),
         searched_names: names,
         ref_count,
         file_matches,
@@ -326,8 +326,8 @@ const ALLOCATOR_CRATES: &[(&str, &str)] = &[
 
 /// Add extra regex patterns for crates commonly used through macros/derives/attributes
 /// rather than explicit `use` imports.
-fn add_macro_patterns(patterns: &mut Vec<String>, fat_crate_name: &str, names: &[String]) {
-    let normalized = fat_crate_name.replace('-', "_");
+fn add_macro_patterns(patterns: &mut Vec<String>, heavy_crate_name: &str, names: &[String]) {
+    let normalized = heavy_crate_name.replace('-', "_");
 
     // Check known macro crates.
     for (crate_name, extra_patterns) in MACRO_CRATES {
