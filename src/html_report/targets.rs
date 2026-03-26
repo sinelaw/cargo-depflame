@@ -190,9 +190,9 @@ fn render_action_sections(html: &mut String, report: &AnalysisReport, sections: 
         for &(i, upstream_badge) in &section.targets {
             let t = &report.targets[i];
             let prefix = format!("(-{} deps)", t.w_unique);
-            let fat_link = crate_link(&t.fat_dependency.name);
+            let heavy_link = crate_link(&t.heavy_dependency.name);
             let int_link = crate_link(&t.intermediate.name);
-            let action_line = format_action_line(t, &prefix, &fat_link, &int_link);
+            let action_line = format_action_line(t, &prefix, &heavy_link, &int_link);
             let is_local = t.intermediate_is_workspace_member
                 || matches!(
                     t.suggestion,
@@ -273,14 +273,14 @@ fn render_detail_table(html: &mut String, report: &AnalysisReport) {
             r#"<tr class="expandable" onclick="toggleDetail({idx})">
   <td>{idx}</td>
   <td><code>{intermediate_link}</code>{upstream_indicator}</td>
-  <td><code>{fat_link}</code></td>
+  <td><code>{heavy_link}</code></td>
   <td>{w_uniq}</td><td>{w_trans}</td><td>{c_ref}</td><td>{hurrs}</td>
   <td><span class="badge {conf_class}">{confidence}</span></td>
   <td>{action}</td>
 </tr>
 "#,
             intermediate_link = crate_link(&t.intermediate.name),
-            fat_link = crate_link(&t.fat_dependency.name),
+            heavy_link = crate_link(&t.heavy_dependency.name),
             w_uniq = t.w_unique,
             w_trans = t.w_transitive,
             c_ref = t.c_ref,
@@ -350,7 +350,7 @@ fn render_detail_table(html: &mut String, report: &AnalysisReport) {
         html.push_str(&format!(
             r#"<tr class="detail-row" id="detail-{idx}">
 <td colspan="9"><div class="detail-box">
-  <div><span class="label">Edge:</span> {int_link} v{iv} &rarr; {fat_link} v{fv}</div>
+  <div><span class="label">Edge:</span> {int_link} v{iv} &rarr; {heavy_link} v{fv}</div>
   <div><span class="label">Flags:</span> {flags_html}</div>
   <div><span class="label">Chain:</span> {chain_html}</div>
   <div style="margin-top:8px"><span class="label">References ({ref_count}):</span></div>
@@ -360,8 +360,8 @@ fn render_detail_table(html: &mut String, report: &AnalysisReport) {
 "#,
             int_link = crate_link(&t.intermediate.name),
             iv = html_escape(&t.intermediate.version),
-            fat_link = crate_link(&t.fat_dependency.name),
-            fv = html_escape(&t.fat_dependency.version),
+            heavy_link = crate_link(&t.heavy_dependency.name),
+            fv = html_escape(&t.heavy_dependency.version),
             ref_count = t.scan_result.ref_count,
         ));
     }
@@ -373,25 +373,25 @@ fn render_detail_table(html: &mut String, report: &AnalysisReport) {
 fn format_action_line(
     t: &crate::metrics::UpstreamTarget,
     prefix: &str,
-    fat_link: &str,
+    heavy_link: &str,
     int_link: &str,
 ) -> String {
     match &t.suggestion {
         RemovalStrategy::Remove => {
-            format!("{prefix} Remove {fat_link} from {int_link} &mdash; it appears unused")
+            format!("{prefix} Remove {heavy_link} from {int_link} &mdash; it appears unused")
         }
         RemovalStrategy::InlineUpstream {
-            fat_loc,
+            heavy_loc,
             api_items_used,
         } => {
             format!(
-                "{prefix} Copy the code you need from {fat_link} directly into {int_link} \
-                 &mdash; only {api_items_used} API items used from a {fat_loc}-line crate"
+                "{prefix} Copy the code you need from {heavy_link} directly into {int_link} \
+                 &mdash; only {api_items_used} API items used from a {heavy_loc}-line crate"
             )
         }
         RemovalStrategy::ReplaceWithStd { suggestion } => {
             format!(
-                "{prefix} Replace {fat_link} with <code>{}</code> in {int_link} \
+                "{prefix} Replace {heavy_link} with <code>{}</code> in {int_link} \
                  &mdash; the standard library now covers this",
                 html_escape(suggestion),
             )
@@ -415,38 +415,38 @@ fn format_action_line(
             } else {
                 String::new()
             };
-            format!("{prefix} {fat_link} is already optional in {int_link} ({detail}){feat_hint}")
+            format!("{prefix} {heavy_link} is already optional in {int_link} ({detail}){feat_hint}")
         }
         RemovalStrategy::FeatureGate => {
             if t.intermediate_is_workspace_member {
                 format!(
-                    "{prefix} Make {fat_link} optional in {int_link} \
+                    "{prefix} Make {heavy_link} optional in {int_link} \
                      &mdash; put it behind a Cargo feature flag"
                 )
             } else {
                 format!(
-                    "{prefix} Propose making {fat_link} optional in {int_link} \
+                    "{prefix} Propose making {heavy_link} optional in {int_link} \
                      &mdash; submit a PR to put it behind a feature flag"
                 )
             }
         }
         RemovalStrategy::ReplaceWithLighter { alternative } => {
             format!(
-                "{prefix} Switch from {fat_link} to <code>{}</code> in {int_link} \
+                "{prefix} Switch from {heavy_link} to <code>{}</code> in {int_link} \
                  &mdash; a lighter alternative",
                 html_escape(alternative),
             )
         }
         RemovalStrategy::RequiredBySibling { sibling } => {
             format!(
-                "{prefix} {fat_link} can't be removed &mdash; \
+                "{prefix} {heavy_link} can't be removed &mdash; \
                  it's also required by sibling dep {}",
                 crate_link(sibling)
             )
         }
         RemovalStrategy::MoveToDevDeps => {
             format!(
-                "{prefix} Move {fat_link} to <code>[dev-dependencies]</code> in {int_link} \
+                "{prefix} Move {heavy_link} to <code>[dev-dependencies]</code> in {int_link} \
                  &mdash; only used in test code"
             )
         }
@@ -455,8 +455,8 @@ fn format_action_line(
 
 /// Build a colored diff block showing the Cargo.toml change for a suggestion.
 fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
-    let fat = html_escape(&t.fat_dependency.name);
-    let fat_ver = html_escape(&t.fat_dependency.version);
+    let dep = html_escape(&t.heavy_dependency.name);
+    let dep_ver = html_escape(&t.heavy_dependency.version);
     let int = html_escape(&t.intermediate.name);
     let toml_path = if t.intermediate_is_workspace_member {
         "Cargo.toml".to_string()
@@ -475,15 +475,15 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
     match &t.suggestion {
         RemovalStrategy::Remove => {
             line!("diff-file", "# {toml_path}");
-            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-rm", "- {dep} = \"{dep_ver}\"");
         }
         RemovalStrategy::FeatureGate => {
-            let feat_name = format!("use-{fat}");
+            let feat_name = format!("use-{dep}");
             line!("diff-file", "# {toml_path} — [dependencies]");
-            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-rm", "- {dep} = \"{dep_ver}\"");
             line!(
                 "diff-add",
-                "+ {fat} = {{ version = \"{fat_ver}\", optional = true }}"
+                "+ {dep} = {{ version = \"{dep_ver}\", optional = true }}"
             );
             line!("diff-comment", "");
             line!(
@@ -493,7 +493,7 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
             line!("diff-file", "# {toml_path} — [features]");
             line!(
                 "diff-add",
-                "+ {feat_name} = [\"dep:{fat}\"]  # pick a name that makes sense for your crate"
+                "+ {feat_name} = [\"dep:{dep}\"]  # pick a name that makes sense for your crate"
             );
         }
         RemovalStrategy::AlreadyGated {
@@ -505,7 +505,7 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
             if enabling_features.is_empty() {
                 line!(
                     "diff-comment",
-                    "# check your [{int}] dependency — a feature is pulling in {fat}"
+                    "# check your [{int}] dependency — a feature is pulling in {dep}"
                 );
                 line!(
                     "diff-rm",
@@ -513,7 +513,7 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
                 );
                 line!(
                     "diff-add",
-                    "+ {int} = {{ version = \"...\" }}  # try removing features that pull in {fat}"
+                    "+ {int} = {{ version = \"...\" }}  # try removing features that pull in {dep}"
                 );
             } else if let Some(keep) = recommended_defaults {
                 // The enabling feature is part of "default" — suggest disabling defaults.
@@ -528,7 +528,7 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
                     .join(", ");
                 line!(
                     "diff-comment",
-                    "# default feature(s) {bad_str} of {int} pull in {fat}"
+                    "# default feature(s) {bad_str} of {int} pull in {dep}"
                 );
                 line!("diff-rm", "- {int} = \"...\"");
                 if keep.is_empty() {
@@ -556,7 +556,7 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
                     .join(", ");
                 line!(
                     "diff-comment",
-                    "# feature(s) {feats_str} of {int} pull in {fat}"
+                    "# feature(s) {feats_str} of {int} pull in {dep}"
                 );
                 line!(
                     "diff-rm",
@@ -571,19 +571,19 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
         RemovalStrategy::ReplaceWithStd { suggestion } => {
             let sug = html_escape(suggestion);
             line!("diff-file", "# {toml_path}");
-            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-rm", "- {dep} = \"{dep_ver}\"");
             line!("diff-comment", "# replace usage with {sug}");
         }
         RemovalStrategy::ReplaceWithLighter { alternative } => {
             let alt = html_escape(alternative);
             line!("diff-file", "# {toml_path}");
-            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-rm", "- {dep} = \"{dep_ver}\"");
             line!("diff-add", "+ {alt} = \"...\"");
         }
         RemovalStrategy::InlineUpstream { .. } => {
             let n = t.scan_result.distinct_items.len();
             line!("diff-file", "# {toml_path}");
-            line!("diff-rm", "- {fat} = \"{fat_ver}\"");
+            line!("diff-rm", "- {dep} = \"{dep_ver}\"");
             line!(
                 "diff-comment",
                 "# copy the {n} item(s) you use directly into your code"
@@ -597,10 +597,10 @@ fn build_cargo_diff(t: &crate::metrics::UpstreamTarget) -> String {
                 "diff-file",
                 "# {toml_path} — move from [dependencies] to [dev-dependencies]"
             );
-            line!("diff-rm", "- {fat} = \"{fat_ver}\"  # under [dependencies]");
+            line!("diff-rm", "- {dep} = \"{dep_ver}\"  # under [dependencies]");
             line!(
                 "diff-add",
-                "+ {fat} = \"{fat_ver}\"  # under [dev-dependencies]"
+                "+ {dep} = \"{dep_ver}\"  # under [dev-dependencies]"
             );
         }
     }

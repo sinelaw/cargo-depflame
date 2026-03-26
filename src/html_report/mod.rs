@@ -60,7 +60,7 @@ pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> an
     <span title="Total number of crate dependencies in the full cross-platform resolve graph (includes all targets/platforms).">{total_deps} total deps</span>
     {platform_html}
     <span title="Dependencies that appear in metadata but are not compiled on your current platform (e.g. windows-only crates on linux). These are typically not actionable.">{phantom} phantom deps</span>
-    <span title="Crates with a high transitive dependency count (above the --fat-threshold). These are the heavy hitters that the tool analyzes for removal opportunities.">{fat_nodes} heavy crates analyzed</span>
+    <span title="Crates with a high transitive dependency count (above the --heavy-threshold). These are the heavy hitters that the tool analyzes for removal opportunities.">{heavy_nodes} heavy crates analyzed</span>
     <span title="Number of upstream edges identified as potential optimization targets, ranked by impact.">{n_targets} targets found</span>
     <span style="color:#aaa">v{version} &middot; {timestamp}</span>
   </div>
@@ -101,7 +101,7 @@ pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> an
             format!("<span title=\"Dependencies actually compiled for your current platform/target. This is the number that matters for your build times.\">{platform_info} deps</span>")
         },
         phantom = report.phantom_dependencies,
-        fat_nodes = report.fat_nodes_found,
+        heavy_nodes = report.heavy_nodes_found,
         n_targets = report.targets.len(),
         version = html_escape(&report.tool_version),
         timestamp = html_escape(&report.timestamp),

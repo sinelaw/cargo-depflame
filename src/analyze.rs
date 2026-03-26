@@ -40,20 +40,20 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
 
     let workspace_root = metadata.workspace_root.to_string();
 
-    // Phase 2: Build dependency graph and find fat nodes.
+    // Phase 2: Build dependency graph and find heavy nodes.
     eprintln!("Building dependency graph...");
     let dep_graph = crate::graph::DepGraph::from_metadata(&metadata)?;
     let total_deps = dep_graph.total_dependency_count();
-    let fat_nodes = dep_graph.fat_nodes(args.common.fat_threshold);
+    let heavy_nodes = dep_graph.heavy_nodes(args.common.heavy_threshold);
     eprintln!(
-        "Found {} fat nodes (W_transitive > {}) out of {} total dependencies",
-        fat_nodes.len(),
-        args.common.fat_threshold,
+        "Found {} heavy nodes (W_transitive > {}) out of {} total dependencies",
+        heavy_nodes.len(),
+        args.common.heavy_threshold,
         total_deps
     );
 
-    if fat_nodes.is_empty() {
-        eprintln!("No fat nodes found. Your dependency tree is lean!");
+    if heavy_nodes.is_empty() {
+        eprintln!("No heavy nodes found. Your dependency tree is lean!");
         return Ok(empty_report(
             workspace_root,
             args.common.threshold,
@@ -62,7 +62,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
     }
 
     // Phase 2b: Find intermediate edges.
-    let edges = dep_graph.intermediate_edges(&fat_nodes);
+    let edges = dep_graph.intermediate_edges(&heavy_nodes);
     eprintln!("Found {} intermediate edges to scan", edges.len());
 
     if edges.is_empty() {
@@ -98,15 +98,15 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
     eprintln!("Checking for unused direct dependencies...");
     let already_analyzed: HashSet<(&str, &str)> = ranked
         .iter()
-        .map(|t| (t.intermediate.name.as_str(), t.fat_dependency.name.as_str()))
+        .map(|t| (t.intermediate.name.as_str(), t.heavy_dependency.name.as_str()))
         .collect();
     let unused_deps = find_unused_deps(&dep_graph, &metadata, &real_deps, &already_analyzed);
     let unused_direct_deps_summary: Vec<UnusedDirectDep> = unused_deps
         .iter()
         .map(|t| UnusedDirectDep {
             from_crate: t.intermediate.name.clone(),
-            dep_name: t.fat_dependency.name.clone(),
-            dep_version: t.fat_dependency.version.clone(),
+            dep_name: t.heavy_dependency.name.clone(),
+            dep_version: t.heavy_dependency.version.clone(),
             real_deps_saved: t.w_unique,
             is_test_example: is_test_or_example_crate_name(&t.intermediate.name),
         })
@@ -131,7 +131,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
     let unused_edges: Vec<(String, String)> = ranked
         .iter()
         .filter(|t| t.c_ref == 0)
-        .map(|t| (t.intermediate.name.clone(), t.fat_dependency.name.clone()))
+        .map(|t| (t.intermediate.name.clone(), t.heavy_dependency.name.clone()))
         .collect();
 
     Ok(AnalysisReport {
@@ -142,7 +142,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         total_dependencies: total_deps,
         platform_dependencies: platform_deps,
         phantom_dependencies: phantom_deps,
-        fat_nodes_found: fat_nodes.len(),
+        heavy_nodes_found: heavy_nodes.len(),
         targets: ranked,
         dep_tree: Some(dep_tree),
         unused_edges,
@@ -223,16 +223,16 @@ fn scan_edge(
 
     // Phase 3b: Look up dependency info from cargo_metadata.
     let dep_meta =
-        intermediate_pkg.and_then(|pkg| pkg.dependencies.iter().find(|d| d.name == edge.fat_name));
+        intermediate_pkg.and_then(|pkg| pkg.dependencies.iter().find(|d| d.name == edge.heavy_name));
 
-    // Determine the local alias for the fat dependency.
+    // Determine the local alias for the heavy dependency.
     let alias = dep_meta.and_then(|d| d.rename.clone()).or_else(|| {
         // If no explicit rename, the local name is the crate name with hyphens as underscores.
-        Some(edge.fat_name.replace('-', "_"))
+        Some(edge.heavy_name.replace('-', "_"))
     });
     let was_renamed = dep_meta
         .and_then(|d| d.rename.as_ref())
-        .is_some_and(|r| *r != edge.fat_name.replace('-', "_"));
+        .is_some_and(|r| *r != edge.heavy_name.replace('-', "_"));
 
     let mut aliases: Vec<String> = Vec::new();
     if let Some(ref a) = alias {
@@ -242,7 +242,7 @@ fn scan_edge(
     // Also add the lib target name if it differs from the package name.
     // Crates like `natord-plus-plus` set `[lib] name = "natord"`, so Rust code
     // imports them under that name, not the package name.
-    if let Some(lib_name) = lib_target_name(metadata, &edge.fat_name) {
+    if let Some(lib_name) = lib_target_name(metadata, &edge.heavy_name) {
         let lib_norm = lib_name.replace('-', "_");
         if !aliases.contains(&lib_norm) {
             aliases.push(lib_norm);
@@ -269,29 +269,29 @@ fn scan_edge(
         return None;
     }
 
-    let scan = scanner::scan_files_with_aliases(&rs_files, &edge.fat_name, &aliases);
+    let scan = scanner::scan_files_with_aliases(&rs_files, &edge.heavy_name, &aliases);
 
-    // Phase 4b: Measure fat dep LOC and its own dep count.
-    let fat_dep_loc = registry::find_crate_source(&edge.fat_name, &edge.fat_version)
-        .map(|fat_dir| {
-            let fat_rs = registry::collect_rs_files(&fat_dir);
-            registry::count_loc(&fat_rs)
+    // Phase 4b: Measure heavy dep LOC and its own dep count.
+    let heavy_dep_loc = registry::find_crate_source(&edge.heavy_name, &edge.heavy_version)
+        .map(|heavy_dir| {
+            let heavy_rs = registry::collect_rs_files(&heavy_dir);
+            registry::count_loc(&heavy_rs)
         })
         .unwrap_or(0);
-    let fat_dep_own_deps = dep_graph.direct_dep_count(&edge.fat_id);
+    let heavy_dep_own_deps = dep_graph.direct_dep_count(&edge.heavy_id);
     let has_re_export_all = scan.has_re_export_all;
 
     // Phase 4c: Compute unique subtree weight.
-    let w_unique = dep_graph.unique_subtree_weight(&edge.intermediate_id, &edge.fat_id);
+    let w_unique = dep_graph.unique_subtree_weight(&edge.intermediate_id, &edge.heavy_id);
 
     // Phase 4d: Compute dependency chain.
-    let dep_chain = dep_graph.dependency_chain(&edge.fat_id);
+    let dep_chain = dep_graph.dependency_chain(&edge.heavy_id);
 
-    // Phase 4e: Check if a sibling dep transitively requires the fat dep.
-    let required_by_sibling = dep_graph.sibling_requires(&edge.intermediate_id, &edge.fat_id);
+    // Phase 4e: Check if a sibling dep transitively requires the heavy dep.
+    let required_by_sibling = dep_graph.sibling_requires(&edge.intermediate_id, &edge.heavy_id);
 
-    // Phase 4e: Check if the fat dep is a phantom (not on this platform).
-    let phantom = !platform::is_real_dep(real_deps, &edge.fat_name, &edge.fat_version);
+    // Phase 4e: Check if the heavy dep is a phantom (not on this platform).
+    let phantom = !platform::is_real_dep(real_deps, &edge.heavy_name, &edge.heavy_version);
 
     // Phase 4f: Check if intermediate is a workspace member.
     let intermediate_is_ws = dep_graph.workspace_members.contains(&edge.intermediate_id);
@@ -307,9 +307,9 @@ fn scan_edge(
     Some(metrics::compute_target(ComputeTargetInput {
         intermediate_name: edge.intermediate_name.clone(),
         intermediate_version: edge.intermediate_version.clone(),
-        fat_name: edge.fat_name.clone(),
-        fat_version: edge.fat_version.clone(),
-        w_transitive: edge.fat_transitive_weight,
+        heavy_name: edge.heavy_name.clone(),
+        heavy_version: edge.heavy_version.clone(),
+        w_transitive: edge.heavy_transitive_weight,
         w_unique,
         scan_result: scan,
         edge_meta,
@@ -319,8 +319,8 @@ fn scan_edge(
         phantom,
         intermediate_is_workspace_member: intermediate_is_ws,
         is_standalone_integration,
-        fat_dep_loc,
-        fat_dep_own_deps,
+        heavy_dep_loc,
+        heavy_dep_own_deps,
         has_re_export_all,
     }))
 }
@@ -342,17 +342,17 @@ fn enrich_features(ranked: &mut [UpstreamTarget], metadata: &cargo_metadata::Met
         } = &mut target.suggestion
         {
             if let Some(pkg) = pkg_map.get(target.intermediate.name.as_str()) {
-                let fat_name = &target.fat_dependency.name;
-                // Find which features of the intermediate crate enable the fat dep.
+                let heavy_name = &target.heavy_dependency.name;
+                // Find which features of the intermediate crate enable the heavy dep.
                 let mut found = Vec::new();
                 for (feat_name, feat_deps) in &pkg.features {
                     if feat_name == "default" {
                         continue;
                     }
                     for dep_entry in feat_deps {
-                        let enables = dep_entry == fat_name
-                            || dep_entry == &format!("dep:{fat_name}")
-                            || dep_entry.starts_with(&format!("{fat_name}/"));
+                        let enables = dep_entry == heavy_name
+                            || dep_entry == &format!("dep:{heavy_name}")
+                            || dep_entry.starts_with(&format!("{heavy_name}/"));
                         if enables {
                             found.push(feat_name.clone());
                             break;
@@ -364,9 +364,9 @@ fn enrich_features(ranked: &mut [UpstreamTarget], metadata: &cargo_metadata::Met
                 // Check if any enabling feature is part of "default".
                 if let Some(defaults) = pkg.features.get("default") {
                     let dominated: HashSet<&str> = found.iter().map(|s| s.as_str()).collect();
-                    let dep_prefix = format!("dep:{fat_name}");
+                    let dep_prefix = format!("dep:{heavy_name}");
                     let enables_fat =
-                        |d: &str| dominated.contains(d) || d == fat_name || d == dep_prefix;
+                        |d: &str| dominated.contains(d) || d == heavy_name || d == dep_prefix;
                     let any_in_default = defaults.iter().any(|d| enables_fat(d));
                     if any_in_default {
                         let keep: Vec<String> = defaults
@@ -465,7 +465,7 @@ fn find_unused_deps(
                         name: ws_pkg.name.clone(),
                         version: ws_pkg.version.to_string(),
                     },
-                    fat_dependency: PackageInfo {
+                    heavy_dependency: PackageInfo {
                         name: dep_node.name.clone(),
                         version: dep_node.version.clone(),
                     },
@@ -482,8 +482,8 @@ fn find_unused_deps(
                     phantom: !platform::is_real_dep(real_deps, &dep_node.name, &dep_node.version),
                     intermediate_is_workspace_member: true,
                     is_standalone_integration: dep_graph.is_standalone_workspace_member(ws_id),
-                    fat_dep_loc: 0,
-                    fat_dep_own_deps: dep_graph.direct_dep_count(dep_id),
+                    heavy_dep_loc: 0,
+                    heavy_dep_own_deps: dep_graph.direct_dep_count(dep_id),
                     has_re_export_all: false,
                 });
             }
@@ -562,7 +562,7 @@ fn build_direct_dep_summary(
     entries
 }
 
-/// Build an empty report (used when there are no fat nodes or edges to analyze).
+/// Build an empty report (used when there are no heavy nodes or edges to analyze).
 fn empty_report(workspace_root: String, threshold: f64, total_deps: usize) -> AnalysisReport {
     AnalysisReport {
         tool_version: env!("CARGO_PKG_VERSION").to_string(),
@@ -572,7 +572,7 @@ fn empty_report(workspace_root: String, threshold: f64, total_deps: usize) -> An
         total_dependencies: total_deps,
         platform_dependencies: None,
         phantom_dependencies: 0,
-        fat_nodes_found: 0,
+        heavy_nodes_found: 0,
         targets: Vec::new(),
         dep_tree: None,
         unused_edges: Vec::new(),
