@@ -35,6 +35,24 @@ pub struct AnalysisReport {
     /// Each entry describes a workspace member -> dep edge with 0 code references.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub unused_direct_deps: Vec<UnusedDirectDep>,
+    /// Direct dependencies of workspace members sorted by unique transitive dep count.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub direct_dep_summary: Vec<DirectDepSummary>,
+}
+
+/// Summary of a direct dependency's unique transitive dep contribution.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct DirectDepSummary {
+    /// The workspace member that declares this dependency.
+    pub workspace_member: String,
+    /// The dependency name.
+    pub dep_name: String,
+    /// The dependency version.
+    pub dep_version: String,
+    /// Number of transitive deps unique to this edge (would disappear if cut).
+    pub unique_transitive_deps: usize,
+    /// Total transitive deps (including shared ones).
+    pub total_transitive_deps: usize,
 }
 
 /// A direct dependency of a workspace member that appears unused (0 code references).
@@ -79,6 +97,35 @@ pub fn render_text(
         writeln!(writer, "{} dependencies", report.total_dependencies)?;
     }
     writeln!(writer)?;
+
+    // ── DIRECT DEPENDENCY OVERVIEW ──
+    if !report.direct_dep_summary.is_empty() {
+        writeln!(
+            writer,
+            "{}",
+            "Direct dependencies by unique transitive dep count:".bold()
+        )?;
+        writeln!(writer)?;
+
+        let mut table = Table::new();
+        table
+            .load_preset(UTF8_FULL)
+            .apply_modifier(UTF8_ROUND_CORNERS)
+            .set_header(vec!["#", "Dependency", "Version", "Unique Deps", "Total Deps"]);
+
+        for (i, entry) in report.direct_dep_summary.iter().enumerate() {
+            table.add_row(vec![
+                format!("{}", i + 1),
+                entry.dep_name.clone(),
+                entry.dep_version.clone(),
+                format!("{}", entry.unique_transitive_deps),
+                format!("{}", entry.total_transitive_deps),
+            ]);
+        }
+
+        writeln!(writer, "{table}")?;
+        writeln!(writer)?;
+    }
 
     if report.targets.is_empty() {
         writeln!(
