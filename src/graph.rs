@@ -203,7 +203,11 @@ impl DepGraph {
     /// Compute the "unique subtree weight" for an edge (intermediate -> heavy):
     /// How many transitive deps of the heavy dep would be removed from the entire workspace
     /// if this single edge were cut?
-    pub fn unique_subtree_weight(&self, intermediate_id: &PackageId, heavy_id: &PackageId) -> usize {
+    pub fn unique_subtree_weight(
+        &self,
+        intermediate_id: &PackageId,
+        heavy_id: &PackageId,
+    ) -> usize {
         let heavy_set = match self.nodes.get(heavy_id) {
             Some(n) => &n.transitive_set,
             None => return 0,

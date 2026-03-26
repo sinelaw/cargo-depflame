@@ -111,7 +111,13 @@ pub fn render_text(
         table
             .load_preset(UTF8_FULL)
             .apply_modifier(UTF8_ROUND_CORNERS)
-            .set_header(vec!["#", "Dependency", "Version", "Unique Deps", "Total Deps"]);
+            .set_header(vec![
+                "#",
+                "Dependency",
+                "Version",
+                "Unique Deps",
+                "Total Deps",
+            ]);
 
         for (i, entry) in report.direct_dep_summary.iter().enumerate() {
             table.add_row(vec![
