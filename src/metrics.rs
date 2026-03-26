@@ -338,7 +338,10 @@ fn compute_suggestion(
         return RemovalStrategy::MoveToDevDeps;
     }
 
-    if let Some((_, replacement)) = STD_REPLACEMENTS.iter().find(|(name, _)| *name == heavy_name) {
+    if let Some((_, replacement)) = STD_REPLACEMENTS
+        .iter()
+        .find(|(name, _)| *name == heavy_name)
+    {
         return RemovalStrategy::ReplaceWithStd {
             suggestion: replacement.to_string(),
         };

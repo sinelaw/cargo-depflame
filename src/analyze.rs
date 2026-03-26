@@ -98,7 +98,12 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
     eprintln!("Checking for unused direct dependencies...");
     let already_analyzed: HashSet<(&str, &str)> = ranked
         .iter()
-        .map(|t| (t.intermediate.name.as_str(), t.heavy_dependency.name.as_str()))
+        .map(|t| {
+            (
+                t.intermediate.name.as_str(),
+                t.heavy_dependency.name.as_str(),
+            )
+        })
         .collect();
     let unused_deps = find_unused_deps(&dep_graph, &metadata, &real_deps, &already_analyzed);
     let unused_direct_deps_summary: Vec<UnusedDirectDep> = unused_deps
@@ -222,8 +227,8 @@ fn scan_edge(
     };
 
     // Phase 3b: Look up dependency info from cargo_metadata.
-    let dep_meta =
-        intermediate_pkg.and_then(|pkg| pkg.dependencies.iter().find(|d| d.name == edge.heavy_name));
+    let dep_meta = intermediate_pkg
+        .and_then(|pkg| pkg.dependencies.iter().find(|d| d.name == edge.heavy_name));
 
     // Determine the local alias for the heavy dependency.
     let alias = dep_meta.and_then(|d| d.rename.clone()).or_else(|| {
