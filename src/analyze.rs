@@ -10,7 +10,7 @@ use crate::graph::{DepGraph, EdgeMeta, IntermediateEdge};
 use crate::metrics::{
     self, ComputeTargetInput, Confidence, PackageInfo, RemovalStrategy, UpstreamTarget,
 };
-use crate::report::{AnalysisReport, UnusedDirectDep};
+use crate::report::{AnalysisReport, DirectDepSummary, UnusedDirectDep};
 use crate::{platform, registry, scanner};
 
 /// Run the full analysis pipeline and return the report.
@@ -122,6 +122,9 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         .map(|p| total_deps.saturating_sub(p))
         .unwrap_or(0);
 
+    // Phase 5e: Build direct dependency summary for workspace members.
+    let direct_dep_summary = build_direct_dep_summary(&dep_graph, &real_deps);
+
     eprintln!("Building dependency tree for visualization...");
     let dep_tree = flamegraph::build_dep_tree(&dep_graph);
 
@@ -144,6 +147,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         dep_tree: Some(dep_tree),
         unused_edges,
         unused_direct_deps: unused_direct_deps_summary,
+        direct_dep_summary,
     })
 }
 
@@ -506,6 +510,58 @@ fn merge_unused(
     impactful
 }
 
+/// Build a summary of all direct dependencies for each workspace member,
+/// ordered by how many unique (not shared) transitive deps each one brings in.
+fn build_direct_dep_summary(
+    dep_graph: &DepGraph,
+    real_deps: &Option<HashSet<String>>,
+) -> Vec<DirectDepSummary> {
+    let mut entries = Vec::new();
+
+    for ws_id in &dep_graph.workspace_members {
+        let ws_node = match dep_graph.nodes.get(ws_id) {
+            Some(n) => n,
+            None => continue,
+        };
+
+        let direct_deps = match dep_graph.forward.get(ws_id) {
+            Some(deps) => deps,
+            None => continue,
+        };
+
+        for dep_id in direct_deps {
+            let dep_node = match dep_graph.nodes.get(dep_id) {
+                Some(n) => n,
+                None => continue,
+            };
+            // Skip workspace members (internal crates).
+            if dep_node.is_workspace_member {
+                continue;
+            }
+            // Skip phantom deps (not on this platform).
+            if !platform::is_real_dep(real_deps, &dep_node.name, &dep_node.version) {
+                continue;
+            }
+
+            let w_unique = dep_graph.unique_subtree_weight(ws_id, dep_id);
+            // total_transitive_deps: count of non-self transitive deps
+            let total_transitive = dep_node.transitive_weight.saturating_sub(1);
+
+            entries.push(DirectDepSummary {
+                workspace_member: ws_node.name.clone(),
+                dep_name: dep_node.name.clone(),
+                dep_version: dep_node.version.clone(),
+                unique_transitive_deps: w_unique,
+                total_transitive_deps: total_transitive,
+            });
+        }
+    }
+
+    // Sort by unique transitive deps descending.
+    entries.sort_by(|a, b| b.unique_transitive_deps.cmp(&a.unique_transitive_deps));
+    entries
+}
+
 /// Build an empty report (used when there are no fat nodes or edges to analyze).
 fn empty_report(workspace_root: String, threshold: f64, total_deps: usize) -> AnalysisReport {
     AnalysisReport {
@@ -521,5 +577,6 @@ fn empty_report(workspace_root: String, threshold: f64, total_deps: usize) -> An
         dep_tree: None,
         unused_edges: Vec::new(),
         unused_direct_deps: Vec::new(),
+        direct_dep_summary: Vec::new(),
     }
 }
