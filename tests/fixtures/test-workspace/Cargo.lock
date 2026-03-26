@@ -16,6 +16,7 @@ name = "crate-a"
 version = "0.1.0"
 dependencies = [
  "crate-b",
+ "itoa",
  "once_cell",
  "regex",
 ]

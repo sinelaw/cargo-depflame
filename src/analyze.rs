@@ -665,6 +665,21 @@ fn find_unused_deps(
         .collect()
 }
 
+/// Extract the `[package.metadata.cargo-machete] ignored = [...]` list from a package.
+/// Returns an empty set if the key is absent or malformed.
+fn machete_ignored(pkg: &cargo_metadata::Package) -> HashSet<String> {
+    pkg.metadata
+        .get("cargo-machete")
+        .and_then(|v| v.get("ignored"))
+        .and_then(|v| v.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|v| v.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
 /// Build the flat list of (workspace_member, dep) candidates to check.
 fn collect_unused_candidates<'a>(
     dep_graph: &'a DepGraph,
@@ -694,6 +709,8 @@ fn collect_unused_candidates<'a>(
             continue;
         }
 
+        let ignored = machete_ignored(ws_pkg);
+
         let mut dep_count = 0;
         for dep_id in direct_deps {
             let dep_node = match dep_graph.nodes.get(dep_id) {
@@ -701,6 +718,11 @@ fn collect_unused_candidates<'a>(
                 None => continue,
             };
             if dep_node.is_workspace_member {
+                continue;
+            }
+            if ignored.contains(&dep_node.name)
+                || ignored.contains(&dep_node.name.replace('-', "_"))
+            {
                 continue;
             }
             if already_analyzed.contains(&(ws_pkg.name.clone(), dep_node.name.clone())) {
@@ -870,9 +892,13 @@ fn is_proc_macro_crate(metadata: &cargo_metadata::Metadata, dep_name: &str) -> b
     // Facade pattern: check if the crate has a direct dependency whose name
     // is `<crate>-macro`, `<crate>-macros`, `<crate>-derive`, or `<crate>-impl`
     // and that dep is a proc-macro crate.
-    let suffixes = ["-macro", "-macros", "-derive", "-impl", "_macro", "_macros", "_derive"];
+    let suffixes = [
+        "-macro", "-macros", "-derive", "-impl", "_macro", "_macros", "_derive",
+    ];
     pkg.dependencies.iter().any(|d| {
-        suffixes.iter().any(|suffix| d.name == format!("{dep_name}{suffix}"))
+        suffixes
+            .iter()
+            .any(|suffix| d.name == format!("{dep_name}{suffix}"))
             && metadata
                 .packages
                 .iter()

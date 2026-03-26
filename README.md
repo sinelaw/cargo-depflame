@@ -48,6 +48,17 @@ Both find unused deps. cargo-depflame also:
 - Suggests upstream PRs for feature-gating in external crates
 - Works on stable (no nightly required, unlike cargo-udeps)
 
+### Ignoring false positives
+
+Some crates (e.g., `humantime_serde` used only via `#[serde(with = "...")]`) can't be detected by regex scanning. To suppress false "unused" reports, add the same `[package.metadata.cargo-machete]` section that cargo-machete uses:
+
+```toml
+[package.metadata.cargo-machete]
+ignored = ["humantime_serde"]
+```
+
+Ignored crates still appear in the flamegraph — only the unused-dep suggestion is suppressed.
+
 ### Limitations
 
 The suggestions rely on regex-based source scanning, so treat them as leads to investigate, not commands to execute blindly. The HTML report links to exact source lines for verification.

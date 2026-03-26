@@ -152,6 +152,33 @@ fn report_renders_all_formats() {
     assert!(html.contains("<html"));
 }
 
+/// itoa is declared as a dep of crate-a but never used, and is listed in
+/// [package.metadata.cargo-machete] ignored. It should not appear as unused.
+#[test]
+fn machete_ignored_deps_are_skipped() {
+    let report = analyze::run_analyze(&default_args()).expect("analysis should succeed");
+
+    let itoa_unused = report
+        .unused_direct_deps
+        .iter()
+        .find(|d| d.dep_name == "itoa" && d.from_crate == "crate-a");
+
+    assert!(
+        itoa_unused.is_none(),
+        "itoa is in cargo-machete ignored list and should not appear in unused_direct_deps"
+    );
+
+    let itoa_target = report
+        .targets
+        .iter()
+        .find(|t| t.heavy_dependency.name == "itoa" && t.intermediate.name == "crate-a");
+
+    assert!(
+        itoa_target.is_none(),
+        "itoa should not appear as a target at all when ignored"
+    );
+}
+
 /// Noise filtering works: with include_noise=false, noise targets are excluded.
 #[test]
 fn noise_filtering_works_end_to_end() {
