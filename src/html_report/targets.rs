@@ -19,6 +19,11 @@ pub(super) fn build_targets_html(report: &AnalysisReport) -> String {
          </div>\n",
     );
 
+    // --- Direct dependency overview table ---
+    if !report.direct_dep_summary.is_empty() {
+        render_direct_dep_table(&mut html, report);
+    }
+
     // --- Categorize and render action sections ---
     let sections = categorize_targets(report);
     render_action_sections(&mut html, report, &sections);
@@ -27,6 +32,58 @@ pub(super) fn build_targets_html(report: &AnalysisReport) -> String {
     render_detail_table(&mut html, report);
 
     html
+}
+
+fn render_direct_dep_table(html: &mut String, report: &AnalysisReport) {
+    html.push_str(
+        "<div class=\"action-summary\">\n\
+         <h3>Direct dependencies by unique transitive dep count</h3>\n\
+         <p style=\"font-size:13px;color:#666;margin-bottom:8px\">\
+         Each row shows a direct dependency of your workspace. \
+         <em>Unique Deps</em> is the number of transitive dependencies that \
+         would completely disappear from your build if that single dependency \
+         were removed. <em>Total Deps</em> includes shared transitive deps \
+         that are also pulled in by other crates.</p>\n",
+    );
+
+    html.push_str(
+        "<table class=\"targets-table\" style=\"margin-top:8px\">\n\
+         <thead><tr>\
+         <th>#</th>\
+         <th>Dependency</th>\
+         <th>Version</th>\
+         <th title=\"Transitive deps that would completely disappear if this dependency were removed.\">Unique Deps</th>\
+         <th title=\"Total transitive dependencies (including ones shared with other crates).\">Total Deps</th>\
+         </tr></thead>\n<tbody>\n",
+    );
+
+    for (i, entry) in report.direct_dep_summary.iter().enumerate() {
+        let idx = i + 1;
+        let dep_link = crate_link(&entry.dep_name);
+        let bar_width = if report.direct_dep_summary[0].unique_transitive_deps > 0 {
+            (entry.unique_transitive_deps as f64
+                / report.direct_dep_summary[0].unique_transitive_deps as f64
+                * 100.0) as usize
+        } else {
+            0
+        };
+        html.push_str(&format!(
+            "<tr>\
+             <td>{idx}</td>\
+             <td><code>{dep_link}</code></td>\
+             <td>{version}</td>\
+             <td><div style=\"display:flex;align-items:center;gap:6px\">\
+             <div style=\"background:#4caf50;height:10px;border-radius:2px;min-width:0;width:{bar_width}%\"></div>\
+             <span>{unique}</span></div></td>\
+             <td>{total}</td>\
+             </tr>\n",
+            version = html_escape(&entry.dep_version),
+            unique = entry.unique_transitive_deps,
+            total = entry.total_transitive_deps,
+        ));
+    }
+
+    html.push_str("</tbody>\n</table>\n</div>\n\n");
 }
 
 enum Category {
