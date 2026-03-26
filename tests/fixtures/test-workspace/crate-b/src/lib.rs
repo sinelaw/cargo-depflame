@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 pub struct Config {
     pub name: String,
     pub value: i32,
+    #[serde(with = "humantime_serde")]
+    pub timeout: std::time::Duration,
 }
 
 pub fn to_json(config: &Config) -> String {

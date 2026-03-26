@@ -179,6 +179,23 @@ fn machete_ignored_deps_are_skipped() {
     );
 }
 
+/// humantime-serde is used only via #[serde(with = "humantime_serde")] in crate-b.
+/// The scanner should detect this usage and not flag it as unused.
+#[test]
+fn serde_with_attribute_is_detected() {
+    let report = analyze::run_analyze(&default_args()).expect("analysis should succeed");
+
+    let ht_unused = report
+        .unused_direct_deps
+        .iter()
+        .find(|d| d.dep_name == "humantime-serde" && d.from_crate == "crate-b");
+
+    assert!(
+        ht_unused.is_none(),
+        "humantime-serde is used via #[serde(with = ...)] and should not be flagged as unused"
+    );
+}
+
 /// Noise filtering works: with include_noise=false, noise targets are excluded.
 #[test]
 fn noise_filtering_works_end_to_end() {

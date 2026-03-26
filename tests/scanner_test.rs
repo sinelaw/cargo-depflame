@@ -238,6 +238,37 @@ mod tests {
 }
 
 #[test]
+fn test_scan_serde_with_attribute() {
+    let dir = TempDir::new().unwrap();
+    let p = write_file(
+        dir.path(),
+        "lib.rs",
+        r#"
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct Config {
+    #[serde(with = "humantime_serde")]
+    timeout: std::time::Duration,
+
+    #[serde(deserialize_with = "humantime_serde::deserialize")]
+    interval: std::time::Duration,
+
+    #[serde(serialize_with = "humantime_serde::serialize")]
+    delay: std::time::Duration,
+}
+"#,
+    );
+
+    let result = cargo_depflame::scanner::scan_files(&[p], "humantime-serde");
+    assert!(
+        result.ref_count >= 3,
+        "should detect serde with/serialize_with/deserialize_with references, got {}",
+        result.ref_count
+    );
+}
+
+#[test]
 fn test_scan_mixed_test_and_prod_refs() {
     let dir = TempDir::new().unwrap();
     let p = write_file(

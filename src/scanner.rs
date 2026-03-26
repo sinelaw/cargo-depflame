@@ -76,6 +76,10 @@ fn compile_patterns(heavy_crate_name: &str, names: &[String]) -> (Regex, Regex) 
         pattern_parts.push(format!(r"\b{escaped}::"));
         pattern_parts.push(format!(r"\buse\s+{escaped}\b"));
         pattern_parts.push(format!(r"\bextern\s+crate\s+{escaped}\b"));
+        // #[serde(with = "crate_name")] and serialize_with / deserialize_with variants
+        pattern_parts.push(format!(
+            r#"#\[serde\([^)]*\b(?:(?:de)?serialize_)?with\s*=\s*"{escaped}"#
+        ));
     }
     add_macro_patterns(&mut pattern_parts, heavy_crate_name, names);
 
