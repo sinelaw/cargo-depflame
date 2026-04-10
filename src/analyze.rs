@@ -952,10 +952,7 @@ fn merge_unused(
 
 /// Compute unique ancestor count for a package: how many distinct packages
 /// transitively depend on it (via reverse edges in the dep graph).
-fn unique_ancestor_count(
-    dep_graph: &DepGraph,
-    pkg_id: &cargo_metadata::PackageId,
-) -> usize {
+fn unique_ancestor_count(dep_graph: &DepGraph, pkg_id: &cargo_metadata::PackageId) -> usize {
     let mut visited = HashSet::new();
     let mut queue = VecDeque::new();
     if let Some(parents) = dep_graph.reverse.get(pkg_id) {
