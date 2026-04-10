@@ -2,15 +2,13 @@
 """
 Release script for cargo-depflame.
 
-Bumps the version in Cargo.toml, updates Cargo.lock, commits, tags, and
-pushes to GitHub — which triggers the release workflow that builds binaries
-and publishes to crates.io.
+Bumps the patch version in Cargo.toml, updates Cargo.lock, commits, tags,
+and pushes to GitHub — which triggers the release workflow that builds
+binaries and publishes to crates.io.
 
 Usage:
-    python3 scripts/release.py              # bump patch (default)
-    python3 scripts/release.py minor        # bump minor
-    python3 scripts/release.py 0.2.0        # explicit version
-    python3 scripts/release.py --dry-run    # preview without changes
+    python3 scripts/release.py            # bump and release
+    python3 scripts/release.py --dry-run  # preview without changes
 
 Requirements: git, cargo, and a clean working tree on the main branch.
 """
@@ -64,29 +62,9 @@ def read_current_version() -> str:
     return m.group(2)
 
 
-def bump_version(current: str, bump: str) -> str:
-    parts = list(map(int, current.split(".")))
-    if bump == "patch":
-        parts[2] += 1
-    elif bump == "minor":
-        parts[1] += 1
-        parts[2] = 0
-    elif bump == "major":
-        parts[0] += 1
-        parts[1] = 0
-        parts[2] = 0
-    else:
-        fatal(f"Unknown bump type: {bump}")
-    return ".".join(map(str, parts))
-
-
-def resolve_new_version(arg: str, current: str) -> str:
-    if arg in ("patch", "minor", "major"):
-        return bump_version(current, arg)
-    # Treat as explicit version string.
-    if not re.fullmatch(r"\d+\.\d+\.\d+", arg):
-        fatal(f"Invalid version: {arg!r}  (expected patch|minor|major or X.Y.Z)")
-    return arg
+def bump_patch(current: str) -> str:
+    major, minor, patch = map(int, current.split("."))
+    return f"{major}.{minor}.{patch + 1}"
 
 
 def set_version_in_cargo_toml(new_version: str) -> None:
@@ -134,19 +112,7 @@ def preflight() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Release a new version of cargo-depflame.",
-        epilog="Examples:\n"
-        "  %(prog)s patch          # 0.1.2 -> 0.1.3\n"
-        "  %(prog)s minor          # 0.1.2 -> 0.2.0\n"
-        "  %(prog)s 1.0.0          # explicit version\n"
-        "  %(prog)s --dry-run patch\n",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument(
-        "version",
-        nargs="?",
-        default="patch",
-        help="Version bump type (patch, minor, major) or explicit version (X.Y.Z). Default: patch",
+        description="Bump patch version and release cargo-depflame.",
     )
     parser.add_argument(
         "--dry-run",
@@ -156,17 +122,12 @@ def main() -> None:
     args = parser.parse_args()
 
     current = read_current_version()
-    new_version = resolve_new_version(args.version, current)
+    new_version = bump_patch(current)
     tag = f"v{new_version}"
 
     print(f"\ncargo-depflame release")
-    print(f"  current version: {current}")
-    print(f"  new version:     {new_version}")
-    print(f"  tag:             {tag}")
+    print(f"  {current} -> {new_version} ({tag})")
     print()
-
-    if new_version == current:
-        fatal(f"New version {new_version} is the same as the current version")
 
     if args.dry_run:
         print("[dry-run] Would perform the following steps:")
