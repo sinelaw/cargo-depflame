@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use rayon::prelude::*;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::path::PathBuf;
 use tracing::{debug, info, info_span, warn};
 
@@ -950,6 +950,33 @@ fn merge_unused(
     impactful
 }
 
+/// Compute unique ancestor count for a package: how many distinct packages
+/// transitively depend on it (via reverse edges in the dep graph).
+fn unique_ancestor_count(
+    dep_graph: &DepGraph,
+    pkg_id: &cargo_metadata::PackageId,
+) -> usize {
+    let mut visited = HashSet::new();
+    let mut queue = VecDeque::new();
+    if let Some(parents) = dep_graph.reverse.get(pkg_id) {
+        for p in parents {
+            if visited.insert(p.clone()) {
+                queue.push_back(p.clone());
+            }
+        }
+    }
+    while let Some(cur) = queue.pop_front() {
+        if let Some(parents) = dep_graph.reverse.get(&cur) {
+            for p in parents {
+                if visited.insert(p.clone()) {
+                    queue.push_back(p.clone());
+                }
+            }
+        }
+    }
+    visited.len()
+}
+
 fn build_direct_dep_summary(
     dep_graph: &DepGraph,
     real_deps: &Option<HashSet<String>>,
@@ -981,6 +1008,7 @@ fn build_direct_dep_summary(
 
             let w_unique = dep_graph.unique_subtree_weight(ws_id, dep_id);
             let total_transitive = dep_node.transitive_weight.saturating_sub(1);
+            let ancestors = unique_ancestor_count(dep_graph, dep_id);
 
             entries.push(DirectDepSummary {
                 workspace_member: ws_node.name.clone(),
@@ -988,6 +1016,7 @@ fn build_direct_dep_summary(
                 dep_version: dep_node.version.clone(),
                 unique_transitive_deps: w_unique,
                 total_transitive_deps: total_transitive,
+                unique_ancestors: ancestors,
             });
         }
     }

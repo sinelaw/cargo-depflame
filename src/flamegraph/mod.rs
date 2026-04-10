@@ -23,6 +23,8 @@ pub struct DepTreeNode {
     /// Total transitive dep count (including self).
     pub transitive_weight: usize,
     pub is_workspace: bool,
+    /// Number of unique ancestor nodes (packages that transitively depend on this one).
+    pub unique_ancestors: usize,
     /// Indices into `DepTreeData::nodes`.
     pub children: Vec<usize>,
     /// Features currently enabled for this package in the resolved graph.
@@ -111,6 +113,7 @@ pub fn build_dep_tree(full_metadata: &Metadata, active_metadata: &Metadata) -> D
             name: pkg.name.clone(),
             version: pkg.version.to_string(),
             transitive_weight: 0, // computed below
+            unique_ancestors: 0,  // computed below
             is_workspace: workspace_members.contains(&rnode.id),
             children: Vec::new(),
             enabled_features,
@@ -159,6 +162,44 @@ pub fn build_dep_tree(full_metadata: &Metadata, active_metadata: &Metadata) -> D
     for (id, &weight) in &weight_cache {
         if let Some(&idx) = id_to_idx.get(id) {
             nodes[idx].transitive_weight = weight;
+        }
+    }
+
+    // ── Compute unique ancestors via reverse BFS ───────────────────────────
+
+    // Build reverse edges: child -> [parents].
+    let mut reverse: HashMap<PackageId, Vec<PackageId>> = HashMap::new();
+    for (parent_id, deps) in &forward {
+        for dep_id in deps {
+            reverse
+                .entry(dep_id.clone())
+                .or_default()
+                .push(parent_id.clone());
+        }
+    }
+
+    for id in &ids {
+        let mut visited = HashSet::new();
+        let mut queue = VecDeque::new();
+        // Seed with direct parents.
+        if let Some(parents) = reverse.get(id) {
+            for p in parents {
+                if visited.insert(p.clone()) {
+                    queue.push_back(p.clone());
+                }
+            }
+        }
+        while let Some(cur) = queue.pop_front() {
+            if let Some(parents) = reverse.get(&cur) {
+                for p in parents {
+                    if visited.insert(p.clone()) {
+                        queue.push_back(p.clone());
+                    }
+                }
+            }
+        }
+        if let Some(&idx) = id_to_idx.get(id) {
+            nodes[idx].unique_ancestors = visited.len();
         }
     }
 

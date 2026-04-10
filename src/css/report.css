@@ -227,6 +227,30 @@ body {
   border-color: var(--blue);
 }
 
+.ancestor-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.ancestor-filter-label input {
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.ancestor-filter-label input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
 .legend-right {
   display: flex;
   gap: 14px;

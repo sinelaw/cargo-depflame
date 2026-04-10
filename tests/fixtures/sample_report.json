@@ -422,6 +422,7 @@
         "version": "0.1.0",
         "transitive_weight": 42,
         "is_workspace": true,
+        "unique_ancestors": 0,
         "children": [
           2,
           3,
@@ -447,6 +448,7 @@
         "version": "0.1.0",
         "transitive_weight": 15,
         "is_workspace": true,
+        "unique_ancestors": 0,
         "children": [
           5,
           6,
@@ -458,6 +460,7 @@
         "version": "2.0.0",
         "transitive_weight": 25,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": [
           7,
           11,
@@ -481,6 +484,7 @@
         "version": "1.0.200",
         "transitive_weight": 5,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": [
           13
         ],
@@ -504,6 +508,7 @@
         "version": "0.3.0",
         "transitive_weight": 12,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": [
           14
         ]
@@ -513,6 +518,7 @@
         "version": "1.10.0",
         "transitive_weight": 8,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": [],
         "enabled_features": [
           "default",
@@ -533,6 +539,7 @@
         "version": "0.2.0",
         "transitive_weight": 1,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       },
       {
@@ -540,6 +547,7 @@
         "version": "1.35.0",
         "transitive_weight": 20,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": [],
         "enabled_features": [
           "default",
@@ -561,6 +569,7 @@
         "version": "3.0.0",
         "transitive_weight": 22,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": [
           7
         ]
@@ -570,6 +579,7 @@
         "version": "1.0.0",
         "transitive_weight": 8,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       },
       {
@@ -577,6 +587,7 @@
         "version": "1.19.0",
         "transitive_weight": 1,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       },
       {
@@ -584,6 +595,7 @@
         "version": "1.0.0",
         "transitive_weight": 3,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       },
       {
@@ -591,6 +603,7 @@
         "version": "1.0.0",
         "transitive_weight": 2,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       },
       {
@@ -598,6 +611,7 @@
         "version": "1.0.200",
         "transitive_weight": 4,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       },
       {
@@ -605,6 +619,7 @@
         "version": "0.1.0",
         "transitive_weight": 3,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       },
       {
@@ -612,6 +627,7 @@
         "version": "2.0.0",
         "transitive_weight": 3,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": [
           16,
           17
@@ -622,6 +638,7 @@
         "version": "1.0.0",
         "transitive_weight": 1,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       },
       {
@@ -629,6 +646,7 @@
         "version": "0.5.0",
         "transitive_weight": 1,
         "is_workspace": false,
+        "unique_ancestors": 0,
         "children": []
       }
     ],
@@ -773,21 +791,24 @@
       "dep_name": "heavy-framework",
       "dep_version": "2.0.0",
       "unique_transitive_deps": 18,
-      "total_transitive_deps": 25
+      "total_transitive_deps": 25,
+      "unique_ancestors": 1
     },
     {
       "workspace_member": "my-app",
       "dep_name": "serde",
       "dep_version": "1.0.200",
       "unique_transitive_deps": 3,
-      "total_transitive_deps": 5
+      "total_transitive_deps": 5,
+      "unique_ancestors": 12
     },
     {
       "workspace_member": "my-lib",
       "dep_name": "regex",
       "dep_version": "1.10.0",
       "unique_transitive_deps": 2,
-      "total_transitive_deps": 8
+      "total_transitive_deps": 8,
+      "unique_ancestors": 5
     }
   ]
 }

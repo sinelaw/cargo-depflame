@@ -833,6 +833,7 @@ var DepflameFeatures = (function() {
     applyChanges: applyChanges,
     resetNode: resetNode,
     resetAll: resetAll,
-    recomputeActiveGraph: recomputeActiveGraph
+    recomputeActiveGraph: recomputeActiveGraph,
+    updateSummaryBar: updateSummaryBar
   };
 })();

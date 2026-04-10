@@ -117,6 +117,10 @@ var DepflameContent = (function() {
       +   '</div>'
       +   '<button class="control-btn" onclick="Depflame.resetZoom()">Reset Zoom</button>'
       +   '<button class="control-btn" id="reverse-btn" onclick="Depflame.toggleReverse()">Reverse</button>'
+      +   '<label class="ancestor-filter-label" title="Hide dependencies with more than N unique ancestors (hard to remove).">'
+      +     'Max ancestors: <input type="number" id="ancestor-filter-input" min="0" value="" placeholder="off"'
+      +     ' style="width:50px" onchange="Depflame.setAncestorFilter(this.value)">'
+      +   '</label>'
       +   '<span id="search-matches"></span>'
       + '</div>'
       + '<div class="legend-right">'
@@ -150,6 +154,7 @@ var DepflameContent = (function() {
       + '<th>#</th><th>Dependency</th><th>Version</th>'
       + '<th title="Transitive deps unique to this edge.">Unique Deps</th>'
       + '<th title="Total transitive deps.">Total Deps</th>'
+      + '<th title="Number of unique ancestor packages that transitively depend on this crate. High = hard to remove.">Ancestors</th>'
       + '</tr></thead><tbody>';
 
     for (var i = 0; i < summary.length; i++) {
@@ -161,7 +166,8 @@ var DepflameContent = (function() {
         + '<td><div class="dep-summary-cell">'
         + '<div class="unique-bar" style="width:' + barW + '%"></div>'
         + '<span>' + e.unique_transitive_deps + '</span></div></td>'
-        + '<td>' + e.total_transitive_deps + '</td></tr>';
+        + '<td>' + e.total_transitive_deps + '</td>'
+        + '<td>' + (e.unique_ancestors || 0) + '</td></tr>';
     }
 
     html += '</tbody></table></div>';

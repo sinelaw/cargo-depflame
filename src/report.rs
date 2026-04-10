@@ -51,6 +51,9 @@ pub struct DirectDepSummary {
     pub unique_transitive_deps: usize,
     /// Total transitive deps (including shared ones).
     pub total_transitive_deps: usize,
+    /// Number of unique ancestors (packages that transitively depend on this one).
+    #[serde(default)]
+    pub unique_ancestors: usize,
 }
 
 /// A direct dependency of a workspace member that appears unused (0 code references).
@@ -122,19 +125,21 @@ pub fn render_text(
 
         writeln!(
             writer,
-            "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {:>5}",
+            "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {:>5}  {:>9}",
             "#",
             "Dependency",
             "Version",
             "Unique",
             "Total",
+            "Ancestors",
             idx_w = idx_w,
             name_w = name_w,
             ver_w = ver_w,
         )?;
         writeln!(
             writer,
-            "  {:─>idx_w$}  {:─<name_w$}  {:─<ver_w$}  {:─>6}  {:─>5}",
+            "  {:─>idx_w$}  {:─<name_w$}  {:─<ver_w$}  {:─>6}  {:─>5}  {:─>9}",
+            "",
             "",
             "",
             "",
@@ -147,12 +152,13 @@ pub fn render_text(
         for (i, entry) in report.direct_dep_summary.iter().enumerate() {
             writeln!(
                 writer,
-                "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {:>5}",
+                "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {:>5}  {:>9}",
                 i + 1,
                 entry.dep_name,
                 entry.dep_version,
                 entry.unique_transitive_deps,
                 entry.total_transitive_deps,
+                entry.unique_ancestors,
                 idx_w = idx_w,
                 name_w = name_w,
                 ver_w = ver_w,

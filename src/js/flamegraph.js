@@ -23,6 +23,10 @@ var Depflame = (function() {
   var zoomStack = [];
   var reverseMode = false;
 
+  // Ancestor filter: hide nodes with more than this many unique ancestors.
+  // null = no filter.
+  var ancestorThreshold = null;
+
   // Reference to the current container and data for re-renders.
   var currentContainer = null;
   var currentTreeData  = null;
@@ -88,6 +92,7 @@ var Depflame = (function() {
         isWorkspace: node.is_workspace,
         parentName: parentName || '',
         ancestorCount: ancestorCounts[nodeIdx],
+        uniqueAncestors: node.unique_ancestors || 0,
         collapsedChildren: 0,
         nodeIdx: nodeIdx,
         treePath: treePath
@@ -202,6 +207,7 @@ var Depflame = (function() {
         isWorkspace: node.is_workspace,
         parentName: d > 0 ? tree.nodes[ancestorPath[d - 1]].name : '',
         ancestorCount: ancestorCounts[ni],
+        uniqueAncestors: node.unique_ancestors || 0,
         collapsedChildren: 0,
         nodeIdx: ni,
         treePath: pathStack.join('>')
@@ -280,6 +286,7 @@ var Depflame = (function() {
       isWorkspace: node.is_workspace,
       parentName: parentName || '',
       ancestorCount: ancestorCounts[nodeIdx],
+      uniqueAncestors: node.unique_ancestors || 0,
       collapsedChildren: 0,
       nodeIdx: nodeIdx,
       treePath: treePath
@@ -368,6 +375,7 @@ var Depflame = (function() {
       isWorkspace: targetNode.is_workspace,
       parentName: '',
       ancestorCount: ancestorCounts[targetIdx],
+      uniqueAncestors: targetNode.unique_ancestors || 0,
       collapsedChildren: 0,
       nodeIdx: targetIdx,
       treePath: pathStack.join('>')
@@ -400,6 +408,7 @@ var Depflame = (function() {
         isWorkspace: node.is_workspace,
         parentName: childName || '',
         ancestorCount: ancestorCounts[nodeIdx],
+        uniqueAncestors: node.unique_ancestors || 0,
         collapsedChildren: 0,
         nodeIdx: nodeIdx,
         treePath: pathStack.join('>')
@@ -518,7 +527,8 @@ var Depflame = (function() {
     var s = r.name + ' v' + r.version + '\n'
       + r.weight + ' transitive dep' + (r.weight === 1 ? '' : 's') + '\n'
       + 'depth ' + r.depth;
-    if (r.isShared) s += '\n[shared: ' + r.ancestorCount + ' parents in dep graph]';
+    if (r.isShared) s += '\n[shared: ' + r.ancestorCount + ' direct parents]';
+    if (r.uniqueAncestors > 0) s += '\n[' + r.uniqueAncestors + ' unique ancestors]';
     if (r.collapsedChildren > 0) s += '\n[' + r.collapsedChildren + ' children too small to show]';
     return s;
   }
@@ -910,6 +920,116 @@ var Depflame = (function() {
   }
 
   // -------------------------------------------------------------------------
+  // Ancestor filter.
+  // -------------------------------------------------------------------------
+
+  function setAncestorFilter(value) {
+    var v = parseInt(value, 10);
+    ancestorThreshold = (isNaN(v) || v < 0) ? null : v;
+    if (!currentTreeData) return;
+
+    // Recompute active graph with feature overrides (via DepflameFeatures),
+    // then further filter by ancestor threshold.
+    var result;
+    if (typeof DepflameFeatures !== 'undefined') {
+      result = DepflameFeatures.recomputeActiveGraph(currentTreeData);
+    } else {
+      // No feature engine — all nodes active.
+      result = { activeNodes: null, activeEdges: null, weights: {} };
+    }
+
+    if (ancestorThreshold !== null) {
+      // Remove nodes exceeding ancestor threshold (but keep workspace nodes).
+      var filtered = {};
+      var activeSet = result.activeNodes || {};
+      // If activeNodes is null, treat all nodes as active.
+      var allActive = !result.activeNodes;
+      for (var i = 0; i < currentTreeData.nodes.length; i++) {
+        var node = currentTreeData.nodes[i];
+        var isActive = allActive || activeSet[i];
+        if (!isActive) continue;
+        if (!node.is_workspace && (node.unique_ancestors || 0) > ancestorThreshold) continue;
+        filtered[i] = true;
+      }
+      result.activeNodes = filtered;
+
+      // Recompute weights with the filtered set.
+      var weights = recomputeWeightsForActive(currentTreeData, filtered, result.activeEdges);
+      for (var i = 0; i < currentTreeData.nodes.length; i++) {
+        currentTreeData.nodes[i].transitive_weight = weights[i] || 0;
+      }
+    } else if (result.weights) {
+      // No ancestor filter — apply feature weights.
+      for (var i = 0; i < currentTreeData.nodes.length; i++) {
+        currentTreeData.nodes[i].transitive_weight = result.weights[i] || 0;
+      }
+    }
+
+    // Count active non-workspace deps for summary bar.
+    var activeDeps = 0;
+    var activeNodes = result.activeNodes;
+    if (activeNodes) {
+      for (var idx in activeNodes) {
+        if (!currentTreeData.nodes[parseInt(idx, 10)].is_workspace) activeDeps++;
+      }
+    }
+
+    currentActiveNodes = result.activeNodes;
+    currentActiveEdges = result.activeEdges || null;
+
+    // Re-layout.
+    if (zoomStack.length > 0) {
+      var currentZoomTarget = zoomStack[zoomStack.length - 1][0];
+      if (currentZoomTarget != null && currentActiveNodes && !currentActiveNodes[currentZoomTarget]) {
+        zoomStack = [];
+      }
+    }
+    applyZoomLayout(zoomStack.length > 0 ? zoomStack[zoomStack.length - 1][0] : null);
+
+    if (typeof DepflameFeatures !== 'undefined') {
+      DepflameFeatures.updateSummaryBar(currentTreeData, activeDeps);
+    }
+  }
+
+  // Recompute transitive weights for a filtered active node set.
+  function recomputeWeightsForActive(treeData, activeNodes, activeEdges) {
+    var weights = {};
+    var cache = {};
+    var nodes = treeData.nodes;
+
+    function computeWeight(idx) {
+      if (cache[idx] !== undefined) return cache[idx];
+      if (!activeNodes[idx]) { cache[idx] = 0; return 0; }
+      var visited = {};
+      var stack = [idx];
+      var count = 0;
+      while (stack.length > 0) {
+        var cur = stack.pop();
+        if (visited[cur]) continue;
+        visited[cur] = true;
+        if (!activeNodes[cur]) continue;
+        count++;
+        var children = nodes[cur].children || [];
+        for (var c = 0; c < children.length; c++) {
+          var ci = children[c];
+          if (!visited[ci] && activeNodes[ci]) {
+            if (!activeEdges || activeEdges[cur + ':' + ci]) {
+              stack.push(ci);
+            }
+          }
+        }
+      }
+      cache[idx] = count;
+      return count;
+    }
+
+    for (var idx in activeNodes) {
+      weights[idx] = computeWeight(parseInt(idx, 10));
+    }
+    return weights;
+  }
+
+  // -------------------------------------------------------------------------
   // Public API.
   // -------------------------------------------------------------------------
 
@@ -956,6 +1076,7 @@ var Depflame = (function() {
     zoomReverse: zoomReverse,
     searchByQuery: searchByQuery,
     clearSearch: clearSearch,
+    setAncestorFilter: setAncestorFilter,
     CHART_WIDTH: CHART_WIDTH,
     layoutTree: layoutTree,
     computeAncestorCounts: computeAncestorCounts,

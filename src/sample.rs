@@ -49,6 +49,7 @@ pub fn generate_sample_report() -> AnalysisReport {
                 dep_version: "2.0.0".into(),
                 unique_transitive_deps: 18,
                 total_transitive_deps: 25,
+                unique_ancestors: 1,
             },
             DirectDepSummary {
                 workspace_member: "my-app".into(),
@@ -56,6 +57,7 @@ pub fn generate_sample_report() -> AnalysisReport {
                 dep_version: "1.0.200".into(),
                 unique_transitive_deps: 3,
                 total_transitive_deps: 5,
+                unique_ancestors: 12,
             },
             DirectDepSummary {
                 workspace_member: "my-lib".into(),
@@ -63,6 +65,7 @@ pub fn generate_sample_report() -> AnalysisReport {
                 dep_version: "1.10.0".into(),
                 unique_transitive_deps: 2,
                 total_transitive_deps: 8,
+                unique_ancestors: 5,
             },
         ],
     }
@@ -711,6 +714,7 @@ fn tree_node(
         name: name.into(),
         version: version.into(),
         transitive_weight: weight,
+        unique_ancestors: 0,
         is_workspace,
         children,
         enabled_features,
