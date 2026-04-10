@@ -1,6 +1,6 @@
 [package]
 name = "cargo-depflame"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 rust-version = "1.88"
 description = "Visualize your Cargo dependency tree as a flamegraph and find optimization opportunities"
