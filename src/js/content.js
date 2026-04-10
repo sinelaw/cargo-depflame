@@ -137,26 +137,46 @@ var DepflameContent = (function() {
   // Table tab: direct dep summary.
   // -------------------------------------------------------------------------
 
+  // Current sort state for the dep summary table.
+  var depSortKey = 'unique_transitive_deps';
+  var depSortAsc = false; // default: descending by unique deps
+
   function buildTableTab(r) {
     var summary = r.direct_dep_summary || [];
     if (summary.length === 0) {
       return '<p class="text-light">No direct dependency data available.</p>';
     }
 
-    var maxUnique = summary[0].unique_transitive_deps || 1;
     var html = '<div class="action-summary">'
       + '<h3>Direct dependencies by unique transitive dep count</h3>'
       + '<p class="text-section-desc">'
       + 'Each row shows a direct dependency of your workspace. '
       + '<em>Unique Deps</em> = transitive deps that vanish if removed. '
-      + '<em>Total Deps</em> includes shared ones.</p>'
-      + '<table class="targets-table dep-summary-table"><thead><tr>'
-      + '<th>#</th><th>Dependency</th><th>Version</th>'
-      + '<th title="Transitive deps unique to this edge.">Unique Deps</th>'
-      + '<th title="Total transitive deps.">Total Deps</th>'
-      + '<th title="Number of unique ancestor packages that transitively depend on this crate. High = hard to remove.">Ancestors</th>'
-      + '</tr></thead><tbody>';
+      + '<em>Total Deps</em> includes shared ones. '
+      + 'Click a column header to sort.</p>'
+      + '<table class="targets-table dep-summary-table" id="dep-summary-table"><thead><tr>'
+      + '<th class="sortable" data-sort-key="#">#</th>'
+      + '<th class="sortable" data-sort-key="dep_name">Dependency</th>'
+      + '<th class="sortable" data-sort-key="dep_version">Version</th>'
+      + '<th class="sortable sort-active sort-desc" data-sort-key="unique_transitive_deps"'
+      + ' title="Transitive deps unique to this edge.">Unique Deps</th>'
+      + '<th class="sortable" data-sort-key="total_transitive_deps"'
+      + ' title="Total transitive deps.">Total Deps</th>'
+      + '<th class="sortable" data-sort-key="unique_ancestors"'
+      + ' title="Number of unique ancestor packages that transitively depend on this crate. High = hard to remove.">Ancestors</th>'
+      + '</tr></thead><tbody id="dep-summary-tbody">';
 
+    html += renderDepSummaryRows(summary);
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  function renderDepSummaryRows(summary) {
+    var maxUnique = 1;
+    for (var i = 0; i < summary.length; i++) {
+      if (summary[i].unique_transitive_deps > maxUnique) maxUnique = summary[i].unique_transitive_deps;
+    }
+    var html = '';
     for (var i = 0; i < summary.length; i++) {
       var e = summary[i];
       var barW = maxUnique > 0 ? Math.round(e.unique_transitive_deps / maxUnique * 100) : 0;
@@ -169,9 +189,65 @@ var DepflameContent = (function() {
         + '<td>' + e.total_transitive_deps + '</td>'
         + '<td>' + (e.unique_ancestors || 0) + '</td></tr>';
     }
-
-    html += '</tbody></table></div>';
     return html;
+  }
+
+  function sortDepSummary(key) {
+    var report = window.__DEPFLAME_REPORT__;
+    if (!report) return;
+    var summary = report.direct_dep_summary;
+    if (!summary || summary.length === 0) return;
+
+    // Toggle direction if clicking same column, otherwise default desc for numbers, asc for strings.
+    if (key === depSortKey) {
+      depSortAsc = !depSortAsc;
+    } else {
+      depSortKey = key;
+      depSortAsc = (key === 'dep_name' || key === 'dep_version');
+    }
+
+    // Sort a copy with stable indices for the '#' column.
+    var indexed = summary.map(function(e, i) { return { entry: e, origIdx: i }; });
+
+    if (key === '#') {
+      // Sort by original index (restore default order from analysis).
+      indexed.sort(function(a, b) {
+        return depSortAsc ? a.origIdx - b.origIdx : b.origIdx - a.origIdx;
+      });
+    } else {
+      indexed.sort(function(a, b) {
+        var va = a.entry[key], vb = b.entry[key];
+        if (va == null) va = 0;
+        if (vb == null) vb = 0;
+        var cmp;
+        if (typeof va === 'string') {
+          cmp = va.localeCompare(vb);
+        } else {
+          cmp = va - vb;
+        }
+        return depSortAsc ? cmp : -cmp;
+      });
+    }
+
+    var sorted = indexed.map(function(item) { return item.entry; });
+
+    // Update header classes.
+    var table = document.getElementById('dep-summary-table');
+    if (table) {
+      var ths = table.querySelectorAll('th.sortable');
+      for (var i = 0; i < ths.length; i++) {
+        ths[i].classList.remove('sort-active', 'sort-asc', 'sort-desc');
+        if (ths[i].getAttribute('data-sort-key') === key) {
+          ths[i].classList.add('sort-active', depSortAsc ? 'sort-asc' : 'sort-desc');
+        }
+      }
+    }
+
+    // Re-render tbody.
+    var tbody = document.getElementById('dep-summary-tbody');
+    if (tbody) {
+      tbody.innerHTML = renderDepSummaryRows(sorted);
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -557,6 +633,14 @@ var DepflameContent = (function() {
       });
       searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') { this.value = ''; Depflame.clearSearch(); }
+      });
+    }
+
+    // Wire up sortable table headers.
+    var sortHeaders = document.querySelectorAll('#dep-summary-table th.sortable');
+    for (var i = 0; i < sortHeaders.length; i++) {
+      sortHeaders[i].addEventListener('click', function() {
+        sortDepSummary(this.getAttribute('data-sort-key'));
       });
     }
 
