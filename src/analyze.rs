@@ -981,7 +981,9 @@ fn build_direct_dep_summary(
     dep_graph: &DepGraph,
     real_deps: &Option<HashSet<String>>,
 ) -> Vec<DirectDepSummary> {
-    let mut entries = Vec::new();
+    // Deduplicate by (dep_name, dep_version): when multiple workspace members
+    // depend on the same crate, keep the entry with the highest unique_transitive_deps.
+    let mut best: HashMap<(String, String), DirectDepSummary> = HashMap::new();
 
     for ws_id in &dep_graph.workspace_members {
         let ws_node = match dep_graph.nodes.get(ws_id) {
@@ -1008,19 +1010,27 @@ fn build_direct_dep_summary(
 
             let w_unique = dep_graph.unique_subtree_weight(ws_id, dep_id);
             let total_transitive = dep_node.transitive_weight.saturating_sub(1);
-            let ancestors = unique_ancestor_count(dep_graph, dep_id);
+            let key = (dep_node.name.clone(), dep_node.version.clone());
 
-            entries.push(DirectDepSummary {
-                workspace_member: ws_node.name.clone(),
-                dep_name: dep_node.name.clone(),
-                dep_version: dep_node.version.clone(),
-                unique_transitive_deps: w_unique,
-                total_transitive_deps: total_transitive,
-                unique_ancestors: ancestors,
+            let entry = best.entry(key).or_insert_with(|| {
+                let ancestors = unique_ancestor_count(dep_graph, dep_id);
+                DirectDepSummary {
+                    workspace_member: ws_node.name.clone(),
+                    dep_name: dep_node.name.clone(),
+                    dep_version: dep_node.version.clone(),
+                    unique_transitive_deps: w_unique,
+                    total_transitive_deps: total_transitive,
+                    unique_ancestors: ancestors,
+                }
             });
+            if w_unique > entry.unique_transitive_deps {
+                entry.unique_transitive_deps = w_unique;
+                entry.workspace_member = ws_node.name.clone();
+            }
         }
     }
 
+    let mut entries: Vec<DirectDepSummary> = best.into_values().collect();
     entries.sort_by(|a, b| b.unique_transitive_deps.cmp(&a.unique_transitive_deps));
     entries
 }
