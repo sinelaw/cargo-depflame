@@ -25,6 +25,11 @@ pub enum Command {
     Report(ReportArgs),
     /// Analyze and open an interactive HTML report in the default browser.
     Flame(FlameArgs),
+    /// Build a report from a flat dependency list ("name-1.2.3" lines)
+    /// instead of a local workspace. Reverse-engineers the minimal set of
+    /// root crates that transitively pulls in the whole list, using
+    /// dependency metadata from the crates.io registry index.
+    FromList(FromListArgs),
 }
 
 /// Arguments shared between Analyze and Flame commands.
@@ -112,6 +117,43 @@ pub struct ReportArgs {
 pub struct FlameArgs {
     #[command(flatten)]
     pub common: CommonArgs,
+}
+
+#[derive(Parser, Debug)]
+pub struct FromListArgs {
+    /// Input file with one crate per line ("name-1.2.3", "name@1.2.3" or
+    /// "name 1.2.3"). Use '-' to read from stdin.
+    pub input: String,
+
+    /// Name used for the synthetic root in the report.
+    /// Defaults to the input file name.
+    #[arg(long)]
+    pub root_name: Option<String>,
+
+    /// Output format.
+    #[arg(long, default_value = "text")]
+    pub format: OutputFormat,
+
+    /// Write report to a file instead of stdout.
+    #[arg(long)]
+    pub output: Option<PathBuf>,
+
+    /// Open an interactive HTML report in the default browser
+    /// (ignores --format and --output).
+    #[arg(long)]
+    pub open: bool,
+
+    /// Also follow build-dependency edges (default: normal deps only).
+    #[arg(long)]
+    pub include_build: bool,
+
+    /// Ignore optional dependency edges.
+    #[arg(long)]
+    pub skip_optional: bool,
+
+    /// Minimum transitive weight for a node to be considered "heavy".
+    #[arg(long, default_value_t = 10)]
+    pub heavy_threshold: usize,
 }
 
 #[derive(Debug, Clone, clap::ValueEnum)]

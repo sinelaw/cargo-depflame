@@ -61,6 +61,27 @@ pub struct DepGraph {
 }
 
 impl DepGraph {
+    /// Build a DepGraph from pre-computed parts. Used by `from-list` mode,
+    /// where edges come from the registry index instead of cargo metadata.
+    /// Transitive weights are computed here.
+    pub fn from_parts(
+        nodes: HashMap<PackageId, DepNode>,
+        forward: HashMap<PackageId, Vec<PackageId>>,
+        reverse: HashMap<PackageId, Vec<PackageId>>,
+        workspace_members: HashSet<PackageId>,
+        edge_meta: HashMap<(PackageId, PackageId), EdgeMeta>,
+    ) -> Self {
+        let mut graph = Self {
+            nodes,
+            forward,
+            reverse,
+            workspace_members,
+            edge_meta,
+        };
+        graph.compute_transitive_weights();
+        graph
+    }
+
     /// Build the dependency graph from cargo_metadata output.
     pub fn from_metadata(metadata: &Metadata) -> Result<Self> {
         let resolve = metadata

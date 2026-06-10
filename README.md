@@ -35,6 +35,18 @@ The flamegraph is built directly from `cargo metadata` — the dependency struct
 
 The HTML report also includes an actionable suggestions tab with Cargo.toml diffs and a raw JSON tab.
 
+## Analyzing a flat dependency list
+
+If all you have is a flat list of crates (say, extracted from someone else's binary) rather than a workspace, `from-list` reconstructs the tree for you (requires the `remote` feature):
+
+```sh
+cargo depflame from-list deps.txt --open
+```
+
+The input is one crate per line (`name-1.2.3`, `name@1.2.3`, or `name 1.2.3`; unparseable lines are skipped with a warning). depflame fetches each crate's dependency metadata from the crates.io sparse index, resolves the dependency edges *between the listed crates*, and reverse-engineers the minimal set of root crates that transitively pulls in the entire list — i.e. the binary's likely direct dependencies. A synthetic root is placed above them, then the usual report is produced: the text table shows the roots ranked by unique transitive weight, and `--open` (or `--format html`) gives the interactive flamegraph.
+
+Caveats: dev-dependencies are ignored, build-dependency edges are off by default (`--include-build` enables them), and optional edges are followed by default since the list doesn't record feature selections (`--skip-optional` disables them).
+
 ## Heuristic suggestions
 
 Beyond the flamegraph, depflame scans your source code to estimate how heavily each dependency is used and suggests concrete actions: remove unused deps, disable default features, feature-gate, or propose upstream PRs.

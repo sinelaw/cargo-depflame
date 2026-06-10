@@ -974,7 +974,7 @@ fn unique_ancestor_count(dep_graph: &DepGraph, pkg_id: &cargo_metadata::PackageI
     visited.len()
 }
 
-fn build_direct_dep_summary(
+pub(crate) fn build_direct_dep_summary(
     dep_graph: &DepGraph,
     real_deps: &Option<HashSet<String>>,
 ) -> Vec<DirectDepSummary> {

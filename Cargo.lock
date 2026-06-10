@@ -106,6 +106,7 @@ dependencies = [
  "open",
  "rayon",
  "regex",
+ "semver",
  "serde",
  "serde_json",
  "tar",

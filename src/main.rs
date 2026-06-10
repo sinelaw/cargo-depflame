@@ -1,5 +1,7 @@
 use anyhow::{Context, Result};
-use cargo_depflame::cli::{AnalyzeArgs, Cli, Command, FlameArgs, OutputFormat, ReportArgs};
+use cargo_depflame::cli::{
+    AnalyzeArgs, Cli, Command, FlameArgs, FromListArgs, OutputFormat, ReportArgs,
+};
 use cargo_depflame::report::AnalysisReport;
 use cargo_depflame::{analyze, report};
 use clap::Parser;
@@ -20,6 +22,56 @@ fn main() -> Result<()> {
         Command::Analyze(args) => run_analyze_command(args),
         Command::Report(args) => run_report(args),
         Command::Flame(args) => run_flame(args),
+        Command::FromList(args) => run_from_list(args),
+    }
+}
+
+fn run_from_list(args: FromListArgs) -> Result<()> {
+    #[cfg(not(feature = "remote"))]
+    {
+        let _ = args;
+        anyhow::bail!(
+            "The from-list command requires the `remote` feature. \
+             Rebuild with: cargo install --features remote"
+        );
+    }
+    #[cfg(feature = "remote")]
+    {
+        let analysis = cargo_depflame::deplist::run_from_list(&args)?;
+
+        if args.open {
+            let html_path = std::env::temp_dir().join(format!(
+                "depflame-list-{}-{}.html",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_millis()
+            ));
+            let file = std::fs::File::create(&html_path).with_context(|| {
+                format!("failed to create output file: {}", html_path.display())
+            })?;
+            let mut writer: Box<dyn Write> = Box::new(std::io::BufWriter::new(file));
+            write_output(&analysis, &OutputFormat::Html, false, &mut writer)?;
+            save_json(&analysis, &html_path.with_extension("json"))?;
+
+            let uri = format!("file://{}", html_path.display());
+            eprintln!("Opening report: {}", uri);
+            open::that(&uri).with_context(|| format!("failed to open browser for {}", uri))?;
+            return Ok(());
+        }
+
+        let mut writer: Box<dyn Write> = open_writer(&args.output)?;
+        write_output(&analysis, &args.format, false, &mut writer)?;
+
+        if let Some(path) = &args.output {
+            let json_path = path.with_extension("json");
+            if json_path != *path {
+                save_json(&analysis, &json_path)?;
+            }
+        }
+
+        Ok(())
     }
 }
 
