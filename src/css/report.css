@@ -776,25 +776,32 @@ body {
 }
 
 .sim-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
   font-size: 13px;
   margin-bottom: 10px;
 }
 
-.sim-hint { color: #666; }
+/* Prose wraps on its own row: it is long enough to push a single-row layout
+   past the window otherwise. */
+.sim-hint {
+  margin: 0 0 6px;
+  max-width: 90ch;
+  color: #666;
+}
 
-/* The status grows into the free space so the Reset button stays put — it is
-   only ever hidden, never removed from the layout. */
+/* The status and Reset get their own row, so neither one growing can widen the
+   controls past the table. The status takes the free space, which pins the
+   button to the right edge however long the text gets. */
+.sim-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 #sim-status {
   flex: 1;
   min-width: 0;
-  text-align: right;
   color: var(--text);
   font-weight: 600;
-  white-space: nowrap;
 }
 
 .sim-box { cursor: pointer; }
