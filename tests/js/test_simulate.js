@@ -594,3 +594,17 @@ test('the status line reports direct and transitive counts with nothing toggled'
   assertContains(BASELINE_STATUS, 'direct');
   assertContains(BASELINE_STATUS, 'transitive');
 });
+
+test('the counts are on screen from the start, with nothing clicked', function() {
+  freshSim();
+  elements['app'] = new MockElement('div');
+  delete elements['dep-summary-tbody'];
+  delete elements['sim-status'];
+
+  // No refreshDepSummary() here on purpose: init has to populate the counts,
+  // or they stay blank until the first toggle.
+  DepflameContent.init();
+
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS);
+  assertContains(elements['dep-summary-tbody']._innerHTML, 'heavy-framework');
+});

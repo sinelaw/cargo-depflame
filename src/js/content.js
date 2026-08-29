@@ -1277,6 +1277,11 @@ var DepflameContent = (function() {
 
     refreshSharing();
 
+    // The table's status line is filled in by the same refresh that runs after
+    // every toggle, so run it once now — otherwise the counts stay blank until
+    // the first thing you click.
+    refreshDepSummary();
+
     // Wire up sortable table headers.
     var sortHeaders = document.querySelectorAll('#dep-summary-table th.sortable');
     for (var i = 0; i < sortHeaders.length; i++) {
