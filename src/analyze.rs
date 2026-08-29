@@ -270,7 +270,7 @@ fn scan_and_rank(
             .par_iter()
             .filter_map(|edge| {
                 let n = scanned.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
-                if n.is_multiple_of(50) || n == total_edges {
+                if n % 50 == 0 || n == total_edges {
                     debug!(progress = n, total = total_edges, "scanning edges");
                 }
                 scan_edge(

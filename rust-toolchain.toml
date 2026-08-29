@@ -1,0 +1,14 @@
+# Pins the toolchain used to develop and test this crate. rustup reads this
+# file automatically, so `cargo build` here uses the same compiler locally and
+# in CI — the drift that let a clippy lint pass locally and fail on CI.
+#
+# Rust has no LTS channel; this tracks the current stable release. Bump it
+# deliberately and let CI verify the bump.
+#
+# Note this is *not* the crate's MSRV: `rust-version` in Cargo.toml declares
+# the oldest compiler cargo-depflame supports for its users, and is checked by
+# the msrv job in CI.
+[toolchain]
+channel = "1.98.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

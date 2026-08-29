@@ -22,3 +22,20 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+
+  # Verifies the crate still builds and passes on the oldest compiler it claims
+  # to support (`rust-version` in Cargo.toml). Without this the MSRV silently
+  # rots the first time someone uses a newer API.
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Read MSRV from Cargo.toml
+      id: msrv
+      run: echo "version=$(grep -m1 '^rust-version' Cargo.toml | cut -d'"' -f2)" >> "$GITHUB_OUTPUT"
+    - name: Install MSRV toolchain
+      run: rustup toolchain install ${{ steps.msrv.outputs.version }} --profile minimal
+    - name: Build
+      run: cargo +${{ steps.msrv.outputs.version }} build --all-features --verbose
+    - name: Run tests
+      run: cargo +${{ steps.msrv.outputs.version }} test --all-features --verbose
