@@ -6,6 +6,7 @@ use std::io::Write;
 const SHELL_HTML: &str = include_str!("../html/shell.html");
 const FLAMEGRAPH_JS: &str = include_str!("../js/flamegraph.js");
 const FEATURES_JS: &str = include_str!("../js/features.js");
+const SIMULATE_JS: &str = include_str!("../js/simulate.js");
 const CONTENT_JS: &str = include_str!("../js/content.js");
 
 /// Render a self-contained HTML report.
@@ -36,17 +37,22 @@ pub fn render_html_report(report: &AnalysisReport, writer: &mut dyn Write) -> an
     scripts.push_str(FEATURES_JS);
     scripts.push_str("\n</script>\n");
 
-    // 4. Content generator (builds all HTML from JSON).
+    // 4. Removal simulator (Table tab "what if I drop this dep?").
+    scripts.push_str("<script>\n");
+    scripts.push_str(SIMULATE_JS);
+    scripts.push_str("\n</script>\n");
+
+    // 5. Content generator (builds all HTML from JSON).
     scripts.push_str("<script>\n");
     scripts.push_str(CONTENT_JS);
     scripts.push_str("\n</script>\n");
 
-    // 5. Report UI (tab switching, toggles, etc).
+    // 6. Report UI (tab switching, toggles, etc).
     scripts.push_str("<script>\n");
     scripts.push_str(report_js);
     scripts.push_str("\n</script>\n");
 
-    // 6. Initialize.
+    // 7. Initialize.
     scripts.push_str("<script>\nDepflameContent.init();\n</script>\n");
 
     // Assemble final HTML from shell template.

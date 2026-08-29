@@ -730,6 +730,49 @@ body {
   gap: 6px;
 }
 
+.sim-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.sim-hint { color: #666; }
+
+#sim-status {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sim-box { cursor: pointer; }
+.sim-box:disabled { cursor: not-allowed; opacity: 0.35; }
+
+.dep-summary-table tr.row-removed > td {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+/* The checkbox itself stays legible so the row can be un-removed. */
+.dep-summary-table tr.row-removed > td:first-child {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.sim-was {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+.sim-gone {
+  color: var(--text-light);
+  font-style: italic;
+}
+
 .sharing-controls {
   display: flex;
   align-items: center;

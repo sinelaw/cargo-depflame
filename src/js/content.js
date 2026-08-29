@@ -142,11 +142,16 @@ var DepflameContent = (function() {
   var depSortKey = 'unique_transitive_deps';
   var depSortAsc = false; // default: descending by unique deps
 
+  // The rows currently displayed, in display order (re-ordered by sorting).
+  var depSummaryView = [];
+
   function buildTableTab(r) {
     var summary = r.direct_dep_summary || [];
     if (summary.length === 0) {
       return '<p class="text-light">No direct dependency data available.</p>';
     }
+
+    depSummaryView = summary.slice();
 
     var html = '<div class="action-summary">'
       + '<h3>Direct dependencies by unique transitive dep count</h3>'
@@ -155,7 +160,15 @@ var DepflameContent = (function() {
       + '<em>Unique Deps</em> = transitive deps that vanish if removed. '
       + '<em>Total Deps</em> includes shared ones. '
       + 'Click a column header to sort.</p>'
+      + '<div class="sim-controls">'
+      +   '<span class="sim-hint">Tick <em>Remove</em> to simulate dropping a direct dependency — '
+      +   'the Unique Deps and Owners columns recompute for every other dep.</span>'
+      +   '<span id="sim-status"></span>'
+      +   '<button class="control-btn" id="sim-reset" style="display:none" '
+      +   'onclick="DepflameContent.resetRemovals()">Reset</button>'
+      + '</div>'
       + '<table class="targets-table dep-summary-table" id="dep-summary-table"><thead><tr>'
+      + '<th title="Only direct dependencies of a workspace member can be removed.">Remove</th>'
       + '<th class="sortable" data-sort-key="#">#</th>'
       + '<th class="sortable" data-sort-key="dep_name">Dependency</th>'
       + '<th class="sortable" data-sort-key="dep_version">Version</th>'
@@ -174,26 +187,141 @@ var DepflameContent = (function() {
     return html;
   }
 
+  // Node index in the dep tree for a summary row, or -1 when the crate isn't a
+  // direct dependency of a workspace member (so it can't be simulated away).
+  function rowNodeIndex(entry) {
+    if (typeof DepflameSimulate === 'undefined') return -1;
+    if (entry.__simIdx === undefined) {
+      entry.__simIdx = DepflameSimulate.indexFor(entry.dep_name, entry.dep_version);
+    }
+    return entry.__simIdx;
+  }
+
+  // Simulated stats for a row, or null when nothing is marked removed.
+  function simRowFor(entry, sim) {
+    if (!sim) return null;
+    var idx = rowNodeIndex(entry);
+    return idx >= 0 ? sim.rows[idx] : null;
+  }
+
+  // The value a column sorts and renders by: simulated when a simulation is
+  // running, otherwise the value the analysis reported.
+  function cellValue(entry, key, sim) {
+    var row = simRowFor(entry, sim);
+    if (row) {
+      if (key === 'unique_transitive_deps') return row.removed ? -1 : row.unique;
+      if (key === 'owner_count') return row.removed ? -1 : row.owners;
+    }
+    var v = entry[key];
+    return v == null ? 0 : v;
+  }
+
+  function simChange(now, before) {
+    if (before === undefined || before === null || now === before) return '';
+    return ' <span class="sim-was">was ' + before + '</span>';
+  }
+
   function renderDepSummaryRows(summary) {
+    var sim = (typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals())
+      ? DepflameSimulate.current() : null;
+    var base = (typeof DepflameSimulate !== 'undefined') ? DepflameSimulate.baseline() : null;
+
     var maxUnique = 1;
     for (var i = 0; i < summary.length; i++) {
-      if (summary[i].unique_transitive_deps > maxUnique) maxUnique = summary[i].unique_transitive_deps;
+      var u = cellValue(summary[i], 'unique_transitive_deps', sim);
+      if (u > maxUnique) maxUnique = u;
     }
+
     var html = '';
     for (var i = 0; i < summary.length; i++) {
       var e = summary[i];
-      var barW = maxUnique > 0 ? Math.round(e.unique_transitive_deps / maxUnique * 100) : 0;
-      html += '<tr><td>' + (i + 1) + '</td>'
+      var idx = rowNodeIndex(e);
+      var row = simRowFor(e, sim);
+      var baseRow = (base && idx >= 0) ? base.rows[idx] : null;
+
+      var removable = idx >= 0;
+      var checked = removable && DepflameSimulate.isRemoved(idx);
+      var box = '<input type="checkbox" class="sim-box"'
+        + (checked ? ' checked' : '')
+        + (removable ? '' : ' disabled title="Not a direct dependency of a workspace member in the current graph"')
+        + ' onchange="DepflameContent.toggleRemoval(' + idx + ')">';
+
+      var uniqueCell, ownersCell;
+      if (row && row.removed) {
+        uniqueCell = '<td class="sim-gone">—</td>';
+        ownersCell = row.stillPulledBy.length > 0
+          ? '<td class="sim-gone">still pulled in by ' + row.stillPulledBy.map(crateLink).join(', ') + '</td>'
+          : '<td class="sim-gone">gone</td>';
+      } else {
+        var unique = cellValue(e, 'unique_transitive_deps', sim);
+        var barW = maxUnique > 0 ? Math.round(unique / maxUnique * 100) : 0;
+        uniqueCell = '<td><div class="dep-summary-cell">'
+          + '<div class="unique-bar" style="width:' + barW + '%"></div>'
+          + '<span>' + unique + (row ? simChange(unique, baseRow && baseRow.unique) : '') + '</span></div></td>';
+        var owners = cellValue(e, 'owner_count', sim);
+        ownersCell = '<td>' + owners
+          + (row ? simChange(owners, baseRow && baseRow.owners) : '') + '</td>';
+      }
+
+      html += '<tr' + (checked ? ' class="row-removed"' : '') + '>'
+        + '<td>' + box + '</td>'
+        + '<td>' + (i + 1) + '</td>'
         + '<td><code>' + crateLink(e.dep_name) + '</code></td>'
         + '<td>' + esc(e.dep_version) + '</td>'
-        + '<td><div class="dep-summary-cell">'
-        + '<div class="unique-bar" style="width:' + barW + '%"></div>'
-        + '<span>' + e.unique_transitive_deps + '</span></div></td>'
+        + uniqueCell
         + '<td>' + e.total_transitive_deps + '</td>'
         + '<td>' + (e.unique_ancestors || 0) + '</td>'
-        + '<td>' + (e.owner_count || 0) + '</td></tr>';
+        + ownersCell + '</tr>';
     }
     return html;
+  }
+
+  // -------------------------------------------------------------------------
+  // Removal simulator (Table tab).
+  // -------------------------------------------------------------------------
+
+  function toggleRemoval(idx) {
+    if (typeof DepflameSimulate === 'undefined') return;
+    if (idx < 0) return;
+    DepflameSimulate.toggle(idx);
+    refreshDepSummary();
+  }
+
+  function resetRemovals() {
+    if (typeof DepflameSimulate === 'undefined') return;
+    DepflameSimulate.clear();
+    refreshDepSummary();
+  }
+
+  // Called when the feature selection changes the active graph: the cached
+  // node indices and every simulated number are recomputed from scratch.
+  function onGraphChanged() {
+    for (var i = 0; i < depSummaryView.length; i++) {
+      delete depSummaryView[i].__simIdx;
+    }
+    refreshDepSummary();
+  }
+
+  function refreshDepSummary() {
+    var tbody = document.getElementById('dep-summary-tbody');
+    if (tbody) tbody.innerHTML = renderDepSummaryRows(depSummaryView);
+
+    var status = document.getElementById('sim-status');
+    var reset = document.getElementById('sim-reset');
+    var active = typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals();
+    if (status) {
+      if (active) {
+        var base = DepflameSimulate.baseline();
+        var sim = DepflameSimulate.current();
+        var saved = base.totalDeps - sim.totalDeps;
+        status.textContent = sim.removedCount + ' removed — '
+          + base.totalDeps + ' \u2192 ' + sim.totalDeps + ' crates ('
+          + (saved > 0 ? '\u2212' + saved : 'no change') + ')';
+      } else {
+        status.textContent = '';
+      }
+    }
+    if (reset) reset.style.display = active ? '' : 'none';
   }
 
   function sortDepSummary(key) {
@@ -213,6 +341,8 @@ var DepflameContent = (function() {
     }
 
     // Sort a copy with stable indices for the '#' column.
+    var sim = (typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals())
+      ? DepflameSimulate.current() : null;
     var indexed = summary.map(function(e, i) { return { entry: e, origIdx: i }; });
 
     if (key === '#') {
@@ -222,9 +352,7 @@ var DepflameContent = (function() {
       });
     } else {
       indexed.sort(function(a, b) {
-        var va = a.entry[key], vb = b.entry[key];
-        if (va == null) va = 0;
-        if (vb == null) vb = 0;
+        var va = cellValue(a.entry, key, sim), vb = cellValue(b.entry, key, sim);
         var cmp;
         if (typeof va === 'string') {
           cmp = va.localeCompare(vb);
@@ -250,10 +378,8 @@ var DepflameContent = (function() {
     }
 
     // Re-render tbody.
-    var tbody = document.getElementById('dep-summary-tbody');
-    if (tbody) {
-      tbody.innerHTML = renderDepSummaryRows(sorted);
-    }
+    depSummaryView = sorted;
+    refreshDepSummary();
   }
 
   // -------------------------------------------------------------------------
@@ -786,6 +912,8 @@ var DepflameContent = (function() {
     var app = document.getElementById('app');
     if (!app) return;
 
+    if (typeof DepflameSimulate !== 'undefined') DepflameSimulate.init();
+
     sharingScopeIdx = 0;
     sharingMaxOwners = 0;
     sharingSortKey = 'owner_count';
@@ -880,6 +1008,10 @@ var DepflameContent = (function() {
     init: init,
     selectSharingScope: selectSharingScope,
     setSharingMaxOwners: setSharingMaxOwners,
-    sortSharing: sortSharing
+    sortSharing: sortSharing,
+    toggleRemoval: toggleRemoval,
+    resetRemovals: resetRemovals,
+    refreshDepSummary: refreshDepSummary,
+    onGraphChanged: onGraphChanged
   };
 })();
