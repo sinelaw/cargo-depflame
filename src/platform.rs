@@ -15,6 +15,8 @@ pub fn resolve_real_deps(manifest_path: &Path) -> Option<HashSet<String>> {
     let output = Command::new("cargo")
         .args([
             "tree",
+            // No `--workspace`: this is what `cargo build` compiles, which is
+            // also what the dep tree is rooted at (`default-members`).
             "--prefix",
             "none",
             "-e",

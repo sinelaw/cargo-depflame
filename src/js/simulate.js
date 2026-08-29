@@ -51,17 +51,23 @@ var DepflameSimulate = (function() {
 
   // Non-workspace crates that a workspace member depends on directly. These
   // are the only rows the simulator will let you remove.
-  function directDeps(tree, activeEdges) {
+  //
+  // Only members the graph actually reaches count. A workspace member that
+  // nothing builds — one outside `default-members`, or an optional dependency
+  // whose feature is off — is not a root, and its deps are not dependencies.
+  function directDeps(tree, activeEdges, activeNodes) {
     var nodes = tree.nodes;
     var seen = {};
     var out = [];
     for (var i = 0; i < nodes.length; i++) {
       if (!nodes[i].is_workspace) continue;
+      if (activeNodes && !activeNodes[i]) continue;
       var children = nodes[i].children || [];
       for (var c = 0; c < children.length; c++) {
         var ci = children[c];
         if (nodes[ci].is_workspace) continue;
         if (!activeEdges[i + ':' + ci]) continue;
+        if (activeNodes && !activeNodes[ci]) continue;
         if (seen[ci]) continue;
         seen[ci] = true;
         out.push(ci);
@@ -73,7 +79,7 @@ var DepflameSimulate = (function() {
   // Everything reachable from `start` over active edges, including itself.
   // Removals never cut an edge inside a subtree — only the workspace edge
   // above it — so subtrees are independent of what's marked removed.
-  function subtreeOf(tree, activeEdges, start) {
+  function subtreeOf(tree, activeEdges, activeNodes, start) {
     var nodes = tree.nodes;
     var visited = {};
     var queue = [start];
@@ -83,10 +89,10 @@ var DepflameSimulate = (function() {
       var children = nodes[cur].children || [];
       for (var c = 0; c < children.length; c++) {
         var ci = children[c];
-        if (!visited[ci] && activeEdges[cur + ':' + ci]) {
-          visited[ci] = true;
-          queue.push(ci);
-        }
+        if (visited[ci] || !activeEdges[cur + ':' + ci]) continue;
+        if (activeNodes && !activeNodes[ci]) continue;
+        visited[ci] = true;
+        queue.push(ci);
       }
     }
     return visited;
@@ -101,19 +107,19 @@ var DepflameSimulate = (function() {
   function run(removedSet) {
     var tree = treeData();
     if (!tree || !tree.nodes || tree.nodes.length === 0) {
-      return { rows: {}, totalDeps: 0, direct: [], removedCount: 0 };
+      return { rows: {}, totalDeps: 0, direct: [], directCount: 0, removedCount: 0 };
     }
 
     var graph = activeGraph(tree);
     var activeEdges = graph.activeEdges;
-    var direct = directDeps(tree, activeEdges);
+    var direct = directDeps(tree, activeEdges, graph.activeNodes);
 
     var subtrees = {};
     var owners = {};
     var live = [];
     for (var i = 0; i < direct.length; i++) {
       var idx = direct[i];
-      subtrees[idx] = subtreeOf(tree, activeEdges, idx);
+      subtrees[idx] = subtreeOf(tree, activeEdges, graph.activeNodes, idx);
       if (removedSet[idx]) continue;
       live.push(idx);
       for (var key in subtrees[idx]) {
@@ -159,6 +165,9 @@ var DepflameSimulate = (function() {
       rows: rows,
       totalDeps: totalDeps,
       direct: direct,
+      // Direct deps still in play. A removed dep another dep still pulls in
+      // stays in totalDeps, counted as transitive rather than direct.
+      directCount: live.length,
       removedCount: live.length < direct.length ? direct.length - live.length : 0
     };
   }
