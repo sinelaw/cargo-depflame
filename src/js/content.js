@@ -168,6 +168,7 @@ var DepflameContent = (function() {
       + '<em>Unique Deps</em> = transitive deps that vanish if removed. '
       + '<em>Total Deps</em> includes shared ones. '
       + 'Click a column header to sort.</p>'
+      + buildPlatformPicker()
       + buildFeaturePicker()
       + '<div class="sim-controls">'
       +   '<p class="sim-hint">Tick <em>Remove</em> to simulate dropping a direct dependency, '
@@ -212,6 +213,19 @@ var DepflameContent = (function() {
     return entry.__simIdx;
   }
 
+  // Whether a row's crate is missing because it doesn't build for the selected
+  // target, as opposed to being switched off by a feature.
+  function offForPlatform(entry) {
+    var tree = currentTree();
+    if (!tree || typeof DepflameFeatures === 'undefined') return false;
+    for (var i = 0; i < tree.nodes.length; i++) {
+      if (tree.nodes[i].name === entry.dep_name && tree.nodes[i].version === entry.dep_version) {
+        return !DepflameFeatures.isInPlatform(tree, i);
+      }
+    }
+    return false;
+  }
+
   // Simulated stats for a row, or null when nothing is marked removed.
   function simRowFor(entry, sim) {
     if (!sim) return null;
@@ -246,7 +260,10 @@ var DepflameContent = (function() {
     var features = typeof DepflameFeatures !== 'undefined'
       && DepflameFeatures.hasFeatureOverrides
       && DepflameFeatures.hasFeatureOverrides();
-    return removals || features;
+    var platform = typeof DepflameFeatures !== 'undefined'
+      && DepflameFeatures.isHostPlatform
+      && !DepflameFeatures.isHostPlatform(currentTree());
+    return removals || features || platform;
   }
 
   function currentSim() {
@@ -360,10 +377,18 @@ var DepflameContent = (function() {
       if (e.__baseDirect === undefined) e.__baseDirect = idx >= 0;
       var inactive = e.__baseDirect && idx < 0;
 
+      // An inactive row is either feature-gated off or absent on this target;
+      // saying which is the difference between a useful row and a puzzle.
+      var offPlatform = inactive && offForPlatform(e);
+      var reason = offPlatform
+        ? 'not built for ' + DepflameFeatures.getPlatform(currentTree())
+        : 'off in the current feature set';
+
       var removable = idx >= 0;
       var checked = removable && DepflameSimulate.isRemoved(idx);
       var title = inactive
-        ? 'Not enabled by the current feature selection'
+        ? (offPlatform ? 'This crate does not resolve for the selected target'
+                       : 'Not enabled by the current feature selection')
         : 'Not a direct dependency of a workspace member in the current graph';
       var box = '<input type="checkbox" class="sim-box"'
         + (checked ? ' checked' : '')
@@ -380,7 +405,7 @@ var DepflameContent = (function() {
       var uniqueCell, ownersCell;
       if (inactive) {
         uniqueCell = '<td class="sim-gone">—</td>';
-        ownersCell = '<td class="sim-gone">off in the current feature set</td>';
+        ownersCell = '<td class="sim-gone">' + reason + '</td>';
       } else if (row && row.removed) {
         uniqueCell = '<td class="sim-gone">—</td>';
         var pulled = row.stillPulledBy;
@@ -444,6 +469,36 @@ var DepflameContent = (function() {
       out.push({ idx: i, node: node });
     }
     return out;
+  }
+
+  function buildPlatformPicker() {
+    var tree = currentTree();
+    var list = (typeof DepflameFeatures !== 'undefined')
+      ? DepflameFeatures.platformList(tree) : [];
+    if (list.length === 0) return '';
+
+    var selected = DepflameFeatures.getPlatform(tree);
+    var options = '';
+    for (var i = 0; i < list.length; i++) {
+      options += '<option value="' + esc(list[i].triple) + '"'
+        + (list[i].triple === selected ? ' selected' : '') + '>'
+        + esc(list[i].triple) + (list[i].is_host ? ' (this machine)' : '') + '</option>';
+    }
+    options += '<option value=""' + (selected ? '' : ' selected') + '>every target</option>';
+
+    return '<div class="platform-picker">'
+      + '<label>Platform: <select id="platform-select" '
+      + 'onchange="DepflameContent.selectPlatform(this.value)">' + options + '</select></label>'
+      + '<span class="sim-hint">Crates that don\'t build for the selected target drop out '
+      + 'of the table and the flamegraph.</span>'
+      + '</div>';
+  }
+
+  function selectPlatform(triple) {
+    if (typeof DepflameFeatures === 'undefined') return;
+    DepflameFeatures.setPlatform(triple);
+    invalidateOrder();
+    applyGraphChange();
   }
 
   function buildFeaturePicker() {
@@ -511,6 +566,13 @@ var DepflameContent = (function() {
     applyGraphChange();
   }
 
+  function updatePlatformPicker() {
+    var select = document.getElementById('platform-select');
+    if (!select) return;
+    var selected = DepflameFeatures.getPlatform(currentTree()) || '';
+    if (select.value !== selected) select.value = selected;
+  }
+
   function updateFeaturePicker() {
     var body = document.getElementById('feature-picker-body');
     if (body) body.innerHTML = renderFeaturePicker();
@@ -558,6 +620,7 @@ var DepflameContent = (function() {
     for (var i = 0; i < depSummaryBase.length; i++) {
       delete depSummaryBase[i].__simIdx;
     }
+    updatePlatformPicker();
     updateFeaturePicker();
     refreshDepSummary();
   }
@@ -587,6 +650,10 @@ var DepflameContent = (function() {
     var original = DepflameSimulate.original();
     var delta = sim.totalDeps - original.totalDeps;
     var parts = [];
+    var tree = currentTree();
+    if (typeof DepflameFeatures !== 'undefined' && !DepflameFeatures.isHostPlatform(tree)) {
+      parts.push(DepflameFeatures.getPlatform(tree) || 'every target');
+    }
     if (sim.removedCount > 0) parts.push(sim.removedCount + ' removed');
     var counts = original.totalDeps + ' \u2192 ' + sim.totalDeps + ' crates';
     if (delta < 0) counts += ' (\u2212' + (-delta) + ')';
@@ -1255,6 +1322,7 @@ var DepflameContent = (function() {
     sortDepSummary: sortDepSummary,
     toggleRemoval: toggleRemoval,
     resetRemovals: resetRemovals,
+    selectPlatform: selectPlatform,
     toggleWorkspaceFeature: toggleWorkspaceFeature,
     resetWorkspaceFeatures: resetWorkspaceFeatures,
     refreshDepSummary: refreshDepSummary,

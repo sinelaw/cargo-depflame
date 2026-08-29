@@ -545,6 +545,8 @@ pub fn build_report(
         nodes: tree_nodes,
         root_indices: vec![n],
         edges: tree_edges,
+        // A flat crate list carries no target information.
+        platforms: Vec::new(),
     };
 
     AnalysisReport {

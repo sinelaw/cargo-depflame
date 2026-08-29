@@ -730,6 +730,27 @@ body {
   gap: 6px;
 }
 
+.platform-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.platform-picker select {
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.platform-picker .sim-hint { margin: 0; }
+
 .feature-picker {
   margin-bottom: 10px;
   font-size: 13px;

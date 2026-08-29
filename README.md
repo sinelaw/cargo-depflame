@@ -58,6 +58,16 @@ Two scopes are computed: the whole workspace (the union of every member's direct
 
 Text output shows the workspace scope; `--verbose` shows every row and the per-member breakdowns. In the HTML report, the **Sharing** tab has a scope selector, a max-owners filter, and sortable columns, and the Table tab gains an `Owners` column you can sort ascending to put the most uniquely-owned direct deps first.
 
+## Switching platform
+
+The analysis reports your own platform: the counts come from the crates cargo resolves for the host. The HTML report goes further — the **Platform** dropdown in the Table tab switches the whole report to any of the common targets (Linux gnu/musl, macOS, Windows, wasm), or to `every target` for the union.
+
+The masks come from `cargo metadata --filter-platform <triple>` at analysis time, so cargo evaluates the `cfg(...)` expressions and the result is exact rather than a reimplementation of cfg matching. The resolves run in parallel and cost about a second on top of an analysis.
+
+Switching target re-resolves everything downstream: the table's unique and owner counts, the flamegraph, and the removal simulator. A direct dep that doesn't build for the selected target is marked `not built for <triple>` rather than silently dropped, so you can tell a platform-gated dep from a feature-gated one. Selecting a non-host target counts as a modified view, the same as a removal — the status line names the target and the numbers are measured against the analysed graph.
+
+The Sharing tab is computed server-side for the host and doesn't follow the dropdown.
+
 ## Simulating a removal
 
 In the HTML report's **Table** tab, each direct dependency has a `Remove` checkbox. Tick one and the table recomputes, live: every other direct dep's unique transitive dep count and owner count update, and the header shows what the graph would cost (`2 removed — 72 → 53 crates (−19)`). The flamegraph follows — the removed crate and everything only it pulled in disappear from the chart, and the summary bar shows the new dep count.

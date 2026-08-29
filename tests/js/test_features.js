@@ -457,6 +457,11 @@ test('optional dep gated by sub-feature chain: default implies sub-feature', fun
     is_workspace: false, children: [], enabled_features: [], available_features: {}
   });
 
+  // The platform masks list every node that resolves for a target, so a node
+  // appended by a test has to be listed too or it reads as "not on this
+  // platform" and never activates.
+  (treeCopy.platforms || []).forEach(function(p) { p.nodes.push(newIdx); });
+
   treeCopy.nodes[2].available_features = {
     'default': ['async', 'myserde'],
     'async': ['dep:tokio'],
@@ -495,6 +500,11 @@ test('optional dep gated by sub-feature chain: disabling parent feature also rem
     name: 'myserde-crate', version: '1.0.0', transitive_weight: 1,
     is_workspace: false, children: [], enabled_features: [], available_features: {}
   });
+
+  // The platform masks list every node that resolves for a target, so a node
+  // appended by a test has to be listed too or it reads as "not on this
+  // platform" and never activates.
+  (treeCopy.platforms || []).forEach(function(p) { p.nodes.push(newIdx); });
 
   treeCopy.nodes[2].available_features = {
     'default': ['async', 'myserde'],
