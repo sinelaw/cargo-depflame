@@ -665,7 +665,7 @@ mod fetch {
             .map(|name| {
                 let result = fetch_one(&agent, name);
                 let d = done.fetch_add(1, Ordering::Relaxed) + 1;
-                if d.is_multiple_of(100) || d == total {
+                if d % 100 == 0 || d == total {
                     eprintln!("  fetched {d}/{total}");
                 }
                 result.map(|versions| (name.clone(), versions))

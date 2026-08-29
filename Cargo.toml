@@ -2,7 +2,7 @@
 name = "cargo-depflame"
 version = "0.1.4"
 edition = "2021"
-rust-version = "1.88"
+rust-version = "1.85"
 description = "Visualize your Cargo dependency tree as a flamegraph and find optimization opportunities"
 license = "MIT"
 repository = "https://github.com/sinelaw/cargo-depflame"

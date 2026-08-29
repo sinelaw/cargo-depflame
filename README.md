@@ -13,7 +13,7 @@ cargo install cargo-depflame
 cargo install --git https://github.com/sinelaw/cargo-depflame
 ```
 
-Requires Rust 1.88+.
+Requires Rust 1.85+.
 
 ## Usage
 
