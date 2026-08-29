@@ -60,11 +60,13 @@ Text output shows the workspace scope; `--verbose` shows every row and the per-m
 
 ## Simulating a removal
 
-In the HTML report's **Table** tab, each direct dependency has a `Remove` checkbox. Tick one and the table recomputes, live: every other direct dep's unique transitive dep count and owner count update, and the header shows what the graph would cost (`2 removed — 72 → 53 crates (−19)`).
+In the HTML report's **Table** tab, each direct dependency has a `Remove` checkbox. Tick one and the table recomputes, live: every other direct dep's unique transitive dep count and owner count update, and the header shows what the graph would cost (`2 removed — 72 → 53 crates (−19)`). The flamegraph follows — the removed crate and everything only it pulled in disappear from the chart, and the summary bar shows the new dep count.
 
 Only direct dependencies of a workspace member can be removed — a crate that is merely transitive has its checkbox disabled, since dropping it isn't yours to make.
 
-The interesting cases are the ones that save nothing. Removing a dep that another dep also pulls in leaves it in the graph, and the row says so (`still pulled in by tracing-subscriber`) while the crate that now solely owns that subtree absorbs it (its unique count jumps). Removals compose with the flamegraph's feature toggles: the simulation runs on whatever graph the feature selection currently produces.
+The interesting cases are the ones that save nothing. Removing a dep that another dep also pulls in leaves it in the graph, and the row says so (`still pulled in by tracing-subscriber`) while the crate that now solely owns that subtree absorbs it (its unique count jumps).
+
+The Table tab also has a **Workspace features** picker: a checklist of your own crates' features. Turning one off re-resolves the graph exactly as `--no-default-features` would, so the table, the flamegraph and the simulator all follow — a dep that is no longer enabled drops out of the table as `off in the current feature set`. Feature selection and simulated removals compose. The table's `Reset` clears removals but keeps your feature selection; the flamegraph's `Reset all` puts everything back.
 
 ## Analyzing a flat dependency list
 

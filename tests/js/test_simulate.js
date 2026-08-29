@@ -161,12 +161,13 @@ test('toggling a row through the UI re-renders the table with new numbers', func
   DepflameContent.toggleRemoval(nodeIndex('regex'));
   assertContains(tbody._innerHTML, 'row-removed');
   assertContains(elements['sim-status'].textContent, '1 removed');
-  assertEquals(elements['sim-reset'].style.display, '');
+  assertEquals(elements['sim-reset'].style.visibility, 'visible');
 
   DepflameContent.resetRemovals();
   assert(tbody._innerHTML.indexOf('row-removed') === -1, 'reset clears the removed rows');
   assertEquals(elements['sim-status'].textContent, '');
-  assertEquals(elements['sim-reset'].style.display, 'none');
+  assertEquals(elements['sim-reset'].style.visibility, 'hidden',
+    'the button keeps its slot in the layout so the row never jumps');
 });
 
 test('removed rows show a dash instead of a unique count', function() {
@@ -182,4 +183,147 @@ test('removed rows show a dash instead of a unique count', function() {
   assertContains(tbody._innerHTML, 'sim-gone');
   assertContains(tbody._innerHTML, 'gone');
   DepflameContent.resetRemovals();
+});
+
+// ---------------------------------------------------------------------------
+// Removals reach the flamegraph: the same cut edges drive both views.
+// ---------------------------------------------------------------------------
+
+test('cutEdges lists the workspace edges into removed deps', function() {
+  freshSim();
+  var hf = nodeIndex('heavy-framework');
+  var myApp = nodeIndex('my-app');
+  assertEquals(Object.keys(DepflameSimulate.cutEdges()).length, 0);
+
+  DepflameSimulate.toggle(hf);
+  var cuts = DepflameSimulate.cutEdges();
+  assertEquals(Object.keys(cuts).join(','), myApp + ':' + hf);
+  DepflameSimulate.clear();
+});
+
+test('the flamegraph graph drops a removed dep and its private subtree', function() {
+  freshSim();
+  var tree = report.dep_tree;
+  var hf = nodeIndex('heavy-framework');
+  var before = DepflameFeatures.recomputeActiveGraph(tree);
+  assert(before.activeNodes[hf], 'heavy-framework starts active');
+  assert(before.activeNodes[nodeIndex('heavy-sub-a')], 'its subs start active');
+
+  DepflameSimulate.toggle(hf);
+  var after = DepflameFeatures.recomputeActiveGraph(tree, DepflameSimulate.cutEdges());
+  assert(!after.activeNodes[hf], 'the removed dep leaves the flamegraph');
+  assert(!after.activeNodes[nodeIndex('heavy-sub-a')], 'so does its private subtree');
+  assert(after.activeNodes[nodeIndex('tokio')],
+    'tokio stays: http-client still pulls it in');
+
+  // Weights shrink accordingly: my-app no longer counts the removed subtree.
+  assert(after.weights[nodeIndex('my-app')] < before.weights[nodeIndex('my-app')],
+    'the workspace crate gets lighter');
+
+  DepflameSimulate.clear();
+});
+
+// ---------------------------------------------------------------------------
+// Workspace feature picker.
+// ---------------------------------------------------------------------------
+
+test('the table tab renders a feature picker for workspace crates', function() {
+  freshSim();
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var html = elements['app']._innerHTML;
+  var table = html.substring(html.indexOf('id="tab-table"'),
+                             html.indexOf('id="dep-summary-table"'));
+  assertContains(table, 'Workspace features');
+  // my-app declares "default" and "remote"; my-lib declares none.
+  assertContains(table, 'DepflameContent.toggleWorkspaceFeature(');
+  assertContains(table, 'remote</label>');
+  assertContains(table, 'default</label>');
+  assertContains(table, 'Restore defaults');
+});
+
+test('enabling a workspace feature pulls its optional dep into the graph', function() {
+  freshSim();
+  var tree = report.dep_tree;
+  var myApp = nodeIndex('my-app');
+  var remoteLib = nodeIndex('remote-lib');
+  assert(remoteLib >= 0, 'the sample has a feature-gated remote-lib');
+  assert(!DepflameFeatures.recomputeActiveGraph(tree).activeNodes[remoteLib],
+    'remote-lib is off by default');
+  assertEquals(DepflameSimulate.indexFor('remote-lib', null), -1,
+    'and so it is not a removable direct dep');
+
+  DepflameContent.toggleWorkspaceFeature(myApp, 'remote', true);
+  assert(DepflameFeatures.recomputeActiveGraph(tree).activeNodes[remoteLib],
+    'enabling "remote" activates it');
+  assert(DepflameSimulate.indexFor('remote-lib', null) >= 0,
+    'it becomes a removable direct dep');
+
+  DepflameContent.resetWorkspaceFeatures();
+  assert(!DepflameFeatures.recomputeActiveGraph(tree).activeNodes[remoteLib],
+    'restoring defaults switches it back off');
+});
+
+test('disabling a workspace feature marks the affected row as off', function() {
+  freshSim();
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var tbody = new MockElement('tbody');
+  elements['dep-summary-tbody'] = tbody;
+  elements['sim-status'] = new MockElement('span');
+  elements['sim-reset'] = new MockElement('button');
+  elements['feature-picker-body'] = new MockElement('div');
+  elements['feature-picker-status'] = new MockElement('span');
+
+  // "default" on my-app activates heavy-framework; without it the row is off.
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'default', false);
+  assertContains(tbody._innerHTML, 'row-inactive');
+  assertContains(tbody._innerHTML, 'off in the current feature set');
+  assertContains(elements['feature-picker-status'].textContent, 'customized');
+
+  DepflameContent.resetWorkspaceFeatures();
+  assert(tbody._innerHTML.indexOf('row-inactive') === -1,
+    'restoring defaults brings the row back');
+  assertEquals(elements['feature-picker-status'].textContent, '');
+});
+
+test('the flamegraph "Reset all" clears removals as well as features', function() {
+  freshSim();
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  elements['dep-summary-tbody'] = new MockElement('tbody');
+  elements['sim-status'] = new MockElement('span');
+  elements['sim-reset'] = new MockElement('button');
+  elements['feature-picker-body'] = new MockElement('div');
+  elements['feature-picker-status'] = new MockElement('span');
+
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'remote', true);
+  DepflameContent.toggleRemoval(nodeIndex('regex'));
+  assert(DepflameSimulate.hasRemovals(), 'a removal is active');
+  assert(DepflameFeatures.hasFeatureOverrides(), 'a feature override is active');
+
+  DepflameFeatures.resetAll();
+  assert(!DepflameSimulate.hasRemovals(), 'reset all clears removals');
+  assert(!DepflameFeatures.hasFeatureOverrides(), 'reset all clears feature overrides');
+  assertEquals(elements['sim-status'].textContent, '', 'and the table status clears');
+});
+
+test('the table Reset clears removals but keeps the feature selection', function() {
+  freshSim();
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  elements['dep-summary-tbody'] = new MockElement('tbody');
+  elements['sim-status'] = new MockElement('span');
+  elements['sim-reset'] = new MockElement('button');
+  elements['feature-picker-body'] = new MockElement('div');
+  elements['feature-picker-status'] = new MockElement('span');
+
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'remote', true);
+  DepflameContent.toggleRemoval(nodeIndex('regex'));
+
+  DepflameContent.resetRemovals();
+  assert(!DepflameSimulate.hasRemovals(), 'removals are cleared');
+  assert(DepflameFeatures.hasFeatureOverrides(), 'the feature selection survives');
+
+  DepflameFeatures.resetAll();
 });

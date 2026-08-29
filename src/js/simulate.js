@@ -33,7 +33,9 @@ var DepflameSimulate = (function() {
   // "every edge is active" if the feature engine isn't loaded.
   function activeGraph(tree) {
     if (typeof DepflameFeatures !== 'undefined' && DepflameFeatures.recomputeActiveGraph) {
-      return DepflameFeatures.recomputeActiveGraph(tree);
+      // No cuts and no weights: the simulator filters the root set itself, and
+      // only needs to know which edges are live.
+      return DepflameFeatures.recomputeActiveGraph(tree, null, true);
     }
     var activeEdges = {};
     for (var i = 0; i < tree.nodes.length; i++) {
@@ -193,6 +195,23 @@ var DepflameSimulate = (function() {
     return -1;
   }
 
+  // Edges to cut so the rest of the report (flamegraph, summary bar) sees the
+  // same graph the table does: every workspace edge into a removed dep.
+  function cutEdges() {
+    var tree = treeData();
+    var cuts = {};
+    if (!tree) return cuts;
+    var nodes = tree.nodes;
+    for (var i = 0; i < nodes.length; i++) {
+      if (!nodes[i].is_workspace) continue;
+      var children = nodes[i].children || [];
+      for (var c = 0; c < children.length; c++) {
+        if (removed[children[c]]) cuts[i + ':' + children[c]] = true;
+      }
+    }
+    return cuts;
+  }
+
   function toggle(idx) {
     idx = parseInt(idx, 10);
     if (removed[idx]) delete removed[idx];
@@ -222,6 +241,7 @@ var DepflameSimulate = (function() {
     baseline: getBaseline,
     current: current,
     indexFor: indexFor,
+    cutEdges: cutEdges,
     toggle: toggle,
     isRemoved: isRemoved,
     removedIndices: removedIndices,
