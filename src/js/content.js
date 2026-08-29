@@ -142,8 +142,9 @@ var DepflameContent = (function() {
   var depSortKey = 'unique_transitive_deps';
   var depSortAsc = false; // default: descending by unique deps
 
-  // The rows currently displayed, in display order (re-ordered by sorting).
-  var depSummaryView = [];
+  // The analysis's direct-dep rows, in report order. Display order is derived
+  // at render time so sorting, simulated removals and feature toggles compose.
+  var depSummaryBase = [];
 
   function buildTableTab(r) {
     var summary = r.direct_dep_summary || [];
@@ -151,7 +152,7 @@ var DepflameContent = (function() {
       return '<p class="text-light">No direct dependency data available.</p>';
     }
 
-    depSummaryView = summary.slice();
+    depSummaryBase = summary.slice();
 
     var html = '<div class="action-summary">'
       + '<h3>Direct dependencies by unique transitive dep count</h3>'
@@ -162,9 +163,10 @@ var DepflameContent = (function() {
       + 'Click a column header to sort.</p>'
       + buildFeaturePicker()
       + '<div class="sim-controls">'
-      +   '<span class="sim-hint">Tick <em>Remove</em> to simulate dropping a direct dependency — '
-      +   'the Unique Deps and Owners columns recompute for every other dep, '
-      +   'and the flamegraph follows.</span>'
+      +   '<span class="sim-hint">Tick <em>Remove</em> to simulate dropping a direct dependency, '
+      +   'or change the features above. While either is in play the columns are '
+      +   'computed live from the graph on screen — which the flamegraph shows too — '
+      +   'rather than read from the saved analysis.</span>'
       +   '<span id="sim-status"></span>'
       +   '<button class="control-btn" id="sim-reset" style="visibility:hidden" '
       +   'onclick="DepflameContent.resetRemovals()">Reset</button>'
@@ -184,7 +186,8 @@ var DepflameContent = (function() {
       + ' title="How many top-level direct deps pull this crate in. Sort ascending to put uniquely-owned deps first.">Owners</th>'
       + '</tr></thead><tbody id="dep-summary-tbody">';
 
-    html += renderDepSummaryRows(summary);
+    var sim = currentSim();
+    html += renderDepSummaryRows(sortRows(displayRows(sim), sim), sim);
     html += '</tbody></table></div>';
     return html;
   }
@@ -213,6 +216,8 @@ var DepflameContent = (function() {
     if (row) {
       if (key === 'unique_transitive_deps') return row.removed ? -1 : row.unique;
       if (key === 'owner_count') return row.removed ? -1 : row.owners;
+      // Removals never change a surviving dep's subtree, but feature toggles do.
+      if (key === 'total_transitive_deps') return row.subtree;
     }
     var v = entry[key];
     return v == null ? 0 : v;
@@ -223,14 +228,78 @@ var DepflameContent = (function() {
     return ' <span class="sim-was">was ' + before + '</span>';
   }
 
+  // True when the graph on screen differs from the one the analysis ran on —
+  // through a simulated removal or a feature toggle. Either way every derived
+  // number in the table has to be recomputed rather than read off the report.
+  function graphIsModified() {
+    var removals = typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals();
+    var features = typeof DepflameFeatures !== 'undefined'
+      && DepflameFeatures.hasFeatureOverrides
+      && DepflameFeatures.hasFeatureOverrides();
+    return removals || features;
+  }
+
   function currentSim() {
-    return (typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals())
-      ? DepflameSimulate.current() : null;
+    return graphIsModified() ? DepflameSimulate.current() : null;
+  }
+
+  // Rows to display: the analysis's direct deps, plus any crate that is only a
+  // direct dep under the current feature selection.
+  function displayRows(sim) {
+    var rows = [];
+    for (var i = 0; i < depSummaryBase.length; i++) {
+      depSummaryBase[i].__origIdx = i;
+      rows.push(depSummaryBase[i]);
+    }
+    var tree = currentTree();
+    if (!sim || !tree) return rows;
+
+    var known = {};
+    for (var i = 0; i < rows.length; i++) {
+      var known_idx = rowNodeIndex(rows[i]);
+      if (known_idx >= 0) known[known_idx] = true;
+    }
+    // Only crates a feature toggle brought in. A direct dep that was already
+    // in the analysed graph but has no row (a phantom the analysis filtered
+    // out for this platform, say) stays out — it isn't news.
+    var original = DepflameSimulate.original();
+    for (var i = 0; i < sim.direct.length; i++) {
+      var idx = sim.direct[i];
+      if (known[idx] || original.rows[idx]) continue;
+      var node = tree.nodes[idx];
+      rows.push({
+        dep_name: node.name,
+        dep_version: node.version,
+        unique_transitive_deps: 0,
+        total_transitive_deps: 0,
+        unique_ancestors: null,
+        owner_count: 0,
+        __origIdx: rows.length,
+        __simIdx: idx,
+        __baseDirect: true,
+        __added: true
+      });
+    }
+    return rows;
+  }
+
+  function sortRows(rows, sim) {
+    var key = depSortKey;
+    var dir = depSortAsc ? 1 : -1;
+    return rows.slice().sort(function(a, b) {
+      if (key === '#') return dir * (a.__origIdx - b.__origIdx);
+      var va = cellValue(a, key, sim), vb = cellValue(b, key, sim);
+      var cmp = (typeof va === 'string') ? va.localeCompare(vb) : (va - vb);
+      if (cmp !== 0) return dir * cmp;
+      return a.__origIdx - b.__origIdx;
+    });
   }
 
   function renderDepSummaryRows(summary, sim) {
     if (sim === undefined) sim = currentSim();
-    var base = (typeof DepflameSimulate !== 'undefined') ? DepflameSimulate.baseline() : null;
+    // "was N" compares against the graph the report was generated from, so the
+    // annotation shows the total effect of every toggle, not just the last one.
+    var base = (typeof DepflameSimulate !== 'undefined') ? DepflameSimulate.original() : null;
 
     var maxUnique = 1;
     for (var i = 0; i < summary.length; i++) {
@@ -260,6 +329,13 @@ var DepflameContent = (function() {
         + (removable ? '' : ' disabled title="' + title + '"')
         + ' onchange="DepflameContent.toggleRemoval(' + idx + ')">';
 
+      var totalCell = '<td>' + cellValue(e, 'total_transitive_deps', sim)
+        + (row && !row.removed ? simChange(row.subtree, baseRow && baseRow.subtree) : '')
+        + '</td>';
+      var ancestorsCell = '<td>'
+        + (e.unique_ancestors == null ? '<span class="sim-gone">—</span>' : e.unique_ancestors)
+        + '</td>';
+
       var uniqueCell, ownersCell;
       if (inactive) {
         uniqueCell = '<td class="sim-gone">—</td>';
@@ -284,11 +360,12 @@ var DepflameContent = (function() {
       html += '<tr' + rowCls + '>'
         + '<td>' + box + '</td>'
         + '<td>' + (i + 1) + '</td>'
-        + '<td><code>' + crateLink(e.dep_name) + '</code></td>'
+        + '<td><code>' + crateLink(e.dep_name) + '</code>'
+        + (e.__added ? ' <span class="sim-added">new</span>' : '') + '</td>'
         + '<td>' + esc(e.dep_version) + '</td>'
         + uniqueCell
-        + '<td>' + e.total_transitive_deps + '</td>'
-        + '<td>' + (e.unique_ancestors || 0) + '</td>'
+        + totalCell
+        + ancestorsCell
         + ownersCell + '</tr>';
     }
     return html;
@@ -371,15 +448,16 @@ var DepflameContent = (function() {
     if (checked && at === -1) features.push(feature);
     else if (!checked && at !== -1) features.splice(at, 1);
 
-    DepflameFeatures.setNodeFeatures(nodeIdx, features);
+    DepflameFeatures.setNodeFeatures(tree, nodeIdx, features);
     applyGraphChange();
   }
 
   function resetWorkspaceFeatures() {
     if (typeof DepflameFeatures === 'undefined') return;
+    var tree = currentTree();
     var crates = featureCrates();
     for (var c = 0; c < crates.length; c++) {
-      DepflameFeatures.setNodeFeatures(crates[c].idx, null);
+      DepflameFeatures.setNodeFeatures(tree, crates[c].idx, null);
     }
     applyGraphChange();
   }
@@ -428,8 +506,8 @@ var DepflameContent = (function() {
   // Called when the feature selection changes the active graph: the cached
   // node indices and every simulated number are recomputed from scratch.
   function onGraphChanged() {
-    for (var i = 0; i < depSummaryView.length; i++) {
-      delete depSummaryView[i].__simIdx;
+    for (var i = 0; i < depSummaryBase.length; i++) {
+      delete depSummaryBase[i].__simIdx;
     }
     updateFeaturePicker();
     refreshDepSummary();
@@ -440,31 +518,37 @@ var DepflameContent = (function() {
     var sim = currentSim();
 
     var tbody = document.getElementById('dep-summary-tbody');
-    if (tbody) tbody.innerHTML = renderDepSummaryRows(depSummaryView, sim);
+    if (tbody) tbody.innerHTML = renderDepSummaryRows(sortRows(displayRows(sim), sim), sim);
 
     var status = document.getElementById('sim-status');
-    var reset = document.getElementById('sim-reset');
-    var active = !!sim;
-    if (status) {
-      if (active) {
-        var base = DepflameSimulate.baseline();
-        var saved = base.totalDeps - sim.totalDeps;
-        status.textContent = sim.removedCount + ' removed — '
-          + base.totalDeps + ' \u2192 ' + sim.totalDeps + ' crates ('
-          + (saved > 0 ? '\u2212' + saved : 'no change') + ')';
-      } else {
-        status.textContent = '';
-      }
-    }
+    if (status) status.textContent = sim ? statusText(sim) : '';
+
     // Kept in the layout at all times so the row doesn't jump when it appears.
-    if (reset) reset.style.visibility = active ? 'visible' : 'hidden';
+    var reset = document.getElementById('sim-reset');
+    if (reset) {
+      reset.style.visibility =
+        (typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals())
+          ? 'visible' : 'hidden';
+    }
+  }
+
+  // "2 removed — 72 → 53 crates (−19)". Removals and feature toggles both land
+  // here, so the count is always measured against the analysed graph.
+  function statusText(sim) {
+    var original = DepflameSimulate.original();
+    var delta = sim.totalDeps - original.totalDeps;
+    var parts = [];
+    if (sim.removedCount > 0) parts.push(sim.removedCount + ' removed');
+    var counts = original.totalDeps + ' \u2192 ' + sim.totalDeps + ' crates';
+    if (delta < 0) counts += ' (\u2212' + (-delta) + ')';
+    else if (delta > 0) counts += ' (+' + delta + ')';
+    else counts += ' (no change)';
+    parts.push(counts);
+    return parts.join(' \u2014 ');
   }
 
   function sortDepSummary(key) {
-    var report = window.__DEPFLAME_REPORT__;
-    if (!report) return;
-    var summary = report.direct_dep_summary;
-    if (!summary || summary.length === 0) return;
+    if (depSummaryBase.length === 0) return;
 
     // Toggle direction if clicking same column, otherwise default desc for numbers, asc for strings.
     if (key === depSortKey) {
@@ -475,30 +559,6 @@ var DepflameContent = (function() {
       // is the interesting end.
       depSortAsc = (key === 'dep_name' || key === 'dep_version' || key === 'owner_count');
     }
-
-    // Sort a copy with stable indices for the '#' column.
-    var sim = currentSim();
-    var indexed = summary.map(function(e, i) { return { entry: e, origIdx: i }; });
-
-    if (key === '#') {
-      // Sort by original index (restore default order from analysis).
-      indexed.sort(function(a, b) {
-        return depSortAsc ? a.origIdx - b.origIdx : b.origIdx - a.origIdx;
-      });
-    } else {
-      indexed.sort(function(a, b) {
-        var va = cellValue(a.entry, key, sim), vb = cellValue(b.entry, key, sim);
-        var cmp;
-        if (typeof va === 'string') {
-          cmp = va.localeCompare(vb);
-        } else {
-          cmp = va - vb;
-        }
-        return depSortAsc ? cmp : -cmp;
-      });
-    }
-
-    var sorted = indexed.map(function(item) { return item.entry; });
 
     // Update header classes.
     var table = document.getElementById('dep-summary-table');
@@ -512,8 +572,6 @@ var DepflameContent = (function() {
       }
     }
 
-    // Re-render tbody.
-    depSummaryView = sorted;
     refreshDepSummary();
   }
 

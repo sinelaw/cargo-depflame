@@ -327,3 +327,79 @@ test('the table Reset clears removals but keeps the feature selection', function
 
   DepflameFeatures.resetAll();
 });
+
+// ---------------------------------------------------------------------------
+// Feature toggles recompute the table, not just the flamegraph.
+// ---------------------------------------------------------------------------
+
+function tableHarness() {
+  freshSim();
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var tbody = new MockElement('tbody');
+  elements['dep-summary-tbody'] = tbody;
+  elements['sim-status'] = new MockElement('span');
+  elements['sim-reset'] = new MockElement('button');
+  elements['feature-picker-body'] = new MockElement('div');
+  elements['feature-picker-status'] = new MockElement('span');
+  DepflameContent.refreshDepSummary();
+  return tbody;
+}
+
+test('enabling a workspace feature recomputes the table with no removal', function() {
+  var tbody = tableHarness();
+  assertEquals(elements['sim-status'].textContent, '', 'nothing toggled yet');
+  var before = tbody._innerHTML;
+  assert(before.indexOf('remote-lib') === -1, 'remote-lib starts out of the graph');
+
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'remote', true);
+  var after = tbody._innerHTML;
+  assert(after !== before, 'the table re-renders on a feature change');
+  assertContains(after, 'remote-lib');
+  assertContains(after, 'sim-added');
+  // remote-lib brings in two crates of its own: 13 -> 16.
+  assertContains(elements['sim-status'].textContent, '13 \u2192 16 crates (+3)');
+
+  DepflameContent.resetWorkspaceFeatures();
+  assert(tbody._innerHTML.indexOf('remote-lib') === -1, 'and it leaves again');
+  assertEquals(elements['sim-status'].textContent, '');
+});
+
+test('only crates a feature brings in get a row, not every unlisted direct dep', function() {
+  var tbody = tableHarness();
+  // unused-dep and http-client are direct deps in the tree but absent from the
+  // sample summary; a feature toggle must not conjure rows for them.
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'remote', true);
+  var html = tbody._innerHTML;
+  assertContains(html, 'remote-lib');
+  assert(html.indexOf('unused-dep') === -1, 'unused-dep was already there, so no new row');
+  assert(html.indexOf('http-client') === -1, 'nor http-client');
+  DepflameContent.resetWorkspaceFeatures();
+});
+
+test('restoring feature defaults puts the analysis numbers back', function() {
+  var tbody = tableHarness();
+  var before = tbody._innerHTML;
+  assertContains(before, '>18<');  // heavy-framework unique deps, from the report
+
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'default', false);
+  assert(tbody._innerHTML.indexOf('>18<') === -1, 'live numbers replace the report ones');
+
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'default', true);
+  assertContains(tbody._innerHTML, '>18<', 'and the report numbers come back');
+  assertEquals(elements['sim-status'].textContent, '');
+});
+
+test('a feature toggle and a removal compose in the status line', function() {
+  var tbody = tableHarness();
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'remote', true);
+  DepflameContent.toggleRemoval(nodeIndex('regex'));
+
+  var status = elements['sim-status'].textContent;
+  assertContains(status, '1 removed');
+  // remote adds 3, dropping regex removes 1: 13 -> 15.
+  assertContains(status, '13 \u2192 15 crates (+2)');
+
+  DepflameFeatures.resetAll();
+  assertEquals(elements['sim-status'].textContent, '');
+});

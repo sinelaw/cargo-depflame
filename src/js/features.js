@@ -831,10 +831,30 @@ var DepflameFeatures = (function() {
   // Programmatic feature control, used by the Table tab's workspace-feature
   // picker. Passing null clears the override and restores the crate's
   // resolved-by-cargo feature set.
-  function setNodeFeatures(nodeIdx, features) {
+  //
+  // A selection that matches what cargo resolved clears the override too, so
+  // toggling a feature off and back on leaves no trace — otherwise the report
+  // would stay in "modified graph" mode forever.
+  function setNodeFeatures(treeData, nodeIdx, features) {
     nodeIdx = parseInt(nodeIdx, 10);
-    if (features === null || features === undefined) delete featureOverrides[nodeIdx];
-    else featureOverrides[nodeIdx] = features.slice();
+    var node = treeData && treeData.nodes ? treeData.nodes[nodeIdx] : null;
+
+    if (features === null || features === undefined
+        || (node && sameFeatureSet(features, node.enabled_features || []))) {
+      delete featureOverrides[nodeIdx];
+      return;
+    }
+    featureOverrides[nodeIdx] = features.slice();
+  }
+
+  function sameFeatureSet(a, b) {
+    if (a.length !== b.length) return false;
+    var sortedA = a.slice().sort();
+    var sortedB = b.slice().sort();
+    for (var i = 0; i < sortedA.length; i++) {
+      if (sortedA[i] !== sortedB[i]) return false;
+    }
+    return true;
   }
 
   // The features currently in effect for a node (override, or cargo's own).

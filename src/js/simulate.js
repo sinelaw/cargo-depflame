@@ -20,8 +20,12 @@ var DepflameSimulate = (function() {
 
   // Node indices marked as removed, keyed by index.
   var removed = {};
-  // Result of a removal-free run, for "was N" annotations.
+  // Removal-free run under the *current* feature selection. Tracks feature
+  // toggles; used to know which crates are direct deps right now.
   var baseline = null;
+  // The graph as the analysis found it — no removals, no feature overrides.
+  // Never refreshed, so "was N" always compares against the report.
+  var original = null;
 
   function treeData() {
     if (window.__DEPFLAME_DATA__) return window.__DEPFLAME_DATA__;
@@ -168,7 +172,15 @@ var DepflameSimulate = (function() {
 
   function init() {
     removed = {};
-    return refreshBaseline();
+    original = null;
+    var base = refreshBaseline();
+    original = base;
+    return base;
+  }
+
+  function getOriginal() {
+    if (!original) original = run({});
+    return original;
   }
 
   function getBaseline() {
@@ -239,6 +251,7 @@ var DepflameSimulate = (function() {
     init: init,
     refreshBaseline: refreshBaseline,
     baseline: getBaseline,
+    original: getOriginal,
     current: current,
     indexFor: indexFor,
     cutEdges: cutEdges,
