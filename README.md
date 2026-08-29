@@ -72,7 +72,7 @@ The Sharing tab is computed server-side for the host and doesn't follow the drop
 
 The graph is rooted at the crates cargo actually builds — the workspace's `default-members` when it declares them. A member that nothing builds contributes nothing: if `app` depends on `gui` (another member) behind an off-by-default feature, `gui`'s dependencies are not dependencies, and they appear only once you enable that feature in the picker. Every direct dep in the graph gets a row, so anything that *is* counted can also be simulated away.
 
-One known gap: `cargo metadata` resolves features across the whole workspace, so a crate outside `default-members` can still enable extra features on a shared dep, and those pull in a few crates `cargo build` wouldn't compile.
+Feature state comes from what cargo actually builds (`cargo tree -f "{f}"`), not from `cargo metadata`, which unifies features across every workspace member — including members a default build never compiles. The graph the report opens on therefore matches `cargo build` crate for crate.
 
 ## Simulating a removal
 

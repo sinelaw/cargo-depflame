@@ -1,7 +1,98 @@
 use rayon::prelude::*;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use std::process::Command;
+
+/// What `cargo build` actually resolves: the packages it compiles, and the
+/// features it enables on each of them.
+#[derive(Debug, Default)]
+pub struct BuildResolve {
+    /// `"name version"` for every package compiled by a default build.
+    pub packages: HashSet<String>,
+    /// `"name version"` -> the features cargo enables on it.
+    pub features: HashMap<String, Vec<String>>,
+}
+
+/// Run `cargo tree` on the workspace to get the packages actually resolved for
+/// the current platform (as opposed to the full cross-platform resolve graph
+/// from `cargo metadata`), along with the features enabled on each.
+///
+/// This is narrower than `cargo metadata` in a second way that matters:
+/// metadata unifies features across every workspace member, so a member
+/// outside `default-members` can enable features — and so pull in optional
+/// deps — that a default build never sees.
+pub fn resolve_build(manifest_path: &Path) -> Option<BuildResolve> {
+    // "{p}|{f}": the package, then its enabled features, comma separated.
+    let output = Command::new("cargo")
+        .args([
+            "tree",
+            "--prefix",
+            "none",
+            "-e",
+            "normal,build",
+            "--format",
+            "{p}|{f}",
+            "--manifest-path",
+        ])
+        .arg(manifest_path)
+        .output()
+        .ok()?;
+
+    if !output.status.success() {
+        return None;
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut resolve = BuildResolve::default();
+
+    for line in stdout.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        let (pkg, feats) = match line.split_once('|') {
+            Some(parts) => parts,
+            None => continue,
+        };
+        // "{p}" is "name vVERSION (source)".
+        let parts: Vec<&str> = pkg.split_whitespace().collect();
+        if parts.len() < 2 {
+            continue;
+        }
+        let key = format!(
+            "{} {}",
+            parts[0],
+            parts[1].strip_prefix('v').unwrap_or(parts[1])
+        );
+        // cargo tree marks an already-printed subtree with a trailing "(*)",
+        // which lands after the feature list: "serde v1.0.228|default,std (*)".
+        let feats = feats.trim().strip_suffix("(*)").unwrap_or(feats).trim();
+        let features: Vec<String> = feats
+            .split(',')
+            .map(|f| f.trim())
+            .filter(|f| !f.is_empty() && *f != "(*)")
+            .map(|f| f.to_string())
+            .collect();
+
+        resolve.packages.insert(key.clone());
+        // A package can appear more than once with different feature sets —
+        // resolver v2 resolves build-dependencies separately from normal ones,
+        // so the same crate may be built twice with different features. Union
+        // them: a crate is in the graph if any of those builds pulls it in.
+        let entry = resolve.features.entry(key).or_default();
+        for feature in features {
+            if !entry.contains(&feature) {
+                entry.push(feature);
+            }
+        }
+    }
+
+    if resolve.packages.is_empty() {
+        None
+    } else {
+        Some(resolve)
+    }
+}
 
 /// Run `cargo tree` on the workspace to get the set of packages actually
 /// resolved for the current platform (as opposed to the full cross-platform

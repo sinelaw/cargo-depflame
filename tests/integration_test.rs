@@ -374,3 +374,46 @@ fn dep_tree_roots_are_the_built_members() {
         "roots are workspace members"
     );
 }
+
+/// The tree's enabled features come from what cargo actually builds, so the
+/// graph the report opens on matches `cargo build` rather than the
+/// workspace-unified metadata resolve.
+#[test]
+fn tree_features_match_a_default_build() {
+    let manifest = fixture_workspace();
+    let build = cargo_depflame::platform::resolve_build(&manifest)
+        .expect("cargo tree should resolve the fixture workspace");
+
+    let report = analyze::run_analyze(&default_args()).expect("analysis should succeed");
+    let tree = report.dep_tree.expect("dep tree present");
+
+    // serde is built with "derive" here; the fixture enables it explicitly.
+    let serde = tree
+        .nodes
+        .iter()
+        .find(|n| n.name == "serde")
+        .expect("serde in the tree");
+    let key = format!("serde {}", serde.version);
+    let expected = build.features.get(&key).expect("cargo tree lists serde");
+    let mut expected = expected.clone();
+    expected.sort();
+    assert_eq!(
+        serde.enabled_features, expected,
+        "the tree's features are the ones cargo enables"
+    );
+
+    // A crate cargo doesn't build gets no features, so nothing it gates can
+    // activate.
+    for node in &tree.nodes {
+        if node.is_workspace {
+            continue;
+        }
+        let key = format!("{} {}", node.name, node.version);
+        if !build.packages.contains(&key) {
+            assert!(
+                node.enabled_features.is_empty(),
+                "{key} isn't built, so it should carry no enabled features"
+            );
+        }
+    }
+}

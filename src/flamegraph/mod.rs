@@ -78,14 +78,20 @@ pub struct DepTreeEdge {
 // ---------------------------------------------------------------------------
 
 pub fn build_dep_tree(full_metadata: &Metadata, active_metadata: &Metadata) -> DepTreeData {
-    build_dep_tree_indexed(full_metadata, active_metadata).0
+    build_dep_tree_indexed(full_metadata, active_metadata, &HashMap::new()).0
 }
 
 /// As [`build_dep_tree`], but also returns the package-id → node-index map,
 /// which callers need to translate per-platform resolves into node masks.
+/// `build_features` maps `"name version"` to the features cargo enables in a
+/// default build. When it has an entry for a package that wins over the
+/// metadata resolve, which unifies features across every workspace member and
+/// so reports features a default build never enables. An empty map falls back
+/// to the metadata resolve entirely.
 pub fn build_dep_tree_indexed(
     full_metadata: &Metadata,
     active_metadata: &Metadata,
+    build_features: &HashMap<String, Vec<String>>,
 ) -> (DepTreeData, HashMap<PackageId, usize>) {
     let full_resolve = match full_metadata.resolve.as_ref() {
         Some(r) => r,
@@ -120,10 +126,18 @@ pub fn build_dep_tree_indexed(
         let idx = nodes.len();
         id_to_idx.insert(rnode.id.clone(), idx);
 
-        let mut enabled_features: Vec<String> = active_features
-            .get(&rnode.id)
-            .map(|f| f.to_vec())
-            .unwrap_or_default();
+        // What a default build enables, falling back to the metadata resolve
+        // when cargo tree didn't report this package (it isn't built, or the
+        // command failed and the map is empty).
+        let build_key = format!("{} {}", pkg.name, pkg.version);
+        let mut enabled_features: Vec<String> = match build_features.get(&build_key) {
+            Some(features) => features.clone(),
+            None if build_features.is_empty() => active_features
+                .get(&rnode.id)
+                .map(|f| f.to_vec())
+                .unwrap_or_default(),
+            None => Vec::new(),
+        };
         enabled_features.sort();
 
         let available_features: BTreeMap<String, Vec<String>> = pkg
