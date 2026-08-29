@@ -1,6 +1,7 @@
 use cargo_depflame::analyze;
 use cargo_depflame::cli::{AnalyzeArgs, CommonArgs, OutputFormat};
 use cargo_depflame::metrics::{Confidence, RemovalStrategy};
+use std::collections::HashSet;
 use std::path::PathBuf;
 
 fn fixture_workspace() -> PathBuf {
@@ -346,5 +347,30 @@ fn dep_tree_carries_platform_masks() {
     assert!(
         host.nodes.len() <= tree.nodes.len(),
         "the host mask is a subset of the tree"
+    );
+}
+
+/// The tree is rooted at the members cargo builds. The fixture declares no
+/// `default-members`, so that is every member — the fallback path.
+#[test]
+fn dep_tree_roots_are_the_built_members() {
+    let report = analyze::run_analyze(&default_args()).expect("analysis should succeed");
+    let tree = report.dep_tree.expect("dep tree present");
+
+    let roots: HashSet<&str> = tree
+        .root_indices
+        .iter()
+        .map(|&i| tree.nodes[i].name.as_str())
+        .collect();
+    assert_eq!(
+        roots,
+        HashSet::from(["crate-a", "crate-b"]),
+        "with no default-members declared, every member is a root"
+    );
+    assert!(
+        tree.root_indices
+            .iter()
+            .all(|&i| tree.nodes[i].is_workspace),
+        "roots are workspace members"
     );
 }

@@ -68,9 +68,15 @@ Switching target re-resolves everything downstream: the table's unique and owner
 
 The Sharing tab is computed server-side for the host and doesn't follow the dropdown.
 
+### What counts as a dependency
+
+The graph is rooted at the crates cargo actually builds — the workspace's `default-members` when it declares them. A member that nothing builds contributes nothing: if `app` depends on `gui` (another member) behind an off-by-default feature, `gui`'s dependencies are not dependencies, and they appear only once you enable that feature in the picker. Every direct dep in the graph gets a row, so anything that *is* counted can also be simulated away.
+
+One known gap: `cargo metadata` resolves features across the whole workspace, so a crate outside `default-members` can still enable extra features on a shared dep, and those pull in a few crates `cargo build` wouldn't compile.
+
 ## Simulating a removal
 
-In the HTML report's **Table** tab, each direct dependency has a `Remove` checkbox. Tick one and the table recomputes, live: every other direct dep's unique transitive dep count and owner count update, and the header shows what the graph would cost (`2 removed — 72 → 53 crates (−19)`). The flamegraph follows — the removed crate and everything only it pulled in disappear from the chart, and the summary bar shows the new dep count.
+In the HTML report's **Table** tab, each direct dependency has a `Remove` checkbox. Tick one and the table recomputes, live: every other direct dep's unique transitive dep count and owner count update, and the header shows what the graph costs. That header is always on — `71 direct + 335 transitive = 406 crates` — and gains the delta as you toggle (`6 removed — 65 direct + 170 transitive = 235 crates (−171)`). The flamegraph follows — the removed crate and everything only it pulled in disappear from the chart, and the summary bar shows the new dep count.
 
 Only direct dependencies of a workspace member can be removed — a crate that is merely transitive has its checkbox disabled, since dropping it isn't yours to make.
 

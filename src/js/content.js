@@ -279,32 +279,36 @@ var DepflameContent = (function() {
       rows.push(depSummaryBase[i]);
     }
     var tree = currentTree();
-    if (!sim || !tree) return rows;
+    if (!tree || typeof DepflameSimulate === 'undefined') return rows;
+
+    // Every direct dep in the graph gets a row, even one the analysis didn't
+    // list — otherwise it can't be removed and its subtree looks immovable.
+    var view = sim || DepflameSimulate.baseline();
+    if (!view) return rows;
+    var original = DepflameSimulate.original();
 
     var known = {};
     for (var i = 0; i < rows.length; i++) {
       var known_idx = rowNodeIndex(rows[i]);
       if (known_idx >= 0) known[known_idx] = true;
     }
-    // Only crates a feature toggle brought in. A direct dep that was already
-    // in the analysed graph but has no row (a phantom the analysis filtered
-    // out for this platform, say) stays out — it isn't news.
-    var original = DepflameSimulate.original();
-    for (var i = 0; i < sim.direct.length; i++) {
-      var idx = sim.direct[i];
-      if (known[idx] || original.rows[idx]) continue;
+    for (var i = 0; i < view.direct.length; i++) {
+      var idx = view.direct[i];
+      if (known[idx]) continue;
       var node = tree.nodes[idx];
+      var stats = view.rows[idx] || { unique: 0, subtree: 0, owners: 0 };
       rows.push({
         dep_name: node.name,
         dep_version: node.version,
-        unique_transitive_deps: 0,
-        total_transitive_deps: 0,
+        unique_transitive_deps: stats.unique,
+        total_transitive_deps: stats.subtree,
         unique_ancestors: null,
-        owner_count: 0,
+        owner_count: stats.owners,
         __origIdx: rows.length,
         __simIdx: idx,
         __baseDirect: true,
-        __added: true
+        // "new" means the analysed graph didn't have it at all.
+        __added: !original.rows[idx]
       });
     }
     return rows;
@@ -633,7 +637,7 @@ var DepflameContent = (function() {
     if (tbody) tbody.innerHTML = renderDepSummaryRows(orderedRows(sim), sim);
 
     var status = document.getElementById('sim-status');
-    if (status) status.textContent = sim ? statusText(sim) : '';
+    if (status) status.textContent = statusText(sim);
 
     // Kept in the layout at all times so the row doesn't jump when it appears.
     var reset = document.getElementById('sim-reset');
@@ -644,22 +648,35 @@ var DepflameContent = (function() {
     }
   }
 
-  // "2 removed — 72 → 53 crates (−19)". Removals and feature toggles both land
-  // here, so the count is always measured against the analysed graph.
+  // Always on: "71 direct + 335 transitive = 406 crates", with the platform,
+  // the removal count and the delta from the analysed graph added as they
+  // apply. `sim` is null when nothing is toggled, in which case the untouched
+  // graph is described instead.
   function statusText(sim) {
+    if (typeof DepflameSimulate === 'undefined') return '';
+    var view = sim || DepflameSimulate.baseline();
+    if (!view) return '';
     var original = DepflameSimulate.original();
-    var delta = sim.totalDeps - original.totalDeps;
+
     var parts = [];
     var tree = currentTree();
-    if (typeof DepflameFeatures !== 'undefined' && !DepflameFeatures.isHostPlatform(tree)) {
+    if (typeof DepflameFeatures !== 'undefined'
+        && DepflameFeatures.isHostPlatform
+        && !DepflameFeatures.isHostPlatform(tree)) {
       parts.push(DepflameFeatures.getPlatform(tree) || 'every target');
     }
-    if (sim.removedCount > 0) parts.push(sim.removedCount + ' removed');
-    var counts = original.totalDeps + ' \u2192 ' + sim.totalDeps + ' crates';
+    if (view.removedCount > 0) parts.push(view.removedCount + ' removed');
+
+    var transitive = view.totalDeps - view.directCount;
+    var counts = view.directCount + ' direct + ' + transitive + ' transitive = '
+      + view.totalDeps + ' crates';
+
+    var delta = view.totalDeps - original.totalDeps;
     if (delta < 0) counts += ' (\u2212' + (-delta) + ')';
     else if (delta > 0) counts += ' (+' + delta + ')';
-    else counts += ' (no change)';
+    else if (view.removedCount > 0) counts += ' (no change)';
     parts.push(counts);
+
     return parts.join(' \u2014 ');
   }
 

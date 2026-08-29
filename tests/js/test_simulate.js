@@ -21,12 +21,19 @@ function nodeIndex(name) {
 function freshSim() {
   window.__DEPFLAME_DATA__ = null;
   window.__DEPFLAME_REPORT__ = report;
-  // Feature and platform state lives in DepflameFeatures and outlives a single
-  // test, so reset it here rather than leaking a selection into the next test.
+  // Feature, platform and removal state lives on past a single test — and a
+  // test that fails part-way never reaches its own cleanup — so reset all of
+  // it here rather than leaking a selection into the next test.
+  for (var i = 0; i < report.dep_tree.nodes.length; i++) {
+    DepflameFeatures.setNodeFeatures(report.dep_tree, i, null);
+  }
   DepflameFeatures.setPlatform(DepflameFeatures.hostPlatform(report.dep_tree));
   DepflameSimulate.clear();
   DepflameSimulate.init();
 }
+
+// The status line with nothing toggled: the sample's untouched graph.
+var BASELINE_STATUS = '8 direct + 5 transitive = 13 crates';
 
 test('only direct deps of workspace members are removable', function() {
   freshSim();
@@ -169,7 +176,7 @@ test('toggling a row through the UI re-renders the table with new numbers', func
 
   DepflameContent.resetRemovals();
   assert(tbody._innerHTML.indexOf('row-removed') === -1, 'reset clears the removed rows');
-  assertEquals(elements['sim-status'].textContent, '');
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS);
   assertEquals(elements['sim-reset'].style.visibility, 'hidden',
     'the button keeps its slot in the layout so the row never jumps');
 });
@@ -309,7 +316,8 @@ test('the flamegraph "Reset all" clears removals as well as features', function(
   DepflameFeatures.resetAll();
   assert(!DepflameSimulate.hasRemovals(), 'reset all clears removals');
   assert(!DepflameFeatures.hasFeatureOverrides(), 'reset all clears feature overrides');
-  assertEquals(elements['sim-status'].textContent, '', 'and the table status clears');
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS,
+    'and the status describes the untouched graph again');
 });
 
 test('the table Reset clears removals but keeps the feature selection', function() {
@@ -352,7 +360,7 @@ function tableHarness() {
 
 test('enabling a workspace feature recomputes the table with no removal', function() {
   var tbody = tableHarness();
-  assertEquals(elements['sim-status'].textContent, '', 'nothing toggled yet');
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS, 'nothing toggled yet');
   var before = tbody._innerHTML;
   assert(before.indexOf('remote-lib') === -1, 'remote-lib starts out of the graph');
 
@@ -362,22 +370,33 @@ test('enabling a workspace feature recomputes the table with no removal', functi
   assertContains(after, 'remote-lib');
   assertContains(after, 'sim-added');
   // remote-lib brings in two crates of its own: 13 -> 16.
-  assertContains(elements['sim-status'].textContent, '13 \u2192 16 crates (+3)');
+  assertContains(elements['sim-status'].textContent, '= 16 crates (+3)');
 
   DepflameContent.resetWorkspaceFeatures();
   assert(tbody._innerHTML.indexOf('remote-lib') === -1, 'and it leaves again');
-  assertEquals(elements['sim-status'].textContent, '');
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS);
 });
 
-test('only crates a feature brings in get a row, not every unlisted direct dep', function() {
+test('every direct dep gets a row, even one the analysis did not list', function() {
+  // A workspace whose default-members exclude a crate leaves its deps out of
+  // direct_dep_summary. Without a row they can't be removed and their subtree
+  // looks immovable, so the table fills them in from the graph.
   var tbody = tableHarness();
-  // unused-dep and http-client are direct deps in the tree but absent from the
-  // sample summary; a feature toggle must not conjure rows for them.
+  var html = tbody._innerHTML;
+  assertContains(html, 'unused-dep');
+  assertContains(html, 'http-client');
+  assert(html.indexOf('sim-added') === -1,
+    'they were in the analysed graph, so they are not tagged new');
+});
+
+test('only a crate a feature adds is tagged "new"', function() {
+  var tbody = tableHarness();
   DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'remote', true);
   var html = tbody._innerHTML;
-  assertContains(html, 'remote-lib');
-  assert(html.indexOf('unused-dep') === -1, 'unused-dep was already there, so no new row');
-  assert(html.indexOf('http-client') === -1, 'nor http-client');
+  var remoteRow = html.substring(html.indexOf('remote-lib') - 400, html.indexOf('remote-lib') + 200);
+  assertContains(remoteRow, 'sim-added');
+  var unusedRow = html.substring(html.indexOf('unused-dep') - 400, html.indexOf('unused-dep') + 200);
+  assert(unusedRow.indexOf('sim-added') === -1, 'a pre-existing dep is not new');
   DepflameContent.resetWorkspaceFeatures();
 });
 
@@ -391,7 +410,7 @@ test('restoring feature defaults puts the analysis numbers back', function() {
 
   DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'default', true);
   assertContains(tbody._innerHTML, '>18<', 'and the report numbers come back');
-  assertEquals(elements['sim-status'].textContent, '');
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS);
 });
 
 test('a feature toggle and a removal compose in the status line', function() {
@@ -402,10 +421,10 @@ test('a feature toggle and a removal compose in the status line', function() {
   var status = elements['sim-status'].textContent;
   assertContains(status, '1 removed');
   // remote adds 3, dropping regex removes 1: 13 -> 15.
-  assertContains(status, '13 \u2192 15 crates (+2)');
+  assertContains(status, '= 15 crates (+2)');
 
   DepflameFeatures.resetAll();
-  assertEquals(elements['sim-status'].textContent, '');
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS);
 });
 
 // ---------------------------------------------------------------------------
@@ -500,7 +519,8 @@ test('switching platform drops crates that do not build for the target', functio
 
   DepflameContent.selectPlatform('x86_64-unknown-linux-gnu');
   assert(active()[nodeIndex('tiny-helper')], 'switching back restores it');
-  assertEquals(elements['sim-status'].textContent, '', 'host view is not a modification');
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS,
+    'the host view is not a modification');
 });
 
 test('"every target" shows the union and is reported as a modified view', function() {
@@ -533,4 +553,44 @@ test('platform selection composes with removals', function() {
   assertContains(tbody._innerHTML, 'row-removed');
 
   DepflameFeatures.resetAll();
+});
+
+// ---------------------------------------------------------------------------
+// Only members the build actually reaches are roots.
+// ---------------------------------------------------------------------------
+
+test('a workspace member nothing builds contributes no dependencies', function() {
+  // my-app is the only root. gui-crate is a workspace member too, but nothing
+  // builds it (it would be an optional, feature-gated dep of my-app), so its
+  // deps are not dependencies of anything.
+  var saved = window.__DEPFLAME_DATA__;
+  window.__DEPFLAME_DATA__ = {
+    root_indices: [0],
+    edges: [],
+    platforms: [],
+    nodes: [
+      { name: 'my-app', version: '0.1.0', is_workspace: true, children: [2], transitive_weight: 2, unique_ancestors: 0 },
+      { name: 'gui-crate', version: '0.1.0', is_workspace: true, children: [3], transitive_weight: 2, unique_ancestors: 0 },
+      { name: 'shared', version: '1.0.0', is_workspace: false, children: [], transitive_weight: 1, unique_ancestors: 1 },
+      { name: 'winit', version: '0.30.0', is_workspace: false, children: [], transitive_weight: 1, unique_ancestors: 1 }
+    ]
+  };
+  DepflameSimulate.init();
+
+  var base = DepflameSimulate.baseline();
+  var names = base.direct.map(function(i) { return window.__DEPFLAME_DATA__.nodes[i].name; });
+  assertEquals(names.join(','), 'shared', 'only the built member contributes direct deps');
+  assertEquals(base.totalDeps, 1, 'and winit is not counted as a dependency');
+  assertEquals(base.directCount, 1);
+
+  window.__DEPFLAME_DATA__ = saved;
+  DepflameSimulate.init();
+});
+
+test('the status line reports direct and transitive counts with nothing toggled', function() {
+  tableHarness();
+  // 8 direct deps of my-app/my-lib, 5 crates reached only through them.
+  assertEquals(elements['sim-status'].textContent, BASELINE_STATUS);
+  assertContains(BASELINE_STATUS, 'direct');
+  assertContains(BASELINE_STATUS, 'transitive');
 });

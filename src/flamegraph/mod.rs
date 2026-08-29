@@ -311,10 +311,23 @@ pub fn build_dep_tree_indexed(
     }
 
     // ── Root indices ──────────────────────────────────────────────────────
+    //
+    // The roots are the members `cargo build` actually builds — the workspace's
+    // `default-members` when it declares them. Rooting at every member instead
+    // pulls in the deps of a member nothing builds by default, even one that is
+    // an optional, feature-gated dependency of the crate that does get built.
 
-    let mut root_indices: Vec<usize> = workspace_members
+    let default_members: Vec<&PackageId> = if cargo_metadata::workspace_default_members_is_missing(
+        &full_metadata.workspace_default_members,
+    ) {
+        workspace_members.iter().copied().collect()
+    } else {
+        full_metadata.workspace_default_members.iter().collect()
+    };
+
+    let mut root_indices: Vec<usize> = default_members
         .iter()
-        .filter_map(|id| id_to_idx.get(id).copied())
+        .filter_map(|id| id_to_idx.get(*id).copied())
         .collect();
     root_indices.sort_by(|&a, &b| nodes[b].transitive_weight.cmp(&nodes[a].transitive_weight));
 
