@@ -133,8 +133,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         total_deps,
         heavy_nodes.len(),
         unused_result,
-        &scan_ctx.real_deps,
-        &scan_ctx.build_features,
+        &scan_ctx,
         args,
     )
 }
@@ -366,10 +365,11 @@ fn build_report(
     total_deps: usize,
     heavy_nodes_found: usize,
     unused_result: UnusedDepsResult,
-    real_deps: &Option<HashSet<String>>,
-    build_features: &HashMap<String, Vec<String>>,
+    scan_ctx: &ScanContext,
     args: &AnalyzeArgs,
 ) -> Result<AnalysisReport> {
+    let real_deps = &scan_ctx.real_deps;
+    let build_features = &scan_ctx.build_features;
     // `real_deps` holds every package cargo resolves for this platform, the
     // workspace's own crates included. Those aren't dependencies, and
     // `total_dependencies` doesn't count them either.
