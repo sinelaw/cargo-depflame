@@ -43,6 +43,10 @@ struct HeavyEdges {
 /// Pre-computed data and shared caches used during scanning phases.
 struct ScanContext {
     real_deps: Option<HashSet<String>>,
+    /// Features cargo enables on each package in a default build, keyed by
+    /// "name version". Narrower than the metadata resolve, which unifies
+    /// features across every workspace member.
+    build_features: HashMap<String, Vec<String>>,
     dep_chains: HashMap<cargo_metadata::PackageId, Vec<String>>,
     fs_cache: FsCache,
     regex_cache: RegexCache,
@@ -130,6 +134,7 @@ pub fn run_analyze(args: &AnalyzeArgs) -> Result<AnalysisReport> {
         heavy_nodes.len(),
         unused_result,
         &scan_ctx.real_deps,
+        &scan_ctx.build_features,
         args,
     )
 }
@@ -224,10 +229,15 @@ fn build_graph_and_find_edges(
 fn build_scan_context(manifest_path: &std::path::Path, dep_graph: &DepGraph) -> ScanContext {
     // Phase 2c: Resolve real platform deps.
     eprintln!("Resolving platform-specific dependency tree...");
-    let real_deps = {
+    let build_resolve = {
         let _span = info_span!("resolve_platform_deps").entered();
-        platform::resolve_real_deps(manifest_path)
+        platform::resolve_build(manifest_path)
     };
+    let build_features = build_resolve
+        .as_ref()
+        .map(|r| r.features.clone())
+        .unwrap_or_default();
+    let real_deps = build_resolve.map(|r| r.packages);
     if real_deps.is_none() {
         warn!("could not resolve platform deps, phantom detection disabled");
         eprintln!("  [WARN] Could not resolve platform deps, phantom detection disabled");
@@ -246,6 +256,7 @@ fn build_scan_context(manifest_path: &std::path::Path, dep_graph: &DepGraph) -> 
 
     ScanContext {
         real_deps,
+        build_features,
         dep_chains,
         fs_cache,
         regex_cache,
@@ -356,6 +367,7 @@ fn build_report(
     heavy_nodes_found: usize,
     unused_result: UnusedDepsResult,
     real_deps: &Option<HashSet<String>>,
+    build_features: &HashMap<String, Vec<String>>,
     args: &AnalyzeArgs,
 ) -> Result<AnalysisReport> {
     // `real_deps` holds every package cargo resolves for this platform, the
@@ -383,7 +395,11 @@ fn build_report(
     eprintln!("Building dependency tree for visualization...");
     let (mut dep_tree, id_to_idx) = {
         let _span = info_span!("build_dep_tree").entered();
-        flamegraph::build_dep_tree_indexed(&loaded.metadata_all_features, &loaded.metadata)
+        flamegraph::build_dep_tree_indexed(
+            &loaded.metadata_all_features,
+            &loaded.metadata,
+            build_features,
+        )
     };
 
     // Resolve the graph for each offered target so the report can be switched
