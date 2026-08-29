@@ -730,6 +730,35 @@ body {
   gap: 6px;
 }
 
+.sharing-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.sharing-controls select,
+.sharing-controls input {
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.sharing-controls select:focus,
+.sharing-controls input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+#sharing-count { color: var(--text-light); }
+
 .detail-section { margin-bottom: 12px; }
 .detail-refs-header { margin-top: 8px; }
 .detail-refs-body { margin-left: 8px; }

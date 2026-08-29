@@ -462,7 +462,9 @@ pub fn build_report(
 
     let total_deps = dep_graph.total_dependency_count();
     let heavy_nodes_found = dep_graph.heavy_nodes(heavy_threshold).len();
-    let direct_dep_summary = crate::analyze::build_direct_dep_summary(&dep_graph, &None);
+    let mut direct_dep_summary = crate::analyze::build_direct_dep_summary(&dep_graph, &None);
+    let transitive_sharing = crate::analyze::build_sharing_scopes(&dep_graph, &None);
+    crate::analyze::attach_owner_counts(&mut direct_dep_summary, &transitive_sharing);
 
     // ── DepTreeData (flamegraph) ──────────────────────────────────────────
     // Tree node i corresponds to graph.crates[i]; the synthetic root is n.
@@ -559,6 +561,7 @@ pub fn build_report(
         unused_edges: Vec::new(),
         unused_direct_deps: Vec::new(),
         direct_dep_summary,
+        transitive_sharing,
     }
 }
 
@@ -1039,5 +1042,61 @@ mod tests {
         assert_eq!(report.direct_dep_summary.len(), 1);
         assert_eq!(report.direct_dep_summary[0].dep_name, "a");
         assert_eq!(report.direct_dep_summary[0].total_transitive_deps, 2);
+
+        // Sharing: one scope (the synthetic root), a single top-level dep, so
+        // every crate in the chain a -> b -> c has exactly that one owner.
+        assert_eq!(report.transitive_sharing.len(), 1);
+        let scope = &report.transitive_sharing[0];
+        assert_eq!(scope.scope, "workspace");
+        assert!(scope.is_workspace);
+        assert_eq!(scope.total_direct_deps, 1);
+        assert_eq!(scope.deps.len(), 3);
+        for entry in &scope.deps {
+            assert_eq!(entry.owner_count, 1, "{} should have one owner", entry.name);
+            assert_eq!(entry.owners, vec!["a".to_string()]);
+        }
+        assert!(scope.deps.iter().any(|d| d.name == "a" && d.is_direct));
+        assert!(scope.deps.iter().any(|d| d.name == "c" && !d.is_direct));
+    }
+
+    #[test]
+    fn sharing_counts_owners_across_multiple_roots() {
+        // Two independent roots that share a leaf:
+        //   a -> shared, b -> shared
+        let crates = vec![lc("a", "1.0.0"), lc("b", "1.0.0"), lc("shared", "1.0.0")];
+        let mut index = HashMap::new();
+        index.insert(
+            "a".to_string(),
+            vec![index_version("1.0.0", vec![dep("shared", "^1")])],
+        );
+        index.insert(
+            "b".to_string(),
+            vec![index_version("1.0.0", vec![dep("shared", "^1")])],
+        );
+        index.insert("shared".to_string(), vec![index_version("1.0.0", vec![])]);
+        let g = build_list_graph(
+            crates,
+            &index,
+            &ListGraphOptions {
+                include_build: false,
+                skip_optional: false,
+            },
+        );
+        let (roots, _) = minimal_roots(g.crates.len(), &g.edges);
+
+        let report = build_report("mylist", &g, &roots, 10, 0.0);
+        let scope = &report.transitive_sharing[0];
+        assert_eq!(scope.total_direct_deps, 2);
+
+        let shared = scope
+            .deps
+            .iter()
+            .find(|d| d.name == "shared")
+            .expect("shared crate present");
+        assert_eq!(shared.owner_count, 2);
+        assert_eq!(shared.owners, vec!["a".to_string(), "b".to_string()]);
+
+        // Loosely unique first: the single-owner roots sort ahead of `shared`.
+        assert_eq!(scope.deps.last().unwrap().name, "shared");
     }
 }

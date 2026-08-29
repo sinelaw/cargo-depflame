@@ -35,6 +35,29 @@ The flamegraph is built directly from `cargo metadata` — the dependency struct
 
 The HTML report also includes an actionable suggestions tab with Cargo.toml diffs and a raw JSON tab.
 
+## How shared is each transitive dep?
+
+`W_unique` answers a strict question: what disappears if I drop this direct dependency? The sharing view answers the looser one: **for each transitive dep, how many of my top-level direct dependencies pull it in?**
+
+```
+Transitive deps by how many top-level deps pull them in (loosely unique first):
+
+  workspace (all members) — 12 top-level deps, 66 transitive deps
+  owner spread: 1×42  2×15  4×5  7×4
+   #  Crate               Version  Owners  Pulled in by
+  ──  ──────────────────  ───────  ──────  ────────────
+   1  clap_builder        4.6.0         1  clap
+  ...
+  53  libc                0.2.183       2  dashmap, open
+  63  syn                 2.0.117       7  cargo_metadata, clap, semver, serde, serde_json +2 more
+```
+
+An owner count of 1 means the crate vanishes with that single direct dep. A count of 2 or 3 out of dozens means it is *loosely* unique — dropping a couple of deps would still eliminate it. A count equal to your top-level dep total (`syn` above) means it is unavoidable. The `owner spread` line is a histogram of those counts: `2×15` reads "15 crates have exactly 2 owners".
+
+Two scopes are computed: the whole workspace (the union of every member's direct deps) and one per workspace member. Workspace members are transparent — if `crate-a` depends on sibling `crate-b`, `crate-b`'s direct deps count as top-level for `crate-a` too. Edges follow cargo's own feature resolution, and deps not compiled for your current platform are excluded.
+
+Text output shows the workspace scope; `--verbose` shows every row and the per-member breakdowns. In the HTML report, the **Sharing** tab has a scope selector, a max-owners filter, and sortable columns, and the Table tab gains an `Owners` column you can sort ascending to put the most uniquely-owned direct deps first.
+
 ## Analyzing a flat dependency list
 
 If all you have is a flat list of crates (say, extracted from someone else's binary) rather than a workspace, `from-list` reconstructs the tree for you (requires the `remote` feature):

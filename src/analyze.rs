@@ -12,7 +12,10 @@ use crate::metrics::{
 };
 use crate::platform;
 use crate::registry::FsCache;
-use crate::report::{AnalysisReport, DirectDepSummary, UnusedDirectDep};
+use crate::report::{
+    AnalysisReport, DirectDepSummary, SharedTransitiveDep, SharingScope, UnusedDirectDep,
+    OWNERS_LISTED,
+};
 use crate::scanner::{self, RegexCache};
 
 /// Metadata loaded in Phase 1: default features and all-features variants.
@@ -359,7 +362,9 @@ fn build_report(
         .map(|p| total_deps.saturating_sub(p))
         .unwrap_or(0);
 
-    let direct_dep_summary = build_direct_dep_summary(dep_graph, real_deps);
+    let mut direct_dep_summary = build_direct_dep_summary(dep_graph, real_deps);
+    let transitive_sharing = build_sharing_scopes(dep_graph, real_deps);
+    attach_owner_counts(&mut direct_dep_summary, &transitive_sharing);
 
     eprintln!("Building dependency tree for visualization...");
     let dep_tree = {
@@ -388,6 +393,7 @@ fn build_report(
         unused_edges,
         unused_direct_deps: unused_result.unused_direct_deps_summary,
         direct_dep_summary,
+        transitive_sharing,
     })
 }
 
@@ -1018,6 +1024,8 @@ pub(crate) fn build_direct_dep_summary(
                     unique_transitive_deps: w_unique,
                     total_transitive_deps: total_transitive,
                     unique_ancestors: ancestors,
+                    // Filled in by `attach_owner_counts` once scopes exist.
+                    owner_count: 0,
                 }
             });
             if w_unique > entry.unique_transitive_deps {
@@ -1030,6 +1038,134 @@ pub(crate) fn build_direct_dep_summary(
     let mut entries: Vec<DirectDepSummary> = best.into_values().collect();
     entries.sort_by(|a, b| b.unique_transitive_deps.cmp(&a.unique_transitive_deps));
     entries
+}
+
+/// Copy each direct dep's workspace-wide owner count onto its summary row, so
+/// the direct-dep table can be sorted by "how uniquely is this pulled in".
+pub(crate) fn attach_owner_counts(summary: &mut [DirectDepSummary], scopes: &[SharingScope]) {
+    let workspace = match scopes.iter().find(|s| s.is_workspace) {
+        Some(s) => s,
+        None => return,
+    };
+    let owners: HashMap<(&str, &str), usize> = workspace
+        .deps
+        .iter()
+        .map(|d| ((d.name.as_str(), d.version.as_str()), d.owner_count))
+        .collect();
+
+    for entry in summary.iter_mut() {
+        entry.owner_count = owners
+            .get(&(entry.dep_name.as_str(), entry.dep_version.as_str()))
+            .copied()
+            .unwrap_or(0);
+    }
+}
+
+/// Build the "loose uniqueness" view: for every transitive dep, how many
+/// top-level direct deps pull it in. One scope for the whole workspace, plus
+/// one per workspace member when the workspace has more than one.
+pub(crate) fn build_sharing_scopes(
+    dep_graph: &DepGraph,
+    real_deps: &Option<HashSet<String>>,
+) -> Vec<SharingScope> {
+    let mut members: Vec<cargo_metadata::PackageId> =
+        dep_graph.workspace_members.iter().cloned().collect();
+    members.sort_by_key(|id| {
+        dep_graph
+            .nodes
+            .get(id)
+            .map(|n| (n.name.clone(), n.version.clone()))
+            .unwrap_or_default()
+    });
+
+    let mut scopes = vec![build_sharing_scope(
+        "workspace",
+        true,
+        dep_graph,
+        &members,
+        real_deps,
+    )];
+
+    if members.len() > 1 {
+        for member in &members {
+            let name = match dep_graph.nodes.get(member) {
+                Some(n) => n.name.clone(),
+                None => continue,
+            };
+            scopes.push(build_sharing_scope(
+                &name,
+                false,
+                dep_graph,
+                std::slice::from_ref(member),
+                real_deps,
+            ));
+        }
+    }
+
+    scopes.retain(|s| !s.deps.is_empty());
+    scopes
+}
+
+fn build_sharing_scope(
+    scope: &str,
+    is_workspace: bool,
+    dep_graph: &DepGraph,
+    from: &[cargo_metadata::PackageId],
+    real_deps: &Option<HashSet<String>>,
+) -> SharingScope {
+    // Only walk deps that are actually compiled here: the graph already has
+    // cargo's feature resolution baked in, and `real_deps` drops the rest.
+    let keep = |id: &cargo_metadata::PackageId| match dep_graph.nodes.get(id) {
+        Some(node) => platform::is_real_dep(real_deps, &node.name, &node.version),
+        None => false,
+    };
+
+    let roots: Vec<cargo_metadata::PackageId> = dep_graph
+        .top_level_deps(from)
+        .into_iter()
+        .filter(|id| keep(id))
+        .collect();
+    let root_set: HashSet<&cargo_metadata::PackageId> = roots.iter().collect();
+
+    let owners = dep_graph.owners_by_package(&roots, keep);
+
+    let mut deps: Vec<SharedTransitiveDep> = owners
+        .iter()
+        .filter_map(|(id, owner_ids)| {
+            let node = dep_graph.nodes.get(id)?;
+            if node.is_workspace_member {
+                return None;
+            }
+            Some(SharedTransitiveDep {
+                name: node.name.clone(),
+                version: node.version.clone(),
+                owner_count: owner_ids.len(),
+                owners: owner_ids
+                    .iter()
+                    .take(OWNERS_LISTED)
+                    .filter_map(|o| dep_graph.nodes.get(o).map(|n| n.name.clone()))
+                    .collect(),
+                total_transitive_deps: node.transitive_weight.saturating_sub(1),
+                is_direct: root_set.contains(id),
+            })
+        })
+        .collect();
+
+    // Loosely unique first: fewest owners, then heaviest subtree.
+    deps.sort_by(|a, b| {
+        a.owner_count
+            .cmp(&b.owner_count)
+            .then(b.total_transitive_deps.cmp(&a.total_transitive_deps))
+            .then(a.name.cmp(&b.name))
+            .then(a.version.cmp(&b.version))
+    });
+
+    SharingScope {
+        scope: scope.to_string(),
+        is_workspace,
+        total_direct_deps: roots.len(),
+        deps,
+    }
 }
 
 fn now_timestamp() -> String {
@@ -1055,5 +1191,6 @@ fn empty_report(workspace_root: String, threshold: f64, total_deps: usize) -> An
         unused_edges: Vec::new(),
         unused_direct_deps: Vec::new(),
         direct_dep_summary: Vec::new(),
+        transitive_sharing: Vec::new(),
     }
 }

@@ -32,14 +32,115 @@ test('init() produces header with correct dep counts', function() {
   assertContains(html, '7 Targets');
 });
 
-test('init() produces all four tabs', function() {
+test('init() produces all tabs', function() {
   elements['app'] = new MockElement('div');
   DepflameContent.init();
   var html = elements['app']._innerHTML;
   assertContains(html, 'id="tab-flamegraph"');
   assertContains(html, 'id="tab-table"');
+  assertContains(html, 'id="tab-sharing"');
   assertContains(html, 'id="tab-targets"');
   assertContains(html, 'id="tab-json"');
+});
+
+test('sharing tab lists one option per scope', function() {
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var html = elements['app']._innerHTML;
+  assertContains(html, 'workspace (all members)');
+  assertContains(html, '<option value="1">my-app');
+  assertContains(html, '<option value="2">my-lib');
+  assertContains(html, '3 top-level deps');
+});
+
+test('sharing tab renders owner counts and owner names for the first scope', function() {
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var html = elements['app']._innerHTML;
+  var body = html.substring(html.indexOf('id="tab-sharing"'), html.indexOf('id="tab-targets"'));
+  // libc is pulled in by all three top-level deps of the workspace scope.
+  assertContains(body, 'libc');
+  assertContains(body, '>3<');
+  // Single-owner rows come first and name their one owner.
+  assertContains(body, 'framework-core');
+  // Crates that are themselves direct deps are marked.
+  assertContains(body, '(direct)');
+});
+
+test('sharing tab max-owners filter drops widely shared crates', function() {
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var tbody = new MockElement('tbody');
+  elements['sharing-tbody'] = tbody;
+  elements['sharing-count'] = new MockElement('span');
+
+  DepflameContent.setSharingMaxOwners('1');
+  assert(tbody._innerHTML.indexOf('libc') === -1, 'libc (3 owners) should be filtered out');
+  assertContains(tbody._innerHTML, 'framework-core');
+
+  DepflameContent.setSharingMaxOwners('');
+  assertContains(tbody._innerHTML, 'libc');
+});
+
+test('table tab has a sortable Owners column', function() {
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var html = elements['app']._innerHTML;
+  var table = html.substring(html.indexOf('id="dep-summary-table"'), html.indexOf('id="tab-sharing"'));
+  assertContains(table, 'data-sort-key="owner_count"');
+  // heavy-framework (1 owner) and serde (2 owners) both render their count.
+  assertContains(table, '>Owners<');
+});
+
+test('sharing rows sort by owner count ascending, and flip on re-sort', function() {
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var tbody = new MockElement('tbody');
+  elements['sharing-tbody'] = tbody;
+  elements['sharing-count'] = new MockElement('span');
+
+  // Default order is already ascending by owner count: libc (3 owners) last.
+  DepflameContent.selectSharingScope('0');
+  var asc = tbody._innerHTML;
+  assert(asc.indexOf('libc') > asc.indexOf('framework-core'),
+    'widely shared crates come last by default');
+
+  // Clicking the active column flips to descending: libc first.
+  DepflameContent.sortSharing('owner_count');
+  var desc = tbody._innerHTML;
+  assert(desc.indexOf('libc') < desc.indexOf('framework-core'),
+    'descending puts widely shared crates first');
+});
+
+test('sharing rows can be sorted by subtree size', function() {
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var tbody = new MockElement('tbody');
+  elements['sharing-tbody'] = tbody;
+  elements['sharing-count'] = new MockElement('span');
+
+  DepflameContent.selectSharingScope('0');
+  DepflameContent.sortSharing('total_transitive_deps');
+  var html = tbody._innerHTML;
+  // heavy-framework has the biggest subtree (25) in the workspace scope.
+  assert(html.indexOf('heavy-framework') < html.indexOf('framework-core'),
+    'heaviest subtree first when sorting by subtree size');
+});
+
+test('sharing tab scope selector switches the rendered rows', function() {
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var tbody = new MockElement('tbody');
+  elements['sharing-tbody'] = tbody;
+  elements['sharing-count'] = new MockElement('span');
+
+  DepflameContent.selectSharingScope('2'); // my-lib
+  assertContains(tbody._innerHTML, 'regex-automata');
+  assert(tbody._innerHTML.indexOf('heavy-framework') === -1,
+    'my-lib scope should not contain my-app-only deps');
+
+  DepflameContent.selectSharingScope('0');
+  assertContains(tbody._innerHTML, 'heavy-framework');
 });
 
 test('table tab contains direct dep summary rows', function() {

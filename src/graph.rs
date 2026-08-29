@@ -338,6 +338,90 @@ impl DepGraph {
         self.forward.get(id).map(|deps| deps.len()).unwrap_or(0)
     }
 
+    /// The "top-level direct dependencies" of a scope: the first non-workspace
+    /// packages reached from `from`, treating workspace members as transparent
+    /// (so a member's top-level deps include those of the sibling members it
+    /// depends on).
+    ///
+    /// Returned sorted by (name, version) so downstream output is deterministic.
+    pub fn top_level_deps(&self, from: &[PackageId]) -> Vec<PackageId> {
+        let mut roots: HashSet<PackageId> = HashSet::new();
+        let mut seen: HashSet<PackageId> = from.iter().cloned().collect();
+        let mut queue: VecDeque<PackageId> = from.iter().cloned().collect();
+
+        while let Some(current) = queue.pop_front() {
+            for dep in self.forward.get(&current).into_iter().flatten() {
+                let is_member = self.nodes.get(dep).is_some_and(|n| n.is_workspace_member);
+                if is_member {
+                    if seen.insert(dep.clone()) {
+                        queue.push_back(dep.clone());
+                    }
+                } else {
+                    roots.insert(dep.clone());
+                }
+            }
+        }
+
+        let mut out: Vec<PackageId> = roots.into_iter().collect();
+        out.sort_by(|a, b| {
+            let key = |id: &PackageId| {
+                self.nodes
+                    .get(id)
+                    .map(|n| (n.name.clone(), n.version.clone()))
+                    .unwrap_or_default()
+            };
+            key(a).cmp(&key(b))
+        });
+        out
+    }
+
+    /// For every package reachable from `roots`, which of those roots pull it
+    /// in transitively. A root is always an owner of itself.
+    ///
+    /// This is the "loose uniqueness" counterpart to `unique_subtree_weight`:
+    /// an owner count of 1 means the package would vanish if that single
+    /// top-level dep were dropped, while a count of N means every top-level
+    /// dep in the scope depends on it.
+    ///
+    /// `keep` filters the traversal: nodes it rejects are neither reported nor
+    /// traversed through (used to drop deps that aren't compiled on the
+    /// current platform). Owner vectors preserve the order of `roots`.
+    pub fn owners_by_package<F>(
+        &self,
+        roots: &[PackageId],
+        keep: F,
+    ) -> HashMap<PackageId, Vec<PackageId>>
+    where
+        F: Fn(&PackageId) -> bool,
+    {
+        let mut owners: HashMap<PackageId, Vec<PackageId>> = HashMap::new();
+
+        for root in roots {
+            if !self.nodes.contains_key(root) || !keep(root) {
+                continue;
+            }
+            let mut visited: HashSet<PackageId> = HashSet::new();
+            let mut queue: VecDeque<PackageId> = VecDeque::new();
+            visited.insert(root.clone());
+            queue.push_back(root.clone());
+
+            while let Some(current) = queue.pop_front() {
+                owners
+                    .entry(current.clone())
+                    .or_default()
+                    .push(root.clone());
+                for dep in self.forward.get(&current).into_iter().flatten() {
+                    if !keep(dep) || !visited.insert(dep.clone()) {
+                        continue;
+                    }
+                    queue.push_back(dep.clone());
+                }
+            }
+        }
+
+        owners
+    }
+
     /// Check if a workspace member is a standalone integration crate:
     /// no other workspace member depends on it. This means it's already
     /// effectively opt-in — users only get it if they explicitly add it.
@@ -852,5 +936,102 @@ mod tests {
         assert_eq!(g.direct_dep_count(&pid("A")), 2);
         assert_eq!(g.direct_dep_count(&pid("B")), 1);
         assert_eq!(g.direct_dep_count(&pid("D")), 0);
+    }
+
+    // ---------------------------------------------------------------
+    // top_level_deps / owners_by_package
+    // ---------------------------------------------------------------
+
+    /// Names of the packages in a list, sorted for stable comparison.
+    fn names(g: &DepGraph, ids: &[PackageId]) -> Vec<String> {
+        let mut v: Vec<String> = ids.iter().map(|id| g.nodes[id].name.clone()).collect();
+        v.sort();
+        v
+    }
+
+    fn owner_names(
+        g: &DepGraph,
+        owners: &HashMap<PackageId, Vec<PackageId>>,
+        of: &str,
+    ) -> Vec<String> {
+        let mut v: Vec<String> = owners
+            .get(&pid(of))
+            .map(|ids| ids.iter().map(|id| g.nodes[id].name.clone()).collect())
+            .unwrap_or_default();
+        v.sort();
+        v
+    }
+
+    #[test]
+    fn top_level_deps_skips_workspace_members() {
+        // WS1 -> WS2 -> A, WS1 -> B. WS2 is a member, so A is top-level too.
+        let g = test_graph(
+            &[("WS1", "WS2"), ("WS2", "A"), ("WS1", "B")],
+            &["WS1", "WS2"],
+        );
+        let roots = g.top_level_deps(&[pid("WS1")]);
+        assert_eq!(names(&g, &roots), vec!["A", "B"]);
+    }
+
+    #[test]
+    fn top_level_deps_per_member() {
+        let g = test_graph(&[("WS1", "A"), ("WS2", "B")], &["WS1", "WS2"]);
+        assert_eq!(names(&g, &g.top_level_deps(&[pid("WS1")])), vec!["A"]);
+        assert_eq!(names(&g, &g.top_level_deps(&[pid("WS2")])), vec!["B"]);
+        assert_eq!(
+            names(&g, &g.top_level_deps(&[pid("WS1"), pid("WS2")])),
+            vec!["A", "B"]
+        );
+    }
+
+    #[test]
+    fn owners_counts_direct_deps_that_reach_a_crate() {
+        // WS -> A -> D, WS -> B -> D, WS -> C. D is pulled in by A and B.
+        let g = test_graph(
+            &[
+                ("WS", "A"),
+                ("WS", "B"),
+                ("WS", "C"),
+                ("A", "D"),
+                ("B", "D"),
+            ],
+            &["WS"],
+        );
+        let roots = g.top_level_deps(&[pid("WS")]);
+        let owners = g.owners_by_package(&roots, |_| true);
+        assert_eq!(owner_names(&g, &owners, "D"), vec!["A", "B"]);
+        // A root owns itself, and nothing else reaches it.
+        assert_eq!(owner_names(&g, &owners, "A"), vec!["A"]);
+        assert_eq!(owner_names(&g, &owners, "C"), vec!["C"]);
+    }
+
+    #[test]
+    fn owners_include_a_direct_dep_reached_through_another() {
+        // WS -> A -> B, WS -> B. B is both direct and pulled in by A.
+        let g = test_graph(&[("WS", "A"), ("WS", "B"), ("A", "B")], &["WS"]);
+        let roots = g.top_level_deps(&[pid("WS")]);
+        let owners = g.owners_by_package(&roots, |_| true);
+        assert_eq!(owner_names(&g, &owners, "B"), vec!["A", "B"]);
+    }
+
+    #[test]
+    fn owners_respect_the_keep_filter() {
+        // WS -> A -> D, WS -> B -> D; B is filtered out (e.g. not compiled here).
+        let g = test_graph(&[("WS", "A"), ("WS", "B"), ("A", "D"), ("B", "D")], &["WS"]);
+        let roots = g.top_level_deps(&[pid("WS")]);
+        let owners = g.owners_by_package(&roots, |id| g.nodes[id].name != "B");
+        assert_eq!(owner_names(&g, &owners, "D"), vec!["A"]);
+        assert!(!owners.contains_key(&pid("B")));
+    }
+
+    #[test]
+    fn owners_skip_filtered_intermediates() {
+        // WS -> A -> X -> D. Filtering X also drops D, since the only path is
+        // through a dep that isn't compiled.
+        let g = test_graph(&[("WS", "A"), ("A", "X"), ("X", "D")], &["WS"]);
+        let roots = g.top_level_deps(&[pid("WS")]);
+        let owners = g.owners_by_package(&roots, |id| g.nodes[id].name != "X");
+        assert!(!owners.contains_key(&pid("D")));
+        assert_eq!(owner_names(&g, &owners, "A"), vec!["A"]);
     }
 }

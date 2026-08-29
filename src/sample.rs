@@ -10,7 +10,9 @@ use std::collections::BTreeMap;
 use crate::flamegraph::{DepTreeData, DepTreeEdge, DepTreeNode};
 use crate::graph::EdgeMeta;
 use crate::metrics::{Confidence, PackageInfo, RemovalStrategy, UpstreamTarget};
-use crate::report::{AnalysisReport, DirectDepSummary, UnusedDirectDep};
+use crate::report::{
+    AnalysisReport, DirectDepSummary, SharedTransitiveDep, SharingScope, UnusedDirectDep,
+};
 use crate::scanner::{FileMatch, ScanResult};
 
 /// Build a deterministic sample [`AnalysisReport`] for testing.
@@ -50,6 +52,7 @@ pub fn generate_sample_report() -> AnalysisReport {
                 unique_transitive_deps: 18,
                 total_transitive_deps: 25,
                 unique_ancestors: 1,
+                owner_count: 1,
             },
             DirectDepSummary {
                 workspace_member: "my-app".into(),
@@ -58,6 +61,7 @@ pub fn generate_sample_report() -> AnalysisReport {
                 unique_transitive_deps: 3,
                 total_transitive_deps: 5,
                 unique_ancestors: 12,
+                owner_count: 2,
             },
             DirectDepSummary {
                 workspace_member: "my-lib".into(),
@@ -66,9 +70,115 @@ pub fn generate_sample_report() -> AnalysisReport {
                 unique_transitive_deps: 2,
                 total_transitive_deps: 8,
                 unique_ancestors: 5,
+                owner_count: 1,
             },
         ],
+        transitive_sharing: sample_sharing(),
     }
+}
+
+/// Sharing scopes for the sample workspace: one workspace-wide view plus one
+/// per member, covering strictly unique (1 owner), loosely shared (2) and
+/// ubiquitous (all owners) crates.
+fn sample_sharing() -> Vec<SharingScope> {
+    let shared =
+        |name: &str, version: &str, count: usize, owners: &[&str], weight: usize, direct: bool| {
+            SharedTransitiveDep {
+                name: name.into(),
+                version: version.into(),
+                owner_count: count,
+                owners: owners.iter().map(|o| (*o).to_string()).collect(),
+                total_transitive_deps: weight,
+                is_direct: direct,
+            }
+        };
+
+    vec![
+        SharingScope {
+            scope: "workspace".into(),
+            is_workspace: true,
+            total_direct_deps: 3,
+            deps: vec![
+                shared(
+                    "heavy-framework",
+                    "2.0.0",
+                    1,
+                    &["heavy-framework"],
+                    25,
+                    true,
+                ),
+                shared("framework-core", "2.0.0", 1, &["heavy-framework"], 9, false),
+                shared("regex", "1.10.0", 1, &["regex"], 8, true),
+                shared("regex-automata", "0.4.0", 1, &["regex"], 2, false),
+                shared(
+                    "serde",
+                    "1.0.200",
+                    2,
+                    &["heavy-framework", "serde"],
+                    5,
+                    true,
+                ),
+                shared(
+                    "serde_derive",
+                    "1.0.200",
+                    2,
+                    &["heavy-framework", "serde"],
+                    3,
+                    false,
+                ),
+                shared(
+                    "libc",
+                    "0.2.155",
+                    3,
+                    &["heavy-framework", "regex", "serde"],
+                    0,
+                    false,
+                ),
+            ],
+        },
+        SharingScope {
+            scope: "my-app".into(),
+            is_workspace: false,
+            total_direct_deps: 2,
+            deps: vec![
+                shared(
+                    "heavy-framework",
+                    "2.0.0",
+                    1,
+                    &["heavy-framework"],
+                    25,
+                    true,
+                ),
+                shared("framework-core", "2.0.0", 1, &["heavy-framework"], 9, false),
+                shared(
+                    "serde",
+                    "1.0.200",
+                    2,
+                    &["heavy-framework", "serde"],
+                    5,
+                    true,
+                ),
+                shared(
+                    "libc",
+                    "0.2.155",
+                    2,
+                    &["heavy-framework", "serde"],
+                    0,
+                    false,
+                ),
+            ],
+        },
+        SharingScope {
+            scope: "my-lib".into(),
+            is_workspace: false,
+            total_direct_deps: 1,
+            deps: vec![
+                shared("regex", "1.10.0", 1, &["regex"], 8, true),
+                shared("regex-automata", "0.4.0", 1, &["regex"], 2, false),
+                shared("libc", "0.2.155", 1, &["regex"], 0, false),
+            ],
+        },
+    ]
 }
 
 fn sample_targets() -> Vec<UpstreamTarget> {

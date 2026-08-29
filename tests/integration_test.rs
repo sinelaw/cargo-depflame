@@ -223,3 +223,71 @@ fn noise_filtering_works_end_to_end() {
         "unfiltered report should have >= targets"
     );
 }
+
+/// Transitive sharing: a workspace-wide scope plus one scope per member, with
+/// owner counts that reflect which top-level deps pull each crate in.
+///
+/// crate-a depends on crate-b (a workspace member), so crate-b's deps count as
+/// top-level for crate-a too. serde is pulled in by both serde and serde_json.
+#[test]
+fn transitive_sharing_has_workspace_and_member_scopes() {
+    let report = analyze::run_analyze(&default_args()).expect("analysis should succeed");
+
+    let scopes = &report.transitive_sharing;
+    assert!(!scopes.is_empty(), "sharing scopes should be populated");
+    assert!(scopes[0].is_workspace, "the first scope is workspace-wide");
+
+    let member_scopes: Vec<&str> = scopes
+        .iter()
+        .filter(|s| !s.is_workspace)
+        .map(|s| s.scope.as_str())
+        .collect();
+    assert!(member_scopes.contains(&"crate-a"), "{member_scopes:?}");
+    assert!(member_scopes.contains(&"crate-b"), "{member_scopes:?}");
+
+    let ws = &scopes[0];
+    // Workspace members are transparent: crate-b's deps are top-level too.
+    assert!(
+        ws.total_direct_deps >= 6,
+        "expected all members' direct deps, got {}",
+        ws.total_direct_deps
+    );
+    assert!(
+        !ws.deps.iter().any(|d| d.name.starts_with("crate-")),
+        "workspace members should not appear as transitive deps"
+    );
+
+    let serde = ws
+        .deps
+        .iter()
+        .find(|d| d.name == "serde")
+        .expect("serde in the workspace scope");
+    assert!(
+        serde.owner_count >= 2,
+        "serde is pulled in by serde and serde_json, got {}",
+        serde.owner_count
+    );
+    assert!(serde.is_direct, "serde is itself a top-level dep");
+    assert!(serde.owners.contains(&"serde_json".to_string()));
+
+    // Every owner count is bounded by the scope's top-level dep count.
+    for scope in scopes {
+        for dep in &scope.deps {
+            assert!(
+                dep.owner_count >= 1 && dep.owner_count <= scope.total_direct_deps,
+                "{} has {} owners in scope {} ({} top-level deps)",
+                dep.name,
+                dep.owner_count,
+                scope.scope,
+                scope.total_direct_deps
+            );
+        }
+    }
+
+    // crate-b's scope only sees its own deps — regex is crate-a's.
+    let b = scopes
+        .iter()
+        .find(|s| s.scope == "crate-b")
+        .expect("crate-b scope");
+    assert!(!b.deps.iter().any(|d| d.name == "regex"));
+}

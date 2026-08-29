@@ -792,7 +792,8 @@
       "dep_version": "2.0.0",
       "unique_transitive_deps": 18,
       "total_transitive_deps": 25,
-      "unique_ancestors": 1
+      "unique_ancestors": 1,
+      "owner_count": 1
     },
     {
       "workspace_member": "my-app",
@@ -800,7 +801,8 @@
       "dep_version": "1.0.200",
       "unique_transitive_deps": 3,
       "total_transitive_deps": 5,
-      "unique_ancestors": 12
+      "unique_ancestors": 12,
+      "owner_count": 2
     },
     {
       "workspace_member": "my-lib",
@@ -808,7 +810,177 @@
       "dep_version": "1.10.0",
       "unique_transitive_deps": 2,
       "total_transitive_deps": 8,
-      "unique_ancestors": 5
+      "unique_ancestors": 5,
+      "owner_count": 1
+    }
+  ],
+  "transitive_sharing": [
+    {
+      "scope": "workspace",
+      "is_workspace": true,
+      "total_direct_deps": 3,
+      "deps": [
+        {
+          "name": "heavy-framework",
+          "version": "2.0.0",
+          "owner_count": 1,
+          "owners": [
+            "heavy-framework"
+          ],
+          "total_transitive_deps": 25,
+          "is_direct": true
+        },
+        {
+          "name": "framework-core",
+          "version": "2.0.0",
+          "owner_count": 1,
+          "owners": [
+            "heavy-framework"
+          ],
+          "total_transitive_deps": 9,
+          "is_direct": false
+        },
+        {
+          "name": "regex",
+          "version": "1.10.0",
+          "owner_count": 1,
+          "owners": [
+            "regex"
+          ],
+          "total_transitive_deps": 8,
+          "is_direct": true
+        },
+        {
+          "name": "regex-automata",
+          "version": "0.4.0",
+          "owner_count": 1,
+          "owners": [
+            "regex"
+          ],
+          "total_transitive_deps": 2,
+          "is_direct": false
+        },
+        {
+          "name": "serde",
+          "version": "1.0.200",
+          "owner_count": 2,
+          "owners": [
+            "heavy-framework",
+            "serde"
+          ],
+          "total_transitive_deps": 5,
+          "is_direct": true
+        },
+        {
+          "name": "serde_derive",
+          "version": "1.0.200",
+          "owner_count": 2,
+          "owners": [
+            "heavy-framework",
+            "serde"
+          ],
+          "total_transitive_deps": 3,
+          "is_direct": false
+        },
+        {
+          "name": "libc",
+          "version": "0.2.155",
+          "owner_count": 3,
+          "owners": [
+            "heavy-framework",
+            "regex",
+            "serde"
+          ],
+          "total_transitive_deps": 0,
+          "is_direct": false
+        }
+      ]
+    },
+    {
+      "scope": "my-app",
+      "is_workspace": false,
+      "total_direct_deps": 2,
+      "deps": [
+        {
+          "name": "heavy-framework",
+          "version": "2.0.0",
+          "owner_count": 1,
+          "owners": [
+            "heavy-framework"
+          ],
+          "total_transitive_deps": 25,
+          "is_direct": true
+        },
+        {
+          "name": "framework-core",
+          "version": "2.0.0",
+          "owner_count": 1,
+          "owners": [
+            "heavy-framework"
+          ],
+          "total_transitive_deps": 9,
+          "is_direct": false
+        },
+        {
+          "name": "serde",
+          "version": "1.0.200",
+          "owner_count": 2,
+          "owners": [
+            "heavy-framework",
+            "serde"
+          ],
+          "total_transitive_deps": 5,
+          "is_direct": true
+        },
+        {
+          "name": "libc",
+          "version": "0.2.155",
+          "owner_count": 2,
+          "owners": [
+            "heavy-framework",
+            "serde"
+          ],
+          "total_transitive_deps": 0,
+          "is_direct": false
+        }
+      ]
+    },
+    {
+      "scope": "my-lib",
+      "is_workspace": false,
+      "total_direct_deps": 1,
+      "deps": [
+        {
+          "name": "regex",
+          "version": "1.10.0",
+          "owner_count": 1,
+          "owners": [
+            "regex"
+          ],
+          "total_transitive_deps": 8,
+          "is_direct": true
+        },
+        {
+          "name": "regex-automata",
+          "version": "0.4.0",
+          "owner_count": 1,
+          "owners": [
+            "regex"
+          ],
+          "total_transitive_deps": 2,
+          "is_direct": false
+        },
+        {
+          "name": "libc",
+          "version": "0.2.155",
+          "owner_count": 1,
+          "owners": [
+            "regex"
+          ],
+          "total_transitive_deps": 0,
+          "is_direct": false
+        }
+      ]
     }
   ]
 }

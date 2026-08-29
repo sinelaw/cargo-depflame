@@ -82,6 +82,7 @@ var DepflameContent = (function() {
     return '<div class="tabs">'
       + '<button class="tab-btn active" onclick="showTab(\'flamegraph\')">Flamegraph</button>'
       + '<button class="tab-btn" onclick="showTab(\'table\')">Table</button>'
+      + '<button class="tab-btn" onclick="showTab(\'sharing\')">Sharing</button>'
       + '<button class="tab-btn" onclick="showTab(\'targets\')">Suggestions (' + nTargets + ')</button>'
       + '<button class="tab-btn" onclick="showTab(\'json\')">Raw JSON</button>'
       + '</div>';
@@ -164,6 +165,8 @@ var DepflameContent = (function() {
       + ' title="Total transitive deps.">Total Deps</th>'
       + '<th class="sortable" data-sort-key="unique_ancestors"'
       + ' title="Number of unique ancestor packages that transitively depend on this crate. High = hard to remove.">Ancestors</th>'
+      + '<th class="sortable" data-sort-key="owner_count"'
+      + ' title="How many top-level direct deps pull this crate in. Sort ascending to put uniquely-owned deps first.">Owners</th>'
       + '</tr></thead><tbody id="dep-summary-tbody">';
 
     html += renderDepSummaryRows(summary);
@@ -187,7 +190,8 @@ var DepflameContent = (function() {
         + '<div class="unique-bar" style="width:' + barW + '%"></div>'
         + '<span>' + e.unique_transitive_deps + '</span></div></td>'
         + '<td>' + e.total_transitive_deps + '</td>'
-        + '<td>' + (e.unique_ancestors || 0) + '</td></tr>';
+        + '<td>' + (e.unique_ancestors || 0) + '</td>'
+        + '<td>' + (e.owner_count || 0) + '</td></tr>';
     }
     return html;
   }
@@ -203,7 +207,9 @@ var DepflameContent = (function() {
       depSortAsc = !depSortAsc;
     } else {
       depSortKey = key;
-      depSortAsc = (key === 'dep_name' || key === 'dep_version');
+      // Ascending by default for names and for owner_count, where "few owners"
+      // is the interesting end.
+      depSortAsc = (key === 'dep_name' || key === 'dep_version' || key === 'owner_count');
     }
 
     // Sort a copy with stable indices for the '#' column.
@@ -248,6 +254,178 @@ var DepflameContent = (function() {
     if (tbody) {
       tbody.innerHTML = renderDepSummaryRows(sorted);
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Sharing tab: how many top-level deps pull in each transitive dep.
+  // -------------------------------------------------------------------------
+
+  var sharingScopeIdx = 0;
+  var sharingMaxOwners = 0; // 0 = no filter
+  var sharingSortKey = 'owner_count';
+  var sharingSortAsc = true; // default: fewest owners (most unique) first
+
+  function sharingScopes() {
+    var r = window.__DEPFLAME_REPORT__;
+    return (r && r.transitive_sharing) || [];
+  }
+
+  function scopeLabel(scope) {
+    return scope.is_workspace ? 'workspace (all members)' : scope.scope;
+  }
+
+  function buildSharingTab(r) {
+    var scopes = r.transitive_sharing || [];
+    if (scopes.length === 0) {
+      return '<p class="text-light">No dependency sharing data available.</p>';
+    }
+
+    var options = '';
+    for (var i = 0; i < scopes.length; i++) {
+      options += '<option value="' + i + '">' + esc(scopeLabel(scopes[i]))
+        + ' — ' + scopes[i].total_direct_deps + ' top-level deps</option>';
+    }
+
+    return '<div class="action-summary">'
+      + '<h3>Transitive deps by how many top-level deps pull them in</h3>'
+      + '<p class="text-section-desc">'
+      + '<em>Owners</em> = how many of the scope\'s top-level direct dependencies '
+      + 'transitively pull this crate in. 1 means it disappears with that single dep; '
+      + 'a count equal to the scope\'s top-level dep count means everything needs it. '
+      + 'Rows are ordered loosely-unique first.</p>'
+      + '<div class="sharing-controls">'
+      +   '<label>Scope: <select id="sharing-scope-select" '
+      +     'onchange="DepflameContent.selectSharingScope(this.value)">' + options + '</select></label>'
+      +   '<label title="Show only crates pulled in by at most N top-level deps.">'
+      +     ' Max owners: <input type="number" id="sharing-max-owners" min="1" value="" '
+      +     'placeholder="off" style="width:50px" '
+      +     'onchange="DepflameContent.setSharingMaxOwners(this.value)"></label>'
+      +   '<span id="sharing-count"></span>'
+      + '</div>'
+      + '<table class="targets-table dep-summary-table" id="sharing-table"><thead><tr>'
+      + '<th>#</th>'
+      + '<th class="sortable" data-sort-key="name">Crate</th>'
+      + '<th class="sortable" data-sort-key="version">Version</th>'
+      + '<th class="sortable sort-active sort-asc" data-sort-key="owner_count"'
+      + ' title="Number of top-level direct deps that pull this crate in. Ascending = most uniquely owned first.">Owners</th>'
+      + '<th class="sortable" data-sort-key="total_transitive_deps"'
+      + ' title="Transitive deps of this crate.">Subtree</th>'
+      + '<th>Pulled in by</th>'
+      + '</tr></thead><tbody id="sharing-tbody">'
+      + renderSharingRows(scopes[0])
+      + '</tbody></table></div>';
+  }
+
+  // Sort a scope's rows by the active column. Ties fall back to the report's
+  // own order: fewest owners, then heaviest subtree, then name.
+  function sortedSharingDeps(scope) {
+    var deps = (scope.deps || []).slice();
+    var key = sharingSortKey;
+    var dir = sharingSortAsc ? 1 : -1;
+    deps.sort(function(a, b) {
+      var va = a[key], vb = b[key];
+      if (va == null) va = 0;
+      if (vb == null) vb = 0;
+      var cmp = (typeof va === 'string') ? va.localeCompare(vb) : (va - vb);
+      if (cmp !== 0) return dir * cmp;
+      cmp = a.owner_count - b.owner_count;
+      if (cmp !== 0) return cmp;
+      cmp = b.total_transitive_deps - a.total_transitive_deps;
+      if (cmp !== 0) return cmp;
+      return a.name.localeCompare(b.name);
+    });
+    return deps;
+  }
+
+  function renderSharingRows(scope) {
+    var deps = sortedSharingDeps(scope);
+    var total = scope.total_direct_deps || 1;
+    var html = '';
+    var shown = 0;
+    for (var i = 0; i < deps.length; i++) {
+      var e = deps[i];
+      if (sharingMaxOwners > 0 && e.owner_count > sharingMaxOwners) continue;
+      shown++;
+      var barW = Math.round(e.owner_count / total * 100);
+      var owners = (e.owners || []).map(function(o) { return crateLink(o); }).join(', ');
+      var hidden = e.owner_count - (e.owners || []).length;
+      if (hidden > 0) owners += ' <span class="text-light">+' + hidden + ' more</span>';
+      html += '<tr><td>' + shown + '</td>'
+        + '<td><code>' + crateLink(e.name) + '</code>'
+        + (e.is_direct ? ' <span class="text-light">(direct)</span>' : '') + '</td>'
+        + '<td>' + esc(e.version) + '</td>'
+        + '<td><div class="dep-summary-cell">'
+        + '<div class="unique-bar" style="width:' + barW + '%"></div>'
+        + '<span>' + e.owner_count + '</span></div></td>'
+        + '<td>' + e.total_transitive_deps + '</td>'
+        + '<td>' + owners + '</td></tr>';
+    }
+    if (shown === 0) {
+      html = '<tr><td colspan="6" class="text-light">No crates match this filter.</td></tr>';
+    }
+    return html;
+  }
+
+  // Compact histogram of owner counts, e.g. "1x42  2x15  7x4": 42 crates have
+  // a single owner, 15 have two, 4 have seven.
+  function ownerSpread(scope) {
+    var counts = {};
+    var deps = scope.deps || [];
+    for (var i = 0; i < deps.length; i++) {
+      counts[deps[i].owner_count] = (counts[deps[i].owner_count] || 0) + 1;
+    }
+    return Object.keys(counts)
+      .map(Number)
+      .sort(function(a, b) { return a - b; })
+      .map(function(n) { return n + '\u00d7' + counts[n]; })
+      .join('  ');
+  }
+
+  function refreshSharing() {
+    var scopes = sharingScopes();
+    var scope = scopes[sharingScopeIdx];
+    if (!scope) return;
+    var tbody = document.getElementById('sharing-tbody');
+    if (tbody) tbody.innerHTML = renderSharingRows(scope);
+    var count = document.getElementById('sharing-count');
+    if (count) {
+      count.textContent = scope.deps.length + ' transitive deps across '
+        + scope.total_direct_deps + ' top-level deps — spread: ' + ownerSpread(scope);
+    }
+  }
+
+  function selectSharingScope(idx) {
+    sharingScopeIdx = parseInt(idx, 10) || 0;
+    refreshSharing();
+  }
+
+  function setSharingMaxOwners(value) {
+    var n = parseInt(value, 10);
+    sharingMaxOwners = (isNaN(n) || n <= 0) ? 0 : n;
+    refreshSharing();
+  }
+
+  function sortSharing(key) {
+    if (key === sharingSortKey) {
+      sharingSortAsc = !sharingSortAsc;
+    } else {
+      sharingSortKey = key;
+      // Ascending for names and owner counts; descending for subtree size.
+      sharingSortAsc = (key !== 'total_transitive_deps');
+    }
+
+    var table = document.getElementById('sharing-table');
+    if (table) {
+      var ths = table.querySelectorAll('th.sortable');
+      for (var i = 0; i < ths.length; i++) {
+        ths[i].classList.remove('sort-active', 'sort-asc', 'sort-desc');
+        if (ths[i].getAttribute('data-sort-key') === key) {
+          ths[i].classList.add('sort-active', sharingSortAsc ? 'sort-asc' : 'sort-desc');
+        }
+      }
+    }
+
+    refreshSharing();
   }
 
   // -------------------------------------------------------------------------
@@ -608,6 +786,11 @@ var DepflameContent = (function() {
     var app = document.getElementById('app');
     if (!app) return;
 
+    sharingScopeIdx = 0;
+    sharingMaxOwners = 0;
+    sharingSortKey = 'owner_count';
+    sharingSortAsc = true;
+
     var nActionable = 0;
     for (var i = 0; i < report.targets.length; i++) {
       if (report.targets[i].confidence !== 'Noise') nActionable++;
@@ -618,6 +801,7 @@ var DepflameContent = (function() {
     // Tab contents.
     html += buildFlamegraphTab();
     html += '<div id="tab-table" class="tab-content">' + buildTableTab(report) + '</div>';
+    html += '<div id="tab-sharing" class="tab-content">' + buildSharingTab(report) + '</div>';
     html += '<div id="tab-targets" class="tab-content">' + buildSuggestionsTab(report) + '</div>';
     html += '<div id="tab-json" class="tab-content">' + buildJsonTab(report) + '</div>';
 
@@ -636,11 +820,20 @@ var DepflameContent = (function() {
       });
     }
 
+    refreshSharing();
+
     // Wire up sortable table headers.
     var sortHeaders = document.querySelectorAll('#dep-summary-table th.sortable');
     for (var i = 0; i < sortHeaders.length; i++) {
       sortHeaders[i].addEventListener('click', function() {
         sortDepSummary(this.getAttribute('data-sort-key'));
+      });
+    }
+
+    var sharingHeaders = document.querySelectorAll('#sharing-table th.sortable');
+    for (var i = 0; i < sharingHeaders.length; i++) {
+      sharingHeaders[i].addEventListener('click', function() {
+        sortSharing(this.getAttribute('data-sort-key'));
       });
     }
 
@@ -683,5 +876,10 @@ var DepflameContent = (function() {
     }
   }
 
-  return { init: init };
+  return {
+    init: init,
+    selectSharingScope: selectSharingScope,
+    setSharingMaxOwners: setSharingMaxOwners,
+    sortSharing: sortSharing
+  };
 })();

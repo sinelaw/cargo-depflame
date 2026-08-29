@@ -2,6 +2,7 @@ use crate::flamegraph::DepTreeData;
 use crate::metrics::{Confidence, RemovalStrategy, UpstreamTarget};
 use crate::scanner::display_path;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use std::io::Write;
 
 /// The full serializable analysis report.
@@ -36,6 +37,49 @@ pub struct AnalysisReport {
     /// Direct dependencies of workspace members sorted by unique transitive dep count.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub direct_dep_summary: Vec<DirectDepSummary>,
+    /// "Loose uniqueness" of every transitive dep: how many top-level direct
+    /// deps pull it in. One entry per scope (the whole workspace, plus one per
+    /// workspace member when there is more than one).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub transitive_sharing: Vec<SharingScope>,
+}
+
+/// Max number of owner names recorded per transitive dep. `owner_count` is
+/// always exact; the name list is truncated to keep reports a sane size.
+pub const OWNERS_LISTED: usize = 20;
+
+/// How widely one transitive dependency is shared across the top-level direct
+/// dependencies of a scope.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SharedTransitiveDep {
+    pub name: String,
+    pub version: String,
+    /// Number of top-level direct deps in this scope that transitively pull
+    /// this crate in. 1 = strictly unique to one direct dep; `total_direct_deps`
+    /// = pulled in by every direct dep.
+    pub owner_count: usize,
+    /// Names of those direct deps, truncated to `OWNERS_LISTED` entries.
+    pub owners: Vec<String>,
+    /// Total transitive deps of this crate (excluding itself).
+    pub total_transitive_deps: usize,
+    /// True if this crate is itself one of the scope's top-level direct deps.
+    pub is_direct: bool,
+}
+
+/// Transitive-dep sharing for one scope: either the whole workspace or a
+/// single workspace member.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SharingScope {
+    /// Scope name: the workspace member's name, or "workspace" for the union
+    /// of all members.
+    pub scope: String,
+    /// True for the workspace-wide scope.
+    pub is_workspace: bool,
+    /// Number of top-level direct deps considered in this scope.
+    pub total_direct_deps: usize,
+    /// Transitive deps, sorted "loosely unique" first (ascending owner count,
+    /// then by descending subtree size).
+    pub deps: Vec<SharedTransitiveDep>,
 }
 
 /// Summary of a direct dependency's unique transitive dep contribution.
@@ -54,6 +98,10 @@ pub struct DirectDepSummary {
     /// Number of unique ancestors (packages that transitively depend on this one).
     #[serde(default)]
     pub unique_ancestors: usize,
+    /// How many top-level direct deps of the workspace pull this crate in
+    /// (1 = only this one declares it). See [`SharedTransitiveDep::owner_count`].
+    #[serde(default)]
+    pub owner_count: usize,
 }
 
 /// A direct dependency of a workspace member that appears unused (0 code references).
@@ -69,6 +117,189 @@ pub struct UnusedDirectDep {
     pub real_deps_saved: usize,
     /// Whether this dep is in a test/example/bench crate.
     pub is_test_example: bool,
+}
+
+/// Max sharing rows printed per scope without `--verbose`.
+const SHARING_ROWS: usize = 20;
+
+/// Render the "loose uniqueness" section: for each transitive dep, how many
+/// top-level direct deps pull it in.
+///
+/// Without `--verbose` only the workspace-wide scope is printed, truncated to
+/// [`SHARING_ROWS`] rows; with it, every per-member scope is printed in full.
+fn render_sharing(
+    report: &AnalysisReport,
+    writer: &mut dyn Write,
+    verbose: bool,
+) -> anyhow::Result<()> {
+    if report.transitive_sharing.is_empty() {
+        return Ok(());
+    }
+
+    writeln!(
+        writer,
+        "Transitive deps by how many top-level deps pull them in (loosely unique first):"
+    )?;
+    writeln!(writer)?;
+
+    for scope in &report.transitive_sharing {
+        if !verbose && !scope.is_workspace {
+            continue;
+        }
+        render_sharing_scope(scope, writer, verbose)?;
+    }
+
+    if !verbose && report.transitive_sharing.iter().any(|s| !s.is_workspace) {
+        writeln!(
+            writer,
+            "  ({} per-member breakdowns hidden — use --verbose)",
+            report
+                .transitive_sharing
+                .iter()
+                .filter(|s| !s.is_workspace)
+                .count()
+        )?;
+        writeln!(writer)?;
+    }
+
+    Ok(())
+}
+
+fn render_sharing_scope(
+    scope: &SharingScope,
+    writer: &mut dyn Write,
+    verbose: bool,
+) -> anyhow::Result<()> {
+    let shown = if verbose {
+        scope.deps.len()
+    } else {
+        scope.deps.len().min(SHARING_ROWS)
+    };
+    let rows = &scope.deps[..shown];
+    if rows.is_empty() {
+        return Ok(());
+    }
+
+    let label = if scope.is_workspace {
+        "workspace (all members)".to_string()
+    } else {
+        scope.scope.clone()
+    };
+    writeln!(
+        writer,
+        "  {label} — {} top-level deps, {} transitive deps",
+        scope.total_direct_deps,
+        scope.deps.len()
+    )?;
+    writeln!(writer, "  owner spread: {}", owner_spread(scope))?;
+
+    let name_w = rows
+        .iter()
+        .map(|e| e.name.len())
+        .max()
+        .unwrap_or(10)
+        .max(10);
+    let ver_w = rows
+        .iter()
+        .map(|e| e.version.len())
+        .max()
+        .unwrap_or(7)
+        .max(7);
+    let idx_w = format!("{shown}").len().max(1);
+
+    writeln!(
+        writer,
+        "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  Pulled in by",
+        "#",
+        "Crate",
+        "Version",
+        "Owners",
+        idx_w = idx_w,
+        name_w = name_w,
+        ver_w = ver_w,
+    )?;
+    writeln!(
+        writer,
+        "  {:─>idx_w$}  {:─<name_w$}  {:─<ver_w$}  {:─>6}  {:─<12}",
+        "",
+        "",
+        "",
+        "",
+        "",
+        idx_w = idx_w,
+        name_w = name_w,
+        ver_w = ver_w,
+    )?;
+
+    for (i, entry) in rows.iter().enumerate() {
+        writeln!(
+            writer,
+            "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {}",
+            i + 1,
+            entry.name,
+            entry.version,
+            entry.owner_count,
+            format_owners(entry),
+            idx_w = idx_w,
+            name_w = name_w,
+            ver_w = ver_w,
+        )?;
+    }
+
+    if shown < scope.deps.len() {
+        writeln!(
+            writer,
+            "  ... and {} more (use --verbose)",
+            scope.deps.len() - shown
+        )?;
+    }
+    writeln!(writer)?;
+    Ok(())
+}
+
+/// A compact histogram of owner counts for a scope, e.g. `1x46  2x12  8x3`
+/// (46 crates have a single owner, 12 have two, 3 have eight). It keeps the
+/// whole spectrum visible even when the row list below is truncated.
+fn owner_spread(scope: &SharingScope) -> String {
+    let mut counts: BTreeMap<usize, usize> = BTreeMap::new();
+    for dep in &scope.deps {
+        *counts.entry(dep.owner_count).or_default() += 1;
+    }
+    counts
+        .iter()
+        .map(|(owners, crates)| format!("{owners}\u{d7}{crates}"))
+        .collect::<Vec<_>>()
+        .join("  ")
+}
+
+/// Owner names for one row, elided to keep the column narrow. `owner_count`
+/// stays authoritative; this is just the readable sample.
+fn format_owners(entry: &SharedTransitiveDep) -> String {
+    const MAX_WIDTH: usize = 48;
+
+    let mut out = String::new();
+    let mut listed = 0;
+    for name in &entry.owners {
+        let extra = if out.is_empty() {
+            name.len()
+        } else {
+            name.len() + 2
+        };
+        if listed > 0 && out.len() + extra > MAX_WIDTH {
+            break;
+        }
+        if listed > 0 {
+            out.push_str(", ");
+        }
+        out.push_str(name);
+        listed += 1;
+    }
+
+    let remaining = entry.owner_count - listed;
+    if remaining > 0 {
+        out.push_str(&format!(" +{remaining} more"));
+    }
+    out
 }
 
 /// Render the report as JSON.
@@ -125,20 +356,22 @@ pub fn render_text(
 
         writeln!(
             writer,
-            "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {:>5}  {:>9}",
+            "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {:>5}  {:>9}  {:>6}",
             "#",
             "Dependency",
             "Version",
             "Unique",
             "Total",
             "Ancestors",
+            "Owners",
             idx_w = idx_w,
             name_w = name_w,
             ver_w = ver_w,
         )?;
         writeln!(
             writer,
-            "  {:─>idx_w$}  {:─<name_w$}  {:─<ver_w$}  {:─>6}  {:─>5}  {:─>9}",
+            "  {:─>idx_w$}  {:─<name_w$}  {:─<ver_w$}  {:─>6}  {:─>5}  {:─>9}  {:─>6}",
+            "",
             "",
             "",
             "",
@@ -152,13 +385,14 @@ pub fn render_text(
         for (i, entry) in report.direct_dep_summary.iter().enumerate() {
             writeln!(
                 writer,
-                "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {:>5}  {:>9}",
+                "  {:>idx_w$}  {:<name_w$}  {:<ver_w$}  {:>6}  {:>5}  {:>9}  {:>6}",
                 i + 1,
                 entry.dep_name,
                 entry.dep_version,
                 entry.unique_transitive_deps,
                 entry.total_transitive_deps,
                 entry.unique_ancestors,
+                entry.owner_count,
                 idx_w = idx_w,
                 name_w = name_w,
                 ver_w = ver_w,
@@ -166,6 +400,8 @@ pub fn render_text(
         }
         writeln!(writer)?;
     }
+
+    render_sharing(report, writer, verbose)?;
 
     if report.targets.is_empty() {
         writeln!(
