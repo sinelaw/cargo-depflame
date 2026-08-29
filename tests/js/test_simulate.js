@@ -403,3 +403,52 @@ test('a feature toggle and a removal compose in the status line', function() {
   DepflameFeatures.resetAll();
   assertEquals(elements['sim-status'].textContent, '');
 });
+
+// ---------------------------------------------------------------------------
+// Row order only changes when you ask for it.
+// ---------------------------------------------------------------------------
+
+function rowOrder(tbody) {
+  return tbody._innerHTML.split('<tr').slice(1).map(function(r) {
+    var m = r.match(/crates\/([a-z0-9_-]+)"/);
+    return m ? m[1] : '?';
+  }).join(' ');
+}
+
+test('ticking a Remove box does not reorder the table', function() {
+  var tbody = tableHarness();
+  var before = rowOrder(tbody);
+
+  DepflameContent.toggleRemoval(nodeIndex('heavy-framework'));
+  assertEquals(rowOrder(tbody), before, 'rows stay put when a box is ticked');
+  assertContains(tbody._innerHTML, 'row-removed');
+
+  DepflameContent.toggleRemoval(nodeIndex('serde'));
+  assertEquals(rowOrder(tbody), before, 'and still with a second removal');
+
+  DepflameContent.resetRemovals();
+  assertEquals(rowOrder(tbody), before, 'and when they are cleared again');
+});
+
+test('clicking a column header re-sorts using the simulated values', function() {
+  var tbody = tableHarness();
+  DepflameContent.toggleRemoval(nodeIndex('heavy-framework'));
+  var frozen = rowOrder(tbody);
+
+  // Re-sorting by unique deps sinks the removed row, which no longer has one.
+  DepflameContent.sortDepSummary('unique_transitive_deps');
+  DepflameContent.sortDepSummary('unique_transitive_deps'); // back to descending
+  var resorted = rowOrder(tbody);
+  assert(resorted !== frozen, 'an explicit sort does reorder');
+  assertEquals(resorted.split(' ').pop(), 'heavy-framework',
+    'the removed row sorts last on unique deps');
+
+  DepflameContent.resetRemovals();
+});
+
+test('a feature toggle re-sorts, so an added crate lands in order', function() {
+  var tbody = tableHarness();
+  DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'remote', true);
+  assertContains(rowOrder(tbody), 'remote-lib');
+  DepflameContent.resetWorkspaceFeatures();
+});

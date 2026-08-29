@@ -146,6 +146,13 @@ var DepflameContent = (function() {
   // at render time so sorting, simulated removals and feature toggles compose.
   var depSummaryBase = [];
 
+  // Display order, frozen as a list of row keys. Ticking a Remove box changes
+  // the numbers a sort is based on, and re-sorting under the cursor makes rows
+  // jump away from the box you just clicked — so the order is only recomputed
+  // when you ask for it (a header click) or when the row set itself changes
+  // (a feature toggle). null means "recompute on next render".
+  var depOrder = null;
+
   function buildTableTab(r) {
     var summary = r.direct_dep_summary || [];
     if (summary.length === 0) {
@@ -186,8 +193,9 @@ var DepflameContent = (function() {
       + ' title="How many top-level direct deps pull this crate in. Sort ascending to put uniquely-owned deps first.">Owners</th>'
       + '</tr></thead><tbody id="dep-summary-tbody">';
 
+    invalidateOrder();
     var sim = currentSim();
-    html += renderDepSummaryRows(sortRows(displayRows(sim), sim), sim);
+    html += renderDepSummaryRows(orderedRows(sim), sim);
     html += '</tbody></table></div>';
     return html;
   }
@@ -283,16 +291,47 @@ var DepflameContent = (function() {
     return rows;
   }
 
+  function rowKey(e) {
+    return e.dep_name + '@' + e.dep_version;
+  }
+
+  function invalidateOrder() {
+    depOrder = null;
+  }
+
+  // Sort by the active column's current values and freeze the result.
   function sortRows(rows, sim) {
     var key = depSortKey;
     var dir = depSortAsc ? 1 : -1;
-    return rows.slice().sort(function(a, b) {
+    var sorted = rows.slice().sort(function(a, b) {
       if (key === '#') return dir * (a.__origIdx - b.__origIdx);
       var va = cellValue(a, key, sim), vb = cellValue(b, key, sim);
       var cmp = (typeof va === 'string') ? va.localeCompare(vb) : (va - vb);
       if (cmp !== 0) return dir * cmp;
       return a.__origIdx - b.__origIdx;
     });
+    depOrder = sorted.map(rowKey);
+    return sorted;
+  }
+
+  // Reuse the frozen order. Rows it doesn't know about (a crate a feature just
+  // enabled) go last, where the "new" tag makes them easy to spot.
+  function applyOrder(rows) {
+    var pos = {};
+    for (var i = 0; i < depOrder.length; i++) pos[depOrder[i]] = i;
+    return rows.slice().sort(function(a, b) {
+      var pa = pos[rowKey(a)];
+      var pb = pos[rowKey(b)];
+      if (pa === undefined && pb === undefined) return a.__origIdx - b.__origIdx;
+      if (pa === undefined) return 1;
+      if (pb === undefined) return -1;
+      return pa - pb;
+    });
+  }
+
+  function orderedRows(sim) {
+    var rows = displayRows(sim);
+    return depOrder ? applyOrder(rows) : sortRows(rows, sim);
   }
 
   function renderDepSummaryRows(summary, sim) {
@@ -342,9 +381,15 @@ var DepflameContent = (function() {
         ownersCell = '<td class="sim-gone">off in the current feature set</td>';
       } else if (row && row.removed) {
         uniqueCell = '<td class="sim-gone">—</td>';
-        ownersCell = row.stillPulledBy.length > 0
-          ? '<td class="sim-gone">still pulled in by ' + row.stillPulledBy.map(crateLink).join(', ') + '</td>'
-          : '<td class="sim-gone">gone</td>';
+        var pulled = row.stillPulledBy;
+        if (pulled.length === 0) {
+          ownersCell = '<td class="sim-gone">gone</td>';
+        } else {
+          var shown = pulled.slice(0, 2).map(crateLink).join(', ');
+          if (pulled.length > 2) shown += ' +' + (pulled.length - 2);
+          ownersCell = '<td class="sim-gone" title="' + esc(pulled.join(', ')) + '">'
+            + 'still pulled in by ' + shown + '</td>';
+        }
       } else {
         var unique = cellValue(e, 'unique_transitive_deps', sim);
         var barW = maxUnique > 0 ? Math.round(unique / maxUnique * 100) : 0;
@@ -449,6 +494,7 @@ var DepflameContent = (function() {
     else if (!checked && at !== -1) features.splice(at, 1);
 
     DepflameFeatures.setNodeFeatures(tree, nodeIdx, features);
+    invalidateOrder();
     applyGraphChange();
   }
 
@@ -459,6 +505,7 @@ var DepflameContent = (function() {
     for (var c = 0; c < crates.length; c++) {
       DepflameFeatures.setNodeFeatures(tree, crates[c].idx, null);
     }
+    invalidateOrder();
     applyGraphChange();
   }
 
@@ -518,7 +565,7 @@ var DepflameContent = (function() {
     var sim = currentSim();
 
     var tbody = document.getElementById('dep-summary-tbody');
-    if (tbody) tbody.innerHTML = renderDepSummaryRows(sortRows(displayRows(sim), sim), sim);
+    if (tbody) tbody.innerHTML = renderDepSummaryRows(orderedRows(sim), sim);
 
     var status = document.getElementById('sim-status');
     if (status) status.textContent = sim ? statusText(sim) : '';
@@ -559,6 +606,7 @@ var DepflameContent = (function() {
       // is the interesting end.
       depSortAsc = (key === 'dep_name' || key === 'dep_version' || key === 'owner_count');
     }
+    invalidateOrder();
 
     // Update header classes.
     var table = document.getElementById('dep-summary-table');
@@ -1202,6 +1250,7 @@ var DepflameContent = (function() {
     selectSharingScope: selectSharingScope,
     setSharingMaxOwners: setSharingMaxOwners,
     sortSharing: sortSharing,
+    sortDepSummary: sortDepSummary,
     toggleRemoval: toggleRemoval,
     resetRemovals: resetRemovals,
     toggleWorkspaceFeature: toggleWorkspaceFeature,
