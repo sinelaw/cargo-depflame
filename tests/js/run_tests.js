@@ -65,7 +65,7 @@ global.requestAnimationFrame = function(cb) { cb(); };
 global.setTimeout = global.setTimeout;
 
 // ---------------------------------------------------------------------------
-// Load JS modules (order matters: flamegraph, features, content, report).
+// Load JS modules (order matters: flamegraph, features, simulate, content, report).
 // ---------------------------------------------------------------------------
 
 function loadJS(relPath) {
@@ -76,6 +76,7 @@ function loadJS(relPath) {
 
 loadJS('src/js/flamegraph.js');
 loadJS('src/js/features.js');
+loadJS('src/js/simulate.js');
 loadJS('src/js/content.js');
 loadJS('src/js/report.js');
 
@@ -146,6 +147,7 @@ function loadTests(relPath) {
 loadTests('tests/js/test_content.js');
 loadTests('tests/js/test_flamegraph.js');
 loadTests('tests/js/test_features.js');
+loadTests('tests/js/test_simulate.js');
 
 // ---------------------------------------------------------------------------
 // Summary.

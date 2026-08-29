@@ -58,6 +58,14 @@ Two scopes are computed: the whole workspace (the union of every member's direct
 
 Text output shows the workspace scope; `--verbose` shows every row and the per-member breakdowns. In the HTML report, the **Sharing** tab has a scope selector, a max-owners filter, and sortable columns, and the Table tab gains an `Owners` column you can sort ascending to put the most uniquely-owned direct deps first.
 
+## Simulating a removal
+
+In the HTML report's **Table** tab, each direct dependency has a `Remove` checkbox. Tick one and the table recomputes, live: every other direct dep's unique transitive dep count and owner count update, and the header shows what the graph would cost (`2 removed — 72 → 53 crates (−19)`).
+
+Only direct dependencies of a workspace member can be removed — a crate that is merely transitive has its checkbox disabled, since dropping it isn't yours to make.
+
+The interesting cases are the ones that save nothing. Removing a dep that another dep also pulls in leaves it in the graph, and the row says so (`still pulled in by tracing-subscriber`) while the crate that now solely owns that subtree absorbs it (its unique count jumps). Removals compose with the flamegraph's feature toggles: the simulation runs on whatever graph the feature selection currently produces.
+
 ## Analyzing a flat dependency list
 
 If all you have is a flat list of crates (say, extracted from someone else's binary) rather than a workspace, `from-list` reconstructs the tree for you (requires the `remote` feature):

@@ -196,6 +196,15 @@ var DepflameFeatures = (function() {
     return { activeNodes: activeNodes, weights: weights, activeEdges: activeEdges };
   }
 
+  // The active graph changed, so anything derived from it is stale. The Table
+  // tab's removal simulator computes against this same graph.
+  function notifyGraphChanged() {
+    if (typeof DepflameSimulate !== 'undefined') DepflameSimulate.refreshBaseline();
+    if (typeof DepflameContent !== 'undefined' && DepflameContent.onGraphChanged) {
+      DepflameContent.onGraphChanged();
+    }
+  }
+
   // Apply recomputed weights to the tree data (mutates transitive_weight).
   // Returns the data needed for re-rendering.
   function applyRecomputation(treeData) {
@@ -216,6 +225,8 @@ var DepflameFeatures = (function() {
       var i = parseInt(idx, 10);
       if (!treeData.nodes[i].is_workspace) activeDeps++;
     }
+
+    notifyGraphChanged();
 
     return { activeNodes: result.activeNodes, activeEdges: result.activeEdges, activeDeps: activeDeps };
   }
@@ -767,6 +778,7 @@ var DepflameFeatures = (function() {
     resetWeights(treeData);
     Depflame.rerender(null);
     removeSummaryBar();
+    notifyGraphChanged();
     selectCrate(currentPanelNode); // refresh checkboxes
   }
 
