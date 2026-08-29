@@ -784,7 +784,6 @@ body {
    past the window otherwise. */
 .sim-hint {
   margin: 0 0 6px;
-  max-width: 90ch;
   color: #666;
 }
 
