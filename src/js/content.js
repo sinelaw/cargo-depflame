@@ -160,11 +160,13 @@ var DepflameContent = (function() {
       + '<em>Unique Deps</em> = transitive deps that vanish if removed. '
       + '<em>Total Deps</em> includes shared ones. '
       + 'Click a column header to sort.</p>'
+      + buildFeaturePicker()
       + '<div class="sim-controls">'
       +   '<span class="sim-hint">Tick <em>Remove</em> to simulate dropping a direct dependency — '
-      +   'the Unique Deps and Owners columns recompute for every other dep.</span>'
+      +   'the Unique Deps and Owners columns recompute for every other dep, '
+      +   'and the flamegraph follows.</span>'
       +   '<span id="sim-status"></span>'
-      +   '<button class="control-btn" id="sim-reset" style="display:none" '
+      +   '<button class="control-btn" id="sim-reset" style="visibility:hidden" '
       +   'onclick="DepflameContent.resetRemovals()">Reset</button>'
       + '</div>'
       + '<table class="targets-table dep-summary-table" id="dep-summary-table"><thead><tr>'
@@ -221,9 +223,13 @@ var DepflameContent = (function() {
     return ' <span class="sim-was">was ' + before + '</span>';
   }
 
-  function renderDepSummaryRows(summary) {
-    var sim = (typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals())
+  function currentSim() {
+    return (typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals())
       ? DepflameSimulate.current() : null;
+  }
+
+  function renderDepSummaryRows(summary, sim) {
+    if (sim === undefined) sim = currentSim();
     var base = (typeof DepflameSimulate !== 'undefined') ? DepflameSimulate.baseline() : null;
 
     var maxUnique = 1;
@@ -239,15 +245,26 @@ var DepflameContent = (function() {
       var row = simRowFor(e, sim);
       var baseRow = (base && idx >= 0) ? base.rows[idx] : null;
 
+      // A row that was a direct dep at startup but isn't in the graph now was
+      // switched off by the feature picker, not by the simulator.
+      if (e.__baseDirect === undefined) e.__baseDirect = idx >= 0;
+      var inactive = e.__baseDirect && idx < 0;
+
       var removable = idx >= 0;
       var checked = removable && DepflameSimulate.isRemoved(idx);
+      var title = inactive
+        ? 'Not enabled by the current feature selection'
+        : 'Not a direct dependency of a workspace member in the current graph';
       var box = '<input type="checkbox" class="sim-box"'
         + (checked ? ' checked' : '')
-        + (removable ? '' : ' disabled title="Not a direct dependency of a workspace member in the current graph"')
+        + (removable ? '' : ' disabled title="' + title + '"')
         + ' onchange="DepflameContent.toggleRemoval(' + idx + ')">';
 
       var uniqueCell, ownersCell;
-      if (row && row.removed) {
+      if (inactive) {
+        uniqueCell = '<td class="sim-gone">—</td>';
+        ownersCell = '<td class="sim-gone">off in the current feature set</td>';
+      } else if (row && row.removed) {
         uniqueCell = '<td class="sim-gone">—</td>';
         ownersCell = row.stillPulledBy.length > 0
           ? '<td class="sim-gone">still pulled in by ' + row.stillPulledBy.map(crateLink).join(', ') + '</td>'
@@ -263,7 +280,8 @@ var DepflameContent = (function() {
           + (row ? simChange(owners, baseRow && baseRow.owners) : '') + '</td>';
       }
 
-      html += '<tr' + (checked ? ' class="row-removed"' : '') + '>'
+      var rowCls = checked ? ' class="row-removed"' : (inactive ? ' class="row-inactive"' : '');
+      html += '<tr' + rowCls + '>'
         + '<td>' + box + '</td>'
         + '<td>' + (i + 1) + '</td>'
         + '<td><code>' + crateLink(e.dep_name) + '</code></td>'
@@ -277,6 +295,120 @@ var DepflameContent = (function() {
   }
 
   // -------------------------------------------------------------------------
+  // Workspace feature picker (Table tab).
+  //
+  // The flamegraph's sidebar can toggle features on any crate; this is the
+  // shortcut for the ones you actually control — your own workspace members.
+  // -------------------------------------------------------------------------
+
+  function currentTree() {
+    if (window.__DEPFLAME_DATA__) return window.__DEPFLAME_DATA__;
+    var r = window.__DEPFLAME_REPORT__;
+    return (r && r.dep_tree) || null;
+  }
+
+  // Workspace members that declare features, as [{idx, node}].
+  function featureCrates() {
+    var tree = currentTree();
+    if (!tree) return [];
+    var out = [];
+    for (var i = 0; i < tree.nodes.length; i++) {
+      var node = tree.nodes[i];
+      if (!node.is_workspace) continue;
+      var feats = node.available_features || {};
+      if (Object.keys(feats).length === 0) continue;
+      out.push({ idx: i, node: node });
+    }
+    return out;
+  }
+
+  function buildFeaturePicker() {
+    var crates = featureCrates();
+    if (crates.length === 0) return '';
+    return '<details class="feature-picker">'
+      + '<summary>Workspace features <span id="feature-picker-status"></span></summary>'
+      + '<div class="feature-picker-body" id="feature-picker-body">'
+      + renderFeaturePicker(crates)
+      + '</div></details>';
+  }
+
+  function renderFeaturePicker(crates) {
+    var tree = currentTree();
+    crates = crates || featureCrates();
+    var html = '';
+    for (var c = 0; c < crates.length; c++) {
+      var idx = crates[c].idx;
+      var node = crates[c].node;
+      var enabled = {};
+      var active = (typeof DepflameFeatures !== 'undefined')
+        ? DepflameFeatures.getNodeFeatures(tree, idx) : (node.enabled_features || []);
+      for (var i = 0; i < active.length; i++) enabled[active[i]] = true;
+
+      var names = Object.keys(node.available_features || {}).sort();
+      html += '<div class="feature-group">'
+        + '<span class="feature-group-title"><code>' + esc(node.name) + '</code></span>';
+      for (var i = 0; i < names.length; i++) {
+        var f = names[i];
+        html += '<label class="feature-toggle">'
+          + '<input type="checkbox"' + (enabled[f] ? ' checked' : '')
+          + ' onchange="DepflameContent.toggleWorkspaceFeature(' + idx + ', \''
+          + esc(f).replace(/'/g, "\\'") + '\', this.checked)"> ' + esc(f) + '</label>';
+      }
+      html += '</div>';
+    }
+    html += '<button class="control-btn" onclick="DepflameContent.resetWorkspaceFeatures()">'
+      + 'Restore defaults</button>';
+    return html;
+  }
+
+  function toggleWorkspaceFeature(nodeIdx, feature, checked) {
+    if (typeof DepflameFeatures === 'undefined') return;
+    var tree = currentTree();
+    if (!tree) return;
+
+    var features = DepflameFeatures.getNodeFeatures(tree, nodeIdx);
+    var at = features.indexOf(feature);
+    if (checked && at === -1) features.push(feature);
+    else if (!checked && at !== -1) features.splice(at, 1);
+
+    DepflameFeatures.setNodeFeatures(nodeIdx, features);
+    applyGraphChange();
+  }
+
+  function resetWorkspaceFeatures() {
+    if (typeof DepflameFeatures === 'undefined') return;
+    var crates = featureCrates();
+    for (var c = 0; c < crates.length; c++) {
+      DepflameFeatures.setNodeFeatures(crates[c].idx, null);
+    }
+    applyGraphChange();
+  }
+
+  function updateFeaturePicker() {
+    var body = document.getElementById('feature-picker-body');
+    if (body) body.innerHTML = renderFeaturePicker();
+    var status = document.getElementById('feature-picker-status');
+    if (status) {
+      var custom = typeof DepflameFeatures !== 'undefined'
+        && DepflameFeatures.hasFeatureOverrides && DepflameFeatures.hasFeatureOverrides();
+      status.textContent = custom ? '(customized)' : '';
+    }
+  }
+
+  // Push a graph change (feature toggle or removal) to the flamegraph, which
+  // recomputes weights and calls back into onGraphChanged for the table. When
+  // there's no flamegraph to drive, refresh the table directly.
+  function applyGraphChange() {
+    if (typeof DepflameFeatures !== 'undefined'
+        && DepflameFeatures.applyAndRerender
+        && window.__DEPFLAME_DATA__) {
+      if (DepflameFeatures.applyAndRerender(window.__DEPFLAME_DATA__)) return;
+    }
+    if (typeof DepflameSimulate !== 'undefined') DepflameSimulate.refreshBaseline();
+    onGraphChanged();
+  }
+
+  // -------------------------------------------------------------------------
   // Removal simulator (Table tab).
   // -------------------------------------------------------------------------
 
@@ -284,13 +416,13 @@ var DepflameContent = (function() {
     if (typeof DepflameSimulate === 'undefined') return;
     if (idx < 0) return;
     DepflameSimulate.toggle(idx);
-    refreshDepSummary();
+    applyGraphChange();
   }
 
   function resetRemovals() {
     if (typeof DepflameSimulate === 'undefined') return;
     DepflameSimulate.clear();
-    refreshDepSummary();
+    applyGraphChange();
   }
 
   // Called when the feature selection changes the active graph: the cached
@@ -299,20 +431,23 @@ var DepflameContent = (function() {
     for (var i = 0; i < depSummaryView.length; i++) {
       delete depSummaryView[i].__simIdx;
     }
+    updateFeaturePicker();
     refreshDepSummary();
   }
 
   function refreshDepSummary() {
+    // One simulation run feeds both the rows and the status line.
+    var sim = currentSim();
+
     var tbody = document.getElementById('dep-summary-tbody');
-    if (tbody) tbody.innerHTML = renderDepSummaryRows(depSummaryView);
+    if (tbody) tbody.innerHTML = renderDepSummaryRows(depSummaryView, sim);
 
     var status = document.getElementById('sim-status');
     var reset = document.getElementById('sim-reset');
-    var active = typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals();
+    var active = !!sim;
     if (status) {
       if (active) {
         var base = DepflameSimulate.baseline();
-        var sim = DepflameSimulate.current();
         var saved = base.totalDeps - sim.totalDeps;
         status.textContent = sim.removedCount + ' removed — '
           + base.totalDeps + ' \u2192 ' + sim.totalDeps + ' crates ('
@@ -321,7 +456,8 @@ var DepflameContent = (function() {
         status.textContent = '';
       }
     }
-    if (reset) reset.style.display = active ? '' : 'none';
+    // Kept in the layout at all times so the row doesn't jump when it appears.
+    if (reset) reset.style.visibility = active ? 'visible' : 'hidden';
   }
 
   function sortDepSummary(key) {
@@ -341,8 +477,7 @@ var DepflameContent = (function() {
     }
 
     // Sort a copy with stable indices for the '#' column.
-    var sim = (typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals())
-      ? DepflameSimulate.current() : null;
+    var sim = currentSim();
     var indexed = summary.map(function(e, i) { return { entry: e, origIdx: i }; });
 
     if (key === '#') {
@@ -1011,6 +1146,8 @@ var DepflameContent = (function() {
     sortSharing: sortSharing,
     toggleRemoval: toggleRemoval,
     resetRemovals: resetRemovals,
+    toggleWorkspaceFeature: toggleWorkspaceFeature,
+    resetWorkspaceFeatures: resetWorkspaceFeatures,
     refreshDepSummary: refreshDepSummary,
     onGraphChanged: onGraphChanged
   };

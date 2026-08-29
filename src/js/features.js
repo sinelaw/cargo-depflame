@@ -91,8 +91,17 @@ var DepflameFeatures = (function() {
   }
 
   // Recompute which nodes are active given feature overrides.
+  //
+  // `cutEdges` optionally removes edges ("from:to" keys) before the reachability
+  // walk — that's how the Table tab's removal simulator drops a direct
+  // dependency from the graph everything else is derived from.
+  //
+  // `skipWeights` returns as soon as reachability is known — callers that only
+  // need the active node/edge sets (the removal simulator) skip the per-node
+  // BFS that the flamegraph's bar widths need.
+  //
   // Returns { activeNodes: {idx: true}, weights: {idx: weight} }.
-  function recomputeActiveGraph(treeData) {
+  function recomputeActiveGraph(treeData, cutEdges, skipWeights) {
     var edgeMap = buildEdgeMap(treeData);
     var nodes = treeData.nodes;
     var n = nodes.length;
@@ -139,6 +148,13 @@ var DepflameFeatures = (function() {
       }
     }
 
+    // Step 2b: drop simulated removals.
+    if (cutEdges) {
+      for (var key in cutEdges) {
+        delete activeEdges[key];
+      }
+    }
+
     // Step 3: BFS from roots through active edges only.
     var activeNodes = {};
     var queue = [];
@@ -158,6 +174,10 @@ var DepflameFeatures = (function() {
           queue.push(ci);
         }
       }
+    }
+
+    if (skipWeights) {
+      return { activeNodes: activeNodes, weights: {}, activeEdges: activeEdges };
     }
 
     // Step 4: Recompute transitive weights for active nodes.
@@ -196,6 +216,14 @@ var DepflameFeatures = (function() {
     return { activeNodes: activeNodes, weights: weights, activeEdges: activeEdges };
   }
 
+  // Edges the Table tab's removal simulator wants cut, if any.
+  function simulatorCuts() {
+    if (typeof DepflameSimulate === 'undefined' || !DepflameSimulate.hasRemovals()) {
+      return null;
+    }
+    return DepflameSimulate.cutEdges();
+  }
+
   // The active graph changed, so anything derived from it is stale. The Table
   // tab's removal simulator computes against this same graph.
   function notifyGraphChanged() {
@@ -208,7 +236,7 @@ var DepflameFeatures = (function() {
   // Apply recomputed weights to the tree data (mutates transitive_weight).
   // Returns the data needed for re-rendering.
   function applyRecomputation(treeData) {
-    var result = recomputeActiveGraph(treeData);
+    var result = recomputeActiveGraph(treeData, simulatorCuts());
 
     // Update transitive weights.
     for (var i = 0; i < treeData.nodes.length; i++) {
@@ -775,11 +803,50 @@ var DepflameFeatures = (function() {
     if (!treeData) return;
 
     featureOverrides = {};
+
+    // "Reset all" puts the graph back to how the analysis found it, so it
+    // clears simulated removals too — the Table tab's own Reset is the one
+    // that clears removals while keeping the feature selection.
+    if (typeof DepflameSimulate !== 'undefined') DepflameSimulate.clear();
+
     resetWeights(treeData);
     Depflame.rerender(null);
     removeSummaryBar();
     notifyGraphChanged();
     selectCrate(currentPanelNode); // refresh checkboxes
+  }
+
+  // Recompute the graph and push it to the flamegraph + summary bar. This is
+  // the entry point for anything outside the feature sidebar (the Table tab's
+  // removal checkboxes and workspace-feature picker).
+  function applyAndRerender(treeData) {
+    treeData = treeData || Depflame.getCurrentTreeData();
+    if (!treeData) return null;
+    var result = applyRecomputation(treeData);
+    Depflame.rerender(result.activeNodes, result.activeEdges);
+    updateSummaryBar(treeData, result.activeDeps);
+    return result;
+  }
+
+  // Programmatic feature control, used by the Table tab's workspace-feature
+  // picker. Passing null clears the override and restores the crate's
+  // resolved-by-cargo feature set.
+  function setNodeFeatures(nodeIdx, features) {
+    nodeIdx = parseInt(nodeIdx, 10);
+    if (features === null || features === undefined) delete featureOverrides[nodeIdx];
+    else featureOverrides[nodeIdx] = features.slice();
+  }
+
+  // The features currently in effect for a node (override, or cargo's own).
+  function getNodeFeatures(treeData, nodeIdx) {
+    nodeIdx = parseInt(nodeIdx, 10);
+    if (featureOverrides[nodeIdx] !== undefined) return featureOverrides[nodeIdx].slice();
+    var node = treeData.nodes[nodeIdx];
+    return ((node && node.enabled_features) || []).slice();
+  }
+
+  function hasFeatureOverrides() {
+    return Object.keys(featureOverrides).length > 0;
   }
 
 
@@ -846,6 +913,10 @@ var DepflameFeatures = (function() {
     resetNode: resetNode,
     resetAll: resetAll,
     recomputeActiveGraph: recomputeActiveGraph,
-    updateSummaryBar: updateSummaryBar
+    updateSummaryBar: updateSummaryBar,
+    applyAndRerender: applyAndRerender,
+    setNodeFeatures: setNodeFeatures,
+    getNodeFeatures: getNodeFeatures,
+    hasFeatureOverrides: hasFeatureOverrides
   };
 })();

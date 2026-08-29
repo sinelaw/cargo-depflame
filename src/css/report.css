@@ -730,6 +730,51 @@ body {
   gap: 6px;
 }
 
+.feature-picker {
+  margin-bottom: 10px;
+  font-size: 13px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 10px;
+  background: var(--surface);
+}
+
+.feature-picker > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#feature-picker-status {
+  font-weight: 400;
+  color: var(--text-light);
+}
+
+.feature-picker-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.feature-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature-group-title { color: var(--text-light); }
+
+.feature-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 .sim-controls {
   display: flex;
   align-items: center;
@@ -741,7 +786,12 @@ body {
 
 .sim-hint { color: #666; }
 
+/* The status grows into the free space so the Reset button stays put — it is
+   only ever hidden, never removed from the layout. */
 #sim-status {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
   color: var(--text);
   font-weight: 600;
   white-space: nowrap;
@@ -754,6 +804,8 @@ body {
   opacity: 0.55;
   text-decoration: line-through;
 }
+
+.dep-summary-table tr.row-inactive > td { opacity: 0.55; }
 
 /* The checkbox itself stays legible so the row can be un-removed. */
 .dep-summary-table tr.row-removed > td:first-child {
