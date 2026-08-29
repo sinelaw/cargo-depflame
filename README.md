@@ -66,7 +66,9 @@ Only direct dependencies of a workspace member can be removed — a crate that i
 
 The interesting cases are the ones that save nothing. Removing a dep that another dep also pulls in leaves it in the graph, and the row says so (`still pulled in by tracing-subscriber`) while the crate that now solely owns that subtree absorbs it (its unique count jumps).
 
-The Table tab also has a **Workspace features** picker: a checklist of your own crates' features. Turning one off re-resolves the graph exactly as `--no-default-features` would, so the table, the flamegraph and the simulator all follow — a dep that is no longer enabled drops out of the table as `off in the current feature set`. Feature selection and simulated removals compose. The table's `Reset` clears removals but keeps your feature selection; the flamegraph's `Reset all` puts everything back.
+The Table tab also has a **Workspace features** picker: a checklist of your own crates' features. Turning one off re-resolves the graph exactly as `--no-default-features` would, so the table, the flamegraph and the simulator all follow: every dep's unique and owner counts recompute, a dep that is no longer enabled is marked `off in the current feature set`, and a crate a feature *adds* gets a new row tagged `new`. Feature selection and simulated removals compose.
+
+While anything is toggled the table's numbers are computed live from the graph on screen rather than read from the saved analysis, and `was N` shows the difference from the report. The table's `Reset` clears removals but keeps your feature selection; the flamegraph's `Reset all` puts everything back.
 
 ## Analyzing a flat dependency list
 

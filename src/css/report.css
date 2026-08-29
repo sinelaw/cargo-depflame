@@ -820,6 +820,16 @@ body {
   white-space: nowrap;
 }
 
+.sim-added {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--blue);
+  border: 1px solid var(--blue);
+  border-radius: 3px;
+  padding: 0 3px;
+}
+
 .sim-gone {
   color: var(--text-light);
   font-style: italic;
