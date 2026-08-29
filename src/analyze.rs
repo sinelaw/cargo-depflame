@@ -358,7 +358,20 @@ fn build_report(
     real_deps: &Option<HashSet<String>>,
     args: &AnalyzeArgs,
 ) -> Result<AnalysisReport> {
-    let platform_deps = real_deps.as_ref().map(|s| s.len());
+    // `real_deps` holds every package cargo resolves for this platform, the
+    // workspace's own crates included. Those aren't dependencies, and
+    // `total_dependencies` doesn't count them either.
+    let workspace_keys: HashSet<String> = dep_graph
+        .workspace_members
+        .iter()
+        .filter_map(|id| dep_graph.nodes.get(id))
+        .map(|node| format!("{} {}", node.name, node.version))
+        .collect();
+    let platform_deps = real_deps.as_ref().map(|set| {
+        set.iter()
+            .filter(|key| !workspace_keys.contains(*key))
+            .count()
+    });
     let phantom_deps = platform_deps
         .map(|p| total_deps.saturating_sub(p))
         .unwrap_or(0);
@@ -368,10 +381,20 @@ fn build_report(
     attach_owner_counts(&mut direct_dep_summary, &transitive_sharing);
 
     eprintln!("Building dependency tree for visualization...");
-    let dep_tree = {
+    let (mut dep_tree, id_to_idx) = {
         let _span = info_span!("build_dep_tree").entered();
-        flamegraph::build_dep_tree(&loaded.metadata_all_features, &loaded.metadata)
+        flamegraph::build_dep_tree_indexed(&loaded.metadata_all_features, &loaded.metadata)
     };
+
+    // Resolve the graph for each offered target so the report can be switched
+    // between platforms. cargo evaluates the cfg() expressions, so the masks
+    // are exact; the resolves run in parallel.
+    {
+        let _span = info_span!("resolve_platforms").entered();
+        let resolves = platform::resolve_all_platforms(&args.common.manifest_path);
+        eprintln!("Resolved {} target platforms", resolves.len());
+        flamegraph::attach_platform_masks(&mut dep_tree, &resolves, &id_to_idx);
+    }
 
     let unused_edges: Vec<(String, String)> = unused_result
         .ranked

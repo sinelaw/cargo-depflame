@@ -291,3 +291,60 @@ fn transitive_sharing_has_workspace_and_member_scopes() {
         .expect("crate-b scope");
     assert!(!b.deps.iter().any(|d| d.name == "regex"));
 }
+
+/// Platform masks: every offered target is resolved by cargo itself, so the
+/// report can be switched between platforms client-side.
+#[test]
+fn dep_tree_carries_platform_masks() {
+    let report = analyze::run_analyze(&default_args()).expect("analysis should succeed");
+    let tree = report.dep_tree.expect("dep tree present");
+
+    assert!(
+        tree.platforms.len() > 1,
+        "expected several target platforms, got {}",
+        tree.platforms.len()
+    );
+
+    let hosts: Vec<&str> = tree
+        .platforms
+        .iter()
+        .filter(|p| p.is_host)
+        .map(|p| p.triple.as_str())
+        .collect();
+    assert_eq!(
+        hosts.len(),
+        1,
+        "exactly one platform is the host: {hosts:?}"
+    );
+
+    for platform in &tree.platforms {
+        assert!(
+            !platform.nodes.is_empty(),
+            "{} resolved no crates",
+            platform.triple
+        );
+        assert!(
+            platform.nodes.iter().all(|&i| i < tree.nodes.len()),
+            "{} has a mask entry outside the tree",
+            platform.triple
+        );
+        // Workspace members build everywhere.
+        for (idx, node) in tree.nodes.iter().enumerate() {
+            if node.is_workspace {
+                assert!(
+                    platform.nodes.contains(&idx),
+                    "{} is missing workspace member {}",
+                    platform.triple,
+                    node.name
+                );
+            }
+        }
+    }
+
+    // The host mask is what the report's own platform count is derived from.
+    let host = tree.platforms.iter().find(|p| p.is_host).unwrap();
+    assert!(
+        host.nodes.len() <= tree.nodes.len(),
+        "the host mask is a subset of the tree"
+    );
+}

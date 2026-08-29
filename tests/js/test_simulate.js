@@ -21,6 +21,10 @@ function nodeIndex(name) {
 function freshSim() {
   window.__DEPFLAME_DATA__ = null;
   window.__DEPFLAME_REPORT__ = report;
+  // Feature and platform state lives in DepflameFeatures and outlives a single
+  // test, so reset it here rather than leaking a selection into the next test.
+  DepflameFeatures.setPlatform(DepflameFeatures.hostPlatform(report.dep_tree));
+  DepflameSimulate.clear();
   DepflameSimulate.init();
 }
 
@@ -451,4 +455,82 @@ test('a feature toggle re-sorts, so an added crate lands in order', function() {
   DepflameContent.toggleWorkspaceFeature(nodeIndex('my-app'), 'remote', true);
   assertContains(rowOrder(tbody), 'remote-lib');
   DepflameContent.resetWorkspaceFeatures();
+});
+
+// ---------------------------------------------------------------------------
+// Platform selector.
+// ---------------------------------------------------------------------------
+
+test('the table tab offers every resolved platform plus "every target"', function() {
+  freshSim();
+  elements['app'] = new MockElement('div');
+  DepflameContent.init();
+  var html = elements['app']._innerHTML;
+  var controls = html.substring(html.indexOf('id="tab-table"'),
+                                html.indexOf('id="dep-summary-table"'));
+  assertContains(controls, 'id="platform-select"');
+  assertContains(controls, 'x86_64-unknown-linux-gnu (this machine)');
+  assertContains(controls, 'x86_64-pc-windows-msvc');
+  assertContains(controls, 'every target');
+});
+
+test('the host platform is selected by default and counts as unmodified', function() {
+  freshSim();
+  var tree = report.dep_tree;
+  assertEquals(DepflameFeatures.getPlatform(tree), 'x86_64-unknown-linux-gnu');
+  assert(DepflameFeatures.isHostPlatform(tree), 'host is the default view');
+});
+
+test('switching platform drops crates that do not build for the target', function() {
+  var tbody = tableHarness();
+  var tree = report.dep_tree;
+  var active = function() {
+    return DepflameFeatures.recomputeActiveGraph(tree).activeNodes;
+  };
+  assert(active()[nodeIndex('tiny-helper')], 'tiny-helper builds on the host');
+  assert(active()[nodeIndex('regex')], 'so does regex');
+
+  DepflameContent.selectPlatform('x86_64-pc-windows-msvc');
+  assert(!active()[nodeIndex('tiny-helper')], 'and not on windows');
+  assertContains(elements['sim-status'].textContent, 'x86_64-pc-windows-msvc');
+  // regex has a row in the summary, so it reads as off rather than vanishing —
+  // and says the target is the reason, not a feature.
+  assertContains(tbody._innerHTML, 'row-inactive');
+  assertContains(tbody._innerHTML, 'not built for x86_64-pc-windows-msvc');
+
+  DepflameContent.selectPlatform('x86_64-unknown-linux-gnu');
+  assert(active()[nodeIndex('tiny-helper')], 'switching back restores it');
+  assertEquals(elements['sim-status'].textContent, '', 'host view is not a modification');
+});
+
+test('"every target" shows the union and is reported as a modified view', function() {
+  var tbody = tableHarness();
+  var tree = report.dep_tree;
+  var count = function() {
+    var a = DepflameFeatures.recomputeActiveGraph(tree).activeNodes;
+    return Object.keys(a).length;
+  };
+  var host = count();
+  DepflameContent.selectPlatform('x86_64-pc-windows-msvc');
+  assert(count() < host, 'windows resolves fewer crates in the sample');
+
+  DepflameContent.selectPlatform('');
+  assertEquals(count(), host, 'the union matches the host here');
+  assertContains(elements['sim-status'].textContent, 'every target');
+
+  DepflameFeatures.resetAll();
+  assert(DepflameFeatures.isHostPlatform(tree), 'reset all returns to the host platform');
+});
+
+test('platform selection composes with removals', function() {
+  var tbody = tableHarness();
+  DepflameContent.toggleRemoval(nodeIndex('heavy-framework'));
+  DepflameContent.selectPlatform('x86_64-pc-windows-msvc');
+
+  var status = elements['sim-status'].textContent;
+  assertContains(status, 'x86_64-pc-windows-msvc');
+  assertContains(status, '1 removed');
+  assertContains(tbody._innerHTML, 'row-removed');
+
+  DepflameFeatures.resetAll();
 });

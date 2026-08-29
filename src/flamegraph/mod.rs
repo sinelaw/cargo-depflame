@@ -14,6 +14,20 @@ pub struct DepTreeData {
     /// Per-edge metadata for feature gating.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub edges: Vec<DepTreeEdge>,
+    /// Which nodes resolve for each target platform, so the report can be
+    /// switched between platforms without re-running the analysis.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub platforms: Vec<PlatformMask>,
+}
+
+/// The set of tree nodes that resolve for one target triple.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlatformMask {
+    pub triple: String,
+    /// True for the platform the analysis ran on — the report's own numbers.
+    pub is_host: bool,
+    /// Indices into `DepTreeData::nodes`.
+    pub nodes: Vec<usize>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,9 +78,18 @@ pub struct DepTreeEdge {
 // ---------------------------------------------------------------------------
 
 pub fn build_dep_tree(full_metadata: &Metadata, active_metadata: &Metadata) -> DepTreeData {
+    build_dep_tree_indexed(full_metadata, active_metadata).0
+}
+
+/// As [`build_dep_tree`], but also returns the package-id → node-index map,
+/// which callers need to translate per-platform resolves into node masks.
+pub fn build_dep_tree_indexed(
+    full_metadata: &Metadata,
+    active_metadata: &Metadata,
+) -> (DepTreeData, HashMap<PackageId, usize>) {
     let full_resolve = match full_metadata.resolve.as_ref() {
         Some(r) => r,
-        None => return DepTreeData::default(),
+        None => return (DepTreeData::default(), HashMap::new()),
     };
 
     // Active resolve: features the user actually has enabled.
@@ -295,9 +318,39 @@ pub fn build_dep_tree(full_metadata: &Metadata, active_metadata: &Metadata) -> D
         .collect();
     root_indices.sort_by(|&a, &b| nodes[b].transitive_weight.cmp(&nodes[a].transitive_weight));
 
-    DepTreeData {
-        nodes,
-        root_indices,
-        edges,
-    }
+    (
+        DepTreeData {
+            nodes,
+            root_indices,
+            edges,
+            platforms: Vec::new(),
+        },
+        id_to_idx,
+    )
+}
+
+/// Translate per-platform package resolves into node masks on the tree.
+/// Packages the tree doesn't contain (it is built from the all-features
+/// resolve, so this should be none) are ignored.
+pub fn attach_platform_masks(
+    tree: &mut DepTreeData,
+    resolves: &[crate::platform::PlatformResolve],
+    id_to_idx: &HashMap<PackageId, usize>,
+) {
+    tree.platforms = resolves
+        .iter()
+        .map(|resolve| {
+            let mut nodes: Vec<usize> = resolve
+                .packages
+                .iter()
+                .filter_map(|id| id_to_idx.get(id).copied())
+                .collect();
+            nodes.sort_unstable();
+            PlatformMask {
+                triple: resolve.triple.clone(),
+                is_host: resolve.is_host,
+                nodes,
+            }
+        })
+        .collect();
 }

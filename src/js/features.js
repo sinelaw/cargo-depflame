@@ -13,9 +13,67 @@ var DepflameFeatures = (function() {
   var originalWeights = null;
   var originalTotalDeps = 0;
 
+  // Target triple the report is being viewed as. undefined = not chosen yet
+  // (falls back to the host, matching the numbers the analysis produced);
+  // null = no platform filter, i.e. the union of every target.
+  var platformTriple;
+
   // -------------------------------------------------------------------------
   // Feature resolution engine.
   // -------------------------------------------------------------------------
+
+  // -------------------------------------------------------------------------
+  // Target platform.
+  //
+  // The masks come from `cargo metadata --filter-platform`, so cargo evaluated
+  // the cfg() expressions — switching platforms here is exact, not a guess.
+  // -------------------------------------------------------------------------
+
+  function platformList(treeData) {
+    return (treeData && treeData.platforms) || [];
+  }
+
+  function hostPlatform(treeData) {
+    var list = platformList(treeData);
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].is_host) return list[i].triple;
+    }
+    return list.length > 0 ? list[0].triple : null;
+  }
+
+  function setPlatform(triple) {
+    platformTriple = triple || null;
+  }
+
+  function getPlatform(treeData) {
+    if (platformTriple === undefined) platformTriple = hostPlatform(treeData);
+    return platformTriple;
+  }
+
+  // True when the view is the platform the analysis ran on.
+  function isHostPlatform(treeData) {
+    return getPlatform(treeData) === hostPlatform(treeData);
+  }
+
+  // {nodeIdx: true} for the selected platform, or null for no filtering.
+  function platformNodeSet(treeData) {
+    var triple = getPlatform(treeData);
+    if (!triple) return null;
+    var list = platformList(treeData);
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].triple !== triple) continue;
+      var set = {};
+      for (var j = 0; j < list[i].nodes.length; j++) set[list[i].nodes[j]] = true;
+      return set;
+    }
+    return null;
+  }
+
+  // Does this node build for the selected target?
+  function isInPlatform(treeData, nodeIdx) {
+    var allowed = platformNodeSet(treeData);
+    return allowed ? !!allowed[nodeIdx] : true;
+  }
 
   // Build a lookup: edge key "from:to" -> edge info.
   function buildEdgeMap(treeData) {
@@ -152,6 +210,14 @@ var DepflameFeatures = (function() {
     if (cutEdges) {
       for (var key in cutEdges) {
         delete activeEdges[key];
+      }
+    }
+
+    // Step 2c: drop edges into crates that don't build for the selected target.
+    var allowed = platformNodeSet(treeData);
+    if (allowed) {
+      for (var key in activeEdges) {
+        if (!allowed[parseInt(key.split(':')[1], 10)]) delete activeEdges[key];
       }
     }
 
@@ -808,6 +874,7 @@ var DepflameFeatures = (function() {
     // clears simulated removals too — the Table tab's own Reset is the one
     // that clears removals while keeping the feature selection.
     if (typeof DepflameSimulate !== 'undefined') DepflameSimulate.clear();
+    platformTriple = hostPlatform(treeData);
 
     resetWeights(treeData);
     Depflame.rerender(null);
@@ -937,6 +1004,12 @@ var DepflameFeatures = (function() {
     applyAndRerender: applyAndRerender,
     setNodeFeatures: setNodeFeatures,
     getNodeFeatures: getNodeFeatures,
-    hasFeatureOverrides: hasFeatureOverrides
+    hasFeatureOverrides: hasFeatureOverrides,
+    platformList: platformList,
+    hostPlatform: hostPlatform,
+    setPlatform: setPlatform,
+    getPlatform: getPlatform,
+    isHostPlatform: isHostPlatform,
+    isInPlatform: isInPlatform
   };
 })();

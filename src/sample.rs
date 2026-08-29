@@ -7,7 +7,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::flamegraph::{DepTreeData, DepTreeEdge, DepTreeNode};
+use crate::flamegraph::{DepTreeData, DepTreeEdge, DepTreeNode, PlatformMask};
 use crate::graph::EdgeMeta;
 use crate::metrics::{Confidence, PackageInfo, RemovalStrategy, UpstreamTarget};
 use crate::report::{
@@ -451,6 +451,27 @@ fn sample_targets() -> Vec<UpstreamTarget> {
 ///  15: remote-lib                children: [16, 17]  (optional, not currently enabled)
 ///  16: remote-sub-a              children: []
 ///  17: remote-sub-b              children: []
+/// Two platforms that differ, so the report's platform selector has something
+/// to switch between. The host resolves everything; regex (which has a row in
+/// the direct-dep summary) and tiny-helper (which doesn't) stand in for
+/// unix-only crates and drop out on Windows.
+fn sample_platforms(node_count: usize) -> Vec<PlatformMask> {
+    let all: Vec<usize> = (0..node_count).collect();
+    let windows: Vec<usize> = all.iter().copied().filter(|i| *i != 5 && *i != 6).collect();
+    vec![
+        PlatformMask {
+            triple: "x86_64-unknown-linux-gnu".into(),
+            is_host: true,
+            nodes: all,
+        },
+        PlatformMask {
+            triple: "x86_64-pc-windows-msvc".into(),
+            is_host: false,
+            nodes: windows,
+        },
+    ]
+}
+
 fn sample_dep_tree() -> DepTreeData {
     let nodes = vec![
         // 0: my-app — "remote" feature gates remote-lib (not enabled by default)
@@ -793,10 +814,13 @@ fn sample_dep_tree() -> DepTreeData {
         },
     ];
 
+    let platforms = sample_platforms(nodes.len());
+
     DepTreeData {
         nodes,
         root_indices: vec![0, 1],
         edges,
+        platforms,
     }
 }
 
