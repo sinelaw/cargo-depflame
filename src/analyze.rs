@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use rayon::prelude::*;
+use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::path::PathBuf;
 use tracing::{debug, info, info_span, warn};
@@ -940,8 +941,8 @@ fn merge_unused(
 ) -> Vec<UpstreamTarget> {
     let (mut impactful, mut cosmetic): (Vec<_>, Vec<_>) =
         unused_deps.into_iter().partition(|t| t.w_unique > 0);
-    impactful.sort_by(|a, b| b.w_unique.cmp(&a.w_unique));
-    cosmetic.sort_by(|a, b| b.w_transitive.cmp(&a.w_transitive));
+    impactful.sort_by_key(|t| Reverse(t.w_unique));
+    cosmetic.sort_by_key(|t| Reverse(t.w_transitive));
     for t in &mut cosmetic {
         // Deps with explicit features that save no unique deps are likely
         // kept for feature unification — demote to Noise.
@@ -1036,7 +1037,7 @@ pub(crate) fn build_direct_dep_summary(
     }
 
     let mut entries: Vec<DirectDepSummary> = best.into_values().collect();
-    entries.sort_by(|a, b| b.unique_transitive_deps.cmp(&a.unique_transitive_deps));
+    entries.sort_by_key(|e| Reverse(e.unique_transitive_deps));
     entries
 }
 
