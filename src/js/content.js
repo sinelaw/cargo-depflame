@@ -182,7 +182,12 @@ var DepflameContent = (function() {
       +   '</div>'
       + '</div>'
       + '<table class="targets-table dep-summary-table" id="dep-summary-table"><thead><tr>'
-      + '<th title="Only direct dependencies of a workspace member can be removed.">Remove</th>'
+      + '<th title="Remove every dependency, then none, then back to your own selection.">'
+      +   '<label class="sim-select-all">'
+      +     '<input type="checkbox" id="sim-select-all-box" '
+      +     'onchange="DepflameContent.cycleRemoveAll()"> Remove'
+      +   '</label>'
+      + '</th>'
       + '<th class="sortable" data-sort-key="#">#</th>'
       + '<th class="sortable" data-sort-key="dep_name">Dependency</th>'
       + '<th class="sortable" data-sort-key="dep_version">Version</th>'
@@ -605,16 +610,56 @@ var DepflameContent = (function() {
   // Removal simulator (Table tab).
   // -------------------------------------------------------------------------
 
+  // Where the header checkbox is in its cycle: null means the selection is the
+  // user's own, so the next click starts the cycle over.
+  var bulkPhase = null;
+  // What was ticked before the cycle took over, to hand back at the end of it.
+  var lastCustomRemovals = null;
+
+  function removableIndices() {
+    if (typeof DepflameSimulate === 'undefined') return [];
+    var base = DepflameSimulate.baseline();
+    return base ? base.direct.slice() : [];
+  }
+
+  // Cycle: everything -> nothing -> the selection you had before. With no
+  // selection of your own to return to, it just alternates all/none.
+  function cycleRemoveAll() {
+    if (typeof DepflameSimulate === 'undefined') return;
+
+    if (bulkPhase === null) {
+      lastCustomRemovals = DepflameSimulate.removedIndices();
+      DepflameSimulate.setRemoved(removableIndices());
+      bulkPhase = 'all';
+    } else if (bulkPhase === 'all') {
+      DepflameSimulate.setRemoved([]);
+      bulkPhase = 'none';
+    } else if (lastCustomRemovals && lastCustomRemovals.length > 0) {
+      DepflameSimulate.setRemoved(lastCustomRemovals);
+      bulkPhase = null;
+    } else {
+      DepflameSimulate.setRemoved(removableIndices());
+      bulkPhase = 'all';
+    }
+
+    invalidateOrder();
+    applyGraphChange();
+  }
+
   function toggleRemoval(idx) {
     if (typeof DepflameSimulate === 'undefined') return;
     if (idx < 0) return;
     DepflameSimulate.toggle(idx);
+    // Ticking a row by hand makes this the selection the cycle returns to.
+    bulkPhase = null;
     applyGraphChange();
   }
 
   function resetRemovals() {
     if (typeof DepflameSimulate === 'undefined') return;
     DepflameSimulate.clear();
+    bulkPhase = null;
+    lastCustomRemovals = null;
     applyGraphChange();
   }
 
@@ -639,6 +684,8 @@ var DepflameContent = (function() {
     var status = document.getElementById('sim-status');
     if (status) status.textContent = statusText(sim);
 
+    updateSelectAll();
+
     // Kept in the layout at all times so the row doesn't jump when it appears.
     var reset = document.getElementById('sim-reset');
     if (reset) {
@@ -646,6 +693,17 @@ var DepflameContent = (function() {
         (typeof DepflameSimulate !== 'undefined' && DepflameSimulate.hasRemovals())
           ? 'visible' : 'hidden';
     }
+  }
+
+  // Checked when everything is removed, indeterminate for a partial selection —
+  // the usual three states of a select-all box.
+  function updateSelectAll() {
+    var box = document.getElementById('sim-select-all-box');
+    if (!box || typeof DepflameSimulate === 'undefined') return;
+    var total = removableIndices().length;
+    var removed = DepflameSimulate.removedIndices().length;
+    box.checked = total > 0 && removed === total;
+    box.indeterminate = removed > 0 && removed < total;
   }
 
   // Always on: "71 direct + 335 transitive = 406 crates", with the platform,
@@ -1343,6 +1401,7 @@ var DepflameContent = (function() {
     sortSharing: sortSharing,
     sortDepSummary: sortDepSummary,
     toggleRemoval: toggleRemoval,
+    cycleRemoveAll: cycleRemoveAll,
     resetRemovals: resetRemovals,
     selectPlatform: selectPlatform,
     toggleWorkspaceFeature: toggleWorkspaceFeature,
