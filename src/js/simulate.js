@@ -240,6 +240,14 @@ var DepflameSimulate = (function() {
     return !!removed[idx];
   }
 
+  // Replace the removal set outright — used by the header's select-all.
+  function setRemoved(indices) {
+    removed = {};
+    for (var i = 0; i < (indices || []).length; i++) {
+      removed[parseInt(indices[i], 10)] = true;
+    }
+  }
+
   function isRemoved(idx) {
     return !!removed[parseInt(idx, 10)];
   }
@@ -265,6 +273,7 @@ var DepflameSimulate = (function() {
     indexFor: indexFor,
     cutEdges: cutEdges,
     toggle: toggle,
+    setRemoved: setRemoved,
     isRemoved: isRemoved,
     removedIndices: removedIndices,
     hasRemovals: hasRemovals,

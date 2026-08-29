@@ -78,6 +78,8 @@ Feature state comes from what cargo actually builds (`cargo tree -f "{f}"`), not
 
 In the HTML report's **Table** tab, each direct dependency has a `Remove` checkbox. Tick one and the table recomputes, live: every other direct dep's unique transitive dep count and owner count update, and the header shows what the graph costs. That header is always on — `71 direct + 335 transitive = 406 crates` — and gains the delta as you toggle (`6 removed — 65 direct + 170 transitive = 235 crates (−171)`). The flamegraph follows — the removed crate and everything only it pulled in disappear from the chart, and the summary bar shows the new dep count.
 
+The checkbox in the `Remove` header selects all of them, clicks again to none, and a third time hands back the selection you had — with the usual indeterminate state while only some rows are ticked.
+
 Only direct dependencies of a workspace member can be removed — a crate that is merely transitive has its checkbox disabled, since dropping it isn't yours to make.
 
 The interesting cases are the ones that save nothing. Removing a dep that another dep also pulls in leaves it in the graph, and the row says so (`still pulled in by tracing-subscriber`) while the crate that now solely owns that subtree absorbs it (its unique count jumps).

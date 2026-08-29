@@ -824,6 +824,14 @@ body {
   font-weight: 600;
 }
 
+.sim-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 .sim-box { cursor: pointer; }
 .sim-box:disabled { cursor: not-allowed; opacity: 0.35; }
 

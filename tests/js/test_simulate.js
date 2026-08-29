@@ -127,7 +127,8 @@ test('table tab renders a checkbox per row', function() {
   var table = html.substring(html.indexOf('id="dep-summary-table"'), html.indexOf('id="tab-sharing"'));
   assertContains(table, 'class="sim-box"');
   assertContains(table, 'DepflameContent.toggleRemoval(');
-  assertContains(table, '>Remove<');
+  assertContains(table, 'id="sim-select-all-box"');
+  assertContains(table, 'Remove</label>');
   assert(table.indexOf('disabled') === -1,
     'every sample row is a direct dep, so no checkbox is disabled');
 });
@@ -607,4 +608,98 @@ test('the counts are on screen from the start, with nothing clicked', function()
 
   assertEquals(elements['sim-status'].textContent, BASELINE_STATUS);
   assertContains(elements['dep-summary-tbody']._innerHTML, 'heavy-framework');
+});
+
+// ---------------------------------------------------------------------------
+// Select-all in the Remove header.
+// ---------------------------------------------------------------------------
+
+function removedNames() {
+  var tree = window.__DEPFLAME_DATA__ || report.dep_tree;
+  return DepflameSimulate.removedIndices()
+    .map(function(i) { return tree.nodes[i].name; })
+    .sort()
+    .join(',');
+}
+
+test('the header checkbox cycles all -> none -> your own selection', function() {
+  var tbody = tableHarness();
+  var everything = DepflameSimulate.baseline().direct.length;
+
+  // A selection of the user's own.
+  DepflameContent.toggleRemoval(nodeIndex('serde'));
+  DepflameContent.toggleRemoval(nodeIndex('regex'));
+  assertEquals(removedNames(), 'regex,serde');
+
+  DepflameContent.cycleRemoveAll();
+  assertEquals(DepflameSimulate.removedIndices().length, everything, 'first click removes everything');
+  assertContains(elements['sim-status'].textContent, everything + ' removed');
+
+  DepflameContent.cycleRemoveAll();
+  assertEquals(DepflameSimulate.removedIndices().length, 0, 'second click removes nothing');
+
+  DepflameContent.cycleRemoveAll();
+  assertEquals(removedNames(), 'regex,serde', 'third click hands back the selection');
+
+  DepflameContent.resetRemovals();
+});
+
+test('with no selection of your own the header just alternates all and none', function() {
+  tableHarness();
+  var everything = DepflameSimulate.baseline().direct.length;
+
+  DepflameContent.cycleRemoveAll();
+  assertEquals(DepflameSimulate.removedIndices().length, everything);
+  DepflameContent.cycleRemoveAll();
+  assertEquals(DepflameSimulate.removedIndices().length, 0);
+  DepflameContent.cycleRemoveAll();
+  assertEquals(DepflameSimulate.removedIndices().length, everything,
+    'nothing to return to, so it goes back to all');
+
+  DepflameContent.resetRemovals();
+});
+
+test('ticking a row by hand becomes the selection the cycle returns to', function() {
+  tableHarness();
+  DepflameContent.cycleRemoveAll();          // all
+  DepflameContent.toggleRemoval(nodeIndex('serde'));  // hand-edited from here
+  var mine = removedNames();
+
+  DepflameContent.cycleRemoveAll();          // restarts: all
+  assertEquals(DepflameSimulate.removedIndices().length,
+    DepflameSimulate.baseline().direct.length);
+  DepflameContent.cycleRemoveAll();          // none
+  DepflameContent.cycleRemoveAll();          // back to the hand-edited set
+  assertEquals(removedNames(), mine);
+
+  DepflameContent.resetRemovals();
+});
+
+test('the header checkbox shows all, none and partial states', function() {
+  tableHarness();
+  var box = elements['sim-select-all-box'];
+
+  assertEquals(box.checked, false, 'nothing removed');
+  assertEquals(box.indeterminate, false);
+
+  DepflameContent.toggleRemoval(nodeIndex('serde'));
+  assertEquals(box.checked, false);
+  assertEquals(box.indeterminate, true, 'a partial selection is indeterminate');
+
+  DepflameContent.cycleRemoveAll();
+  assertEquals(box.checked, true, 'everything removed');
+  assertEquals(box.indeterminate, false);
+
+  DepflameContent.resetRemovals();
+  assertEquals(box.checked, false);
+  assertEquals(box.indeterminate, false);
+});
+
+test('removing everything through the header empties the graph', function() {
+  tableHarness();
+  DepflameContent.cycleRemoveAll();
+  var sim = DepflameSimulate.current();
+  assertEquals(sim.totalDeps, 0, 'no crates survive when every direct dep goes');
+  assertEquals(sim.directCount, 0);
+  DepflameContent.resetRemovals();
 });
